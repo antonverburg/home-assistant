@@ -132,15 +132,14 @@ class Provider(ABC):
     @callback
     def check_metadata(self, metadata: SpeechMetadata) -> bool:
         """Check if given metadata supported by this provider."""
-        try:
-            assert metadata.lanugage in self.supported_languages
-            assert metadata.format in self.supported_formats
-            assert metadata.codec in self.supported_codecs
-            assert metadata.bitrate in self.supported_bitrates
-            assert metadata.samplerate in self.supported_samplerates
-        except AssertionError:
+        if (
+            metadata.lanugage not in self.supported_languages
+            or metadata.format not in self.supported_formats
+            or metadata.codec not in self.supported_codecs
+            or metadata.bitrate not in self.supported_bitrates
+            or metadata.samplerate not in self.supported_samplerates
+        ):
             return False
-
         return True
 
 
@@ -158,7 +157,7 @@ class SpeechToTextView(HomeAssistantView):
     def _metadat_from_header(self, request: web.Request) -> SpeechMetadata:
         """Extract metadata from header.
 
-        X-Speech-Content: format=audio/wav; codecs=audio/pcm; samplerate=16000; bitrate=16; language=de_de
+        X-Speech-Content: format=wav; codecs=pcm; samplerate=16000; bitrate=16; language=de_de
         """
         data = request.headers[istr("X-Speech-Content")].split(";")
         map(str.strip, data)
@@ -166,7 +165,7 @@ class SpeechToTextView(HomeAssistantView):
         # Convert Header data
         args = dict()
         for value in data:
-            args[value.partition("=")[0]] = value.partition("/")[2]
+            args[value.partition("=")[0]] = value.partition("=")[2]
 
         return SpeechMetadata(**args)
 
