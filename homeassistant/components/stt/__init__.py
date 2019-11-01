@@ -4,12 +4,12 @@ import asyncio
 import functools as ft
 import io
 import logging
-from typing import Optional, Dict, List
+from typing import Dict, List, Optional
 
-import attr
-from aiohttp import web, StreamReader
-from aiohttp.web_exceptions import HTTPNotFound, HTTPNotImplemented
+from aiohttp import StreamReader, web
 from aiohttp.hdrs import istr
+from aiohttp.web_exceptions import HTTPNotFound, HTTPNotImplemented
+import attr
 import voluptuous as vol
 
 from homeassistant.components.http import HomeAssistantView
@@ -22,9 +22,9 @@ from homeassistant.setup import async_prepare_setup_platform
 
 from .const import (
     DOMAIN,
+    AudioBitrates,
     AudioCodecs,
     AudioFormats,
-    AudioBitrates,
     AudioSamplerates,
     SpeechResultState,
 )
@@ -203,4 +203,3 @@ class SpeechToTextView(HomeAssistantView):
                 "bitrates": stt_provider.supported_bitrates,
             }
         )
-
