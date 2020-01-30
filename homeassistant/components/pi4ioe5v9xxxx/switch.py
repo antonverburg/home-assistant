@@ -1,12 +1,12 @@
 """Allows to configure a switch using RPi GPIO."""
 import logging
+from pi4ioe5v9xxxx import pi4ioe5v9xxxx  # pylint: disable=import-error
 import voluptuous as vol
-from pi4ioe5v9xxxx import pi4ioe5v9xxxx   # pylint: disable=import-error
 
 from homeassistant.components.switch import PLATFORM_SCHEMA
 from homeassistant.const import DEVICE_DEFAULT_NAME
-from homeassistant.helpers.entity import ToggleEntity
 import homeassistant.helpers.config_validation as cv
+from homeassistant.helpers.entity import ToggleEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -39,7 +39,13 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     pins = config.get(CONF_PINS)
     switches = []
 
-    pi4ioe5v9xxxx.setup(i2c_bus=config[CONF_I2CBUS], i2c_addr=config[CONF_I2CADDR], bits=config[CONF_BITS], read_mode=False, invert=False)
+    pi4ioe5v9xxxx.setup(
+        i2c_bus=config[CONF_I2CBUS],
+        i2c_addr=config[CONF_I2CADDR],
+        bits=config[CONF_BITS],
+        read_mode=False,
+        invert=False,
+    )
     for pin, name in pins.items():
         switches.append(Pi4ioe5v9Switch(name, pin, config[CONF_INVERT_LOGIC]))
     add_entities(switches)
