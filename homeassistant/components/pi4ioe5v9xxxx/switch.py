@@ -1,5 +1,6 @@
 """Allows to configure a switch using RPi GPIO."""
 import logging
+
 from pi4ioe5v9xxxx import pi4ioe5v9xxxx  # pylint: disable=import-error
 import voluptuous as vol
 
