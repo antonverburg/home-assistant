@@ -960,6 +960,9 @@ pencompy==0.0.3
 # homeassistant.components.unifi_direct
 pexpect==4.6.0
 
+# homeassistant.components.pi4ioe5v9xxxx
+pi4ioe5v9xxxx==0.0.2
+
 # homeassistant.components.rpi_pfio
 pifacecommon==4.2.2
 
@@ -1806,9 +1809,6 @@ smarthab==0.20
 # homeassistant.components.htu21d
 # homeassistant.components.raspihats
 # smbus-cffi==0.5.1
-
-# homeassistant.components.pi4ioe5v9xxxx
-pi4ioe5v9xxxx==0.0.2
 
 # homeassistant.components.smhi
 smhi-pkg==1.0.10
