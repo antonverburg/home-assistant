@@ -1,21 +1,21 @@
 """Support for the World Air Quality Index service."""
 import asyncio
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
 import aiohttp
 import voluptuous as vol
 from waqiasync import WaqiClient
 
+from homeassistant.exceptions import PlatformNotReady
+import homeassistant.helpers.config_validation as cv
 from homeassistant.const import (
     ATTR_ATTRIBUTION,
-    ATTR_TEMPERATURE,
     ATTR_TIME,
+    ATTR_TEMPERATURE,
     CONF_TOKEN,
 )
-from homeassistant.exceptions import PlatformNotReady
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.config_validation import PLATFORM_SCHEMA
 from homeassistant.helpers.entity import Entity
 

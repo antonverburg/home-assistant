@@ -18,8 +18,6 @@ class FbxSensor(Entity):
     """Representation of a freebox sensor."""
 
     _name = "generic"
-    _unit = None
-    _icon = None
 
     def __init__(self, fbx):
         """Initialize the sensor."""
@@ -31,16 +29,6 @@ class FbxSensor(Entity):
     def name(self):
         """Return the name of the sensor."""
         return self._name
-
-    @property
-    def unit_of_measurement(self):
-        """Return the unit of the sensor."""
-        return self._unit
-
-    @property
-    def icon(self):
-        """Return the icon of the sensor."""
-        return self._icon
 
     @property
     def state(self):
@@ -57,7 +45,11 @@ class FbxRXSensor(FbxSensor):
 
     _name = "Freebox download speed"
     _unit = "KB/s"
-    _icon = "mdi:download-network"
+
+    @property
+    def unit_of_measurement(self):
+        """Define the unit."""
+        return self._unit
 
     async def async_update(self):
         """Get the value from fetched datas."""
@@ -71,7 +63,11 @@ class FbxTXSensor(FbxSensor):
 
     _name = "Freebox upload speed"
     _unit = "KB/s"
-    _icon = "mdi:upload-network"
+
+    @property
+    def unit_of_measurement(self):
+        """Define the unit."""
+        return self._unit
 
     async def async_update(self):
         """Get the value from fetched datas."""

@@ -1,14 +1,9 @@
 """Support for HomematicIP Cloud alarm control panel."""
 import logging
-from typing import Any, Dict
 
 from homematicip.functionalHomes import SecurityAndAlarmHome
 
 from homeassistant.components.alarm_control_panel import AlarmControlPanel
-from homeassistant.components.alarm_control_panel.const import (
-    SUPPORT_ALARM_ARM_AWAY,
-    SUPPORT_ALARM_ARM_HOME,
-)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     STATE_ALARM_ARMED_AWAY,
@@ -26,9 +21,7 @@ _LOGGER = logging.getLogger(__name__)
 CONST_ALARM_CONTROL_PANEL_NAME = "HmIP Alarm Control Panel"
 
 
-async def async_setup_platform(
-    hass, config, async_add_entities, discovery_info=None
-) -> None:
+async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the HomematicIP Cloud alarm control devices."""
     pass
 
@@ -47,10 +40,9 @@ class HomematicipAlarmControlPanel(AlarmControlPanel):
     def __init__(self, hap: HomematicipHAP) -> None:
         """Initialize the alarm control panel."""
         self._home = hap.home
-        _LOGGER.info("Setting up %s", self.name)
 
     @property
-    def device_info(self) -> Dict[str, Any]:
+    def device_info(self):
         """Return device specific attributes."""
         return {
             "identifiers": {(HMIPC_DOMAIN, f"ACP {self._home.id}")},
@@ -78,31 +70,26 @@ class HomematicipAlarmControlPanel(AlarmControlPanel):
         return STATE_ALARM_DISARMED
 
     @property
-    def _security_and_alarm(self) -> SecurityAndAlarmHome:
+    def _security_and_alarm(self):
         return self._home.get_functionalHome(SecurityAndAlarmHome)
 
-    @property
-    def supported_features(self) -> int:
-        """Return the list of supported features."""
-        return SUPPORT_ALARM_ARM_HOME | SUPPORT_ALARM_ARM_AWAY
-
-    async def async_alarm_disarm(self, code=None) -> None:
+    async def async_alarm_disarm(self, code=None):
         """Send disarm command."""
         await self._home.set_security_zones_activation(False, False)
 
-    async def async_alarm_arm_home(self, code=None) -> None:
+    async def async_alarm_arm_home(self, code=None):
         """Send arm home command."""
         await self._home.set_security_zones_activation(False, True)
 
-    async def async_alarm_arm_away(self, code=None) -> None:
+    async def async_alarm_arm_away(self, code=None):
         """Send arm away command."""
         await self._home.set_security_zones_activation(True, True)
 
-    async def async_added_to_hass(self) -> None:
+    async def async_added_to_hass(self):
         """Register callbacks."""
         self._home.on_update(self._async_device_changed)
 
-    def _async_device_changed(self, *args, **kwargs) -> None:
+    def _async_device_changed(self, *args, **kwargs):
         """Handle device state changes."""
         _LOGGER.debug("Event %s (%s)", self.name, CONST_ALARM_CONTROL_PANEL_NAME)
         self.async_schedule_update_ha_state()

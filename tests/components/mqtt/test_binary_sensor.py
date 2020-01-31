@@ -1,6 +1,7 @@
 """The tests for the  MQTT binary sensor platform."""
 from datetime import datetime, timedelta
 import json
+
 from unittest.mock import ANY, patch
 
 from homeassistant.components import binary_sensor, mqtt
@@ -78,7 +79,7 @@ async def expires_helper(hass, mqtt_mock, caplog):
     """Run the basic expiry code."""
 
     now = datetime(2017, 1, 1, 1, tzinfo=dt_util.UTC)
-    with patch(("homeassistant.helpers.event.dt_util.utcnow"), return_value=now):
+    with patch(("homeassistant.helpers.event." "dt_util.utcnow"), return_value=now):
         async_fire_time_changed(hass, now)
         async_fire_mqtt_message(hass, "test-topic", "ON")
         await hass.async_block_till_done()
@@ -97,7 +98,7 @@ async def expires_helper(hass, mqtt_mock, caplog):
     assert state.state == STATE_ON
 
     # Next message resets timer
-    with patch(("homeassistant.helpers.event.dt_util.utcnow"), return_value=now):
+    with patch(("homeassistant.helpers.event." "dt_util.utcnow"), return_value=now):
         async_fire_time_changed(hass, now)
         async_fire_mqtt_message(hass, "test-topic", "OFF")
         await hass.async_block_till_done()

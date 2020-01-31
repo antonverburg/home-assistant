@@ -1,9 +1,13 @@
 {
   "domain": "soma",
-  "name": "Soma Connect",
+  "name": "Soma Open API",
   "config_flow": true,
   "documentation": "",
   "dependencies": [],
-  "codeowners": ["@ratsept"],
-  "requirements": ["pysoma==0.0.10"]
+  "codeowners": [
+    "@ratsept"
+  ],
+  "requirements": [
+    "pysoma==0.0.10"
+  ]
 }

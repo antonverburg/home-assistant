@@ -11,6 +11,7 @@ import logging
 
 from homeassistant.core import split_entity_id
 
+
 # mypy: allow-untyped-defs
 
 _LOGGER = logging.getLogger(__name__)

@@ -1,29 +1,48 @@
 """Support for LG WebOS TV notification service."""
-import asyncio
 import logging
 
-from aiopylgtv import PyLGTVCmdException, PyLGTVPairException
-from websockets.exceptions import ConnectionClosed
+import voluptuous as vol
 
-from homeassistant.components.notify import ATTR_DATA, BaseNotificationService
-from homeassistant.const import CONF_HOST, CONF_ICON
-
-from . import DOMAIN
+import homeassistant.helpers.config_validation as cv
+from homeassistant.components.notify import (
+    ATTR_DATA,
+    BaseNotificationService,
+    PLATFORM_SCHEMA,
+)
+from homeassistant.const import CONF_FILENAME, CONF_HOST, CONF_ICON
 
 _LOGGER = logging.getLogger(__name__)
 
+WEBOSTV_CONFIG_FILE = "webostv.conf"
 
-async def async_get_service(hass, config, discovery_info=None):
+PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
+    {
+        vol.Required(CONF_HOST): cv.string,
+        vol.Optional(CONF_FILENAME, default=WEBOSTV_CONFIG_FILE): cv.string,
+        vol.Optional(CONF_ICON): cv.string,
+    }
+)
+
+
+def get_service(hass, config, discovery_info=None):
     """Return the notify service."""
+    from pylgtv import WebOsClient
+    from pylgtv import PyLGTVPairException
 
-    host = discovery_info.get(CONF_HOST)
-    icon_path = discovery_info.get(CONF_ICON)
+    path = hass.config.path(config.get(CONF_FILENAME))
+    client = WebOsClient(config.get(CONF_HOST), key_file_path=path, timeout_connect=8)
 
-    client = hass.data[DOMAIN][host]["client"]
+    if not client.is_registered():
+        try:
+            client.register()
+        except PyLGTVPairException:
+            _LOGGER.error("Pairing with TV failed")
+            return None
+        except OSError:
+            _LOGGER.error("TV unreachable")
+            return None
 
-    svc = LgWebOSNotificationService(client, icon_path)
-
-    return svc
+    return LgWebOSNotificationService(client, config.get(CONF_ICON))
 
 
 class LgWebOSNotificationService(BaseNotificationService):
@@ -34,27 +53,19 @@ class LgWebOSNotificationService(BaseNotificationService):
         self._client = client
         self._icon_path = icon_path
 
-    async def async_send_message(self, message="", **kwargs):
+    def send_message(self, message="", **kwargs):
         """Send a message to the tv."""
-        try:
-            if not self._client.is_connected():
-                await self._client.connect()
+        from pylgtv import PyLGTVPairException
 
+        try:
             data = kwargs.get(ATTR_DATA)
             icon_path = (
                 data.get(CONF_ICON, self._icon_path) if data else self._icon_path
             )
-            await self._client.send_message(message, icon_path=icon_path)
+            self._client.send_message(message, icon_path=icon_path)
         except PyLGTVPairException:
             _LOGGER.error("Pairing with TV failed")
         except FileNotFoundError:
             _LOGGER.error("Icon %s not found", icon_path)
-        except (
-            OSError,
-            ConnectionClosed,
-            ConnectionRefusedError,
-            asyncio.TimeoutError,
-            asyncio.CancelledError,
-            PyLGTVCmdException,
-        ):
+        except OSError:
             _LOGGER.error("TV unreachable")

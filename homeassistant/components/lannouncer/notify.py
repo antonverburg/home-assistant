@@ -5,13 +5,14 @@ from urllib.parse import urlencode
 
 import voluptuous as vol
 
+from homeassistant.const import CONF_HOST, CONF_PORT
+import homeassistant.helpers.config_validation as cv
+
 from homeassistant.components.notify import (
     ATTR_DATA,
     PLATFORM_SCHEMA,
     BaseNotificationService,
 )
-from homeassistant.const import CONF_HOST, CONF_PORT
-import homeassistant.helpers.config_validation as cv
 
 ATTR_METHOD = "method"
 ATTR_METHOD_DEFAULT = "speak"

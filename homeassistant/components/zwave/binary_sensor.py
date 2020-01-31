@@ -1,14 +1,12 @@
 """Support for Z-Wave binary sensors."""
-import datetime
 import logging
-
-from homeassistant.components.binary_sensor import DOMAIN, BinarySensorDevice
+import datetime
+import homeassistant.util.dt as dt_util
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.event import track_point_in_time
-import homeassistant.util.dt as dt_util
-
-from . import ZWaveDeviceEntity, workaround
+from homeassistant.components.binary_sensor import DOMAIN, BinarySensorDevice
+from . import workaround, ZWaveDeviceEntity
 from .const import COMMAND_CLASS_SENSOR_BINARY
 
 _LOGGER = logging.getLogger(__name__)

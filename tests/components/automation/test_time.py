@@ -4,16 +4,12 @@ from unittest.mock import patch
 
 import pytest
 
-import homeassistant.components.automation as automation
 from homeassistant.setup import async_setup_component
 import homeassistant.util.dt as dt_util
+import homeassistant.components.automation as automation
 
-from tests.common import (
-    assert_setup_component,
-    async_fire_time_changed,
-    async_mock_service,
-    mock_component,
-)
+from tests.common import async_fire_time_changed, assert_setup_component, mock_component
+from tests.common import async_mock_service
 
 
 @pytest.fixture
@@ -39,7 +35,7 @@ async def test_if_fires_using_at(hass, calls):
                 "action": {
                     "service": "test.automation",
                     "data_template": {
-                        "some": "{{ trigger.platform }} - {{ trigger.now.hour }}"
+                        "some": "{{ trigger.platform }} - " "{{ trigger.now.hour }}"
                     },
                 },
             }

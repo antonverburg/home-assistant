@@ -2,9 +2,11 @@
 from unittest.mock import Mock, patch
 
 from homeassistant.components import unifi
+
 from homeassistant.setup import async_setup_component
 
-from tests.common import MockConfigEntry, mock_coro
+
+from tests.common import mock_coro, MockConfigEntry
 
 
 async def test_setup_with_no_config(hass):

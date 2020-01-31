@@ -1,11 +1,10 @@
 """Support for the Skybell HD Doorbell."""
 import logging
 
-from requests.exceptions import ConnectTimeout, HTTPError
-from skybellpy import Skybell
+from requests.exceptions import HTTPError, ConnectTimeout
 import voluptuous as vol
 
-from homeassistant.const import ATTR_ATTRIBUTION, CONF_PASSWORD, CONF_USERNAME
+from homeassistant.const import ATTR_ATTRIBUTION, CONF_USERNAME, CONF_PASSWORD
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity
 
@@ -40,6 +39,8 @@ def setup(hass, config):
     password = conf.get(CONF_PASSWORD)
 
     try:
+        from skybellpy import Skybell
+
         cache = hass.config.path(DEFAULT_CACHEDB)
         skybell = Skybell(
             username=username, password=password, get_devices=True, cache_path=cache

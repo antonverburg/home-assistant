@@ -1,7 +1,7 @@
 """Time-based One Time Password auth module."""
 import asyncio
-from io import BytesIO
 import logging
+from io import BytesIO
 from typing import Any, Dict, Optional, Tuple
 
 import voluptuous as vol
@@ -10,9 +10,9 @@ from homeassistant.auth.models import User
 from homeassistant.core import HomeAssistant
 
 from . import (
-    MULTI_FACTOR_AUTH_MODULE_SCHEMA,
-    MULTI_FACTOR_AUTH_MODULES,
     MultiFactorAuthModule,
+    MULTI_FACTOR_AUTH_MODULES,
+    MULTI_FACTOR_AUTH_MODULE_SCHEMA,
     SetupFlow,
 )
 

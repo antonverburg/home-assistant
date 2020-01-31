@@ -1,12 +1,10 @@
 """Support for Z-Wave sensors."""
 import logging
-
-from homeassistant.components.sensor import DEVICE_CLASS_BATTERY, DOMAIN
-from homeassistant.const import TEMP_CELSIUS, TEMP_FAHRENHEIT
 from homeassistant.core import callback
+from homeassistant.components.sensor import DOMAIN, DEVICE_CLASS_BATTERY
+from homeassistant.const import TEMP_CELSIUS, TEMP_FAHRENHEIT
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
-
-from . import ZWaveDeviceEntity, const
+from . import const, ZWaveDeviceEntity
 
 _LOGGER = logging.getLogger(__name__)
 

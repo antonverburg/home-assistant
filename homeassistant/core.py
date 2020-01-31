@@ -14,61 +14,68 @@ import os
 import pathlib
 import threading
 from time import monotonic
+import uuid
+
 from types import MappingProxyType
 from typing import (
-    TYPE_CHECKING,
-    Any,
-    Awaitable,
-    Callable,
-    Coroutine,
-    Dict,
-    List,
-    Mapping,
     Optional,
-    Set,
+    Any,
+    Callable,
+    List,
     TypeVar,
+    Dict,
+    Coroutine,
+    Set,
+    TYPE_CHECKING,
+    Awaitable,
+    Mapping,
 )
-import uuid
 
 from async_timeout import timeout
 import attr
 import voluptuous as vol
 
-from homeassistant import loader, util
 from homeassistant.const import (
     ATTR_DOMAIN,
     ATTR_FRIENDLY_NAME,
     ATTR_NOW,
-    ATTR_SECONDS,
     ATTR_SERVICE,
     ATTR_SERVICE_DATA,
+    ATTR_SECONDS,
     CONF_UNIT_SYSTEM_IMPERIAL,
     EVENT_CALL_SERVICE,
     EVENT_CORE_CONFIG_UPDATE,
-    EVENT_HOMEASSISTANT_CLOSE,
     EVENT_HOMEASSISTANT_START,
     EVENT_HOMEASSISTANT_STOP,
-    EVENT_SERVICE_REGISTERED,
+    EVENT_HOMEASSISTANT_CLOSE,
     EVENT_SERVICE_REMOVED,
+    EVENT_SERVICE_REGISTERED,
     EVENT_STATE_CHANGED,
     EVENT_TIME_CHANGED,
     EVENT_TIMER_OUT_OF_SYNC,
     MATCH_ALL,
     __version__,
 )
+from homeassistant import loader
 from homeassistant.exceptions import (
     HomeAssistantError,
     InvalidEntityFormatError,
     InvalidStateError,
-    ServiceNotFound,
     Unauthorized,
+    ServiceNotFound,
 )
-from homeassistant.util import location, slugify
-from homeassistant.util.async_ import fire_coroutine_threadsafe, run_callback_threadsafe
+from homeassistant.util.async_ import run_callback_threadsafe, fire_coroutine_threadsafe
+from homeassistant import util
 import homeassistant.util.dt as dt_util
-from homeassistant.util.unit_system import IMPERIAL_SYSTEM, METRIC_SYSTEM, UnitSystem
+from homeassistant.util import location, slugify
+from homeassistant.util.unit_system import (
+    UnitSystem,
+    IMPERIAL_SYSTEM,
+    METRIC_SYSTEM,
+)
 
 # Typing imports that create a circular dependency
+# pylint: disable=using-constant-test
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntries
     from homeassistant.components.http import HomeAssistantHTTP
@@ -192,7 +199,7 @@ class HomeAssistant:
         return self.state in (CoreState.starting, CoreState.running)
 
     def start(self) -> int:
-        """Start Home Assistant.
+        """Start home assistant.
 
         Note: This function is only used for testing.
         For regular use, use "await hass.run()".
@@ -217,7 +224,7 @@ class HomeAssistant:
         This method is a coroutine.
         """
         if self.state != CoreState.not_running:
-            raise RuntimeError("Home Assistant is already running")
+            raise RuntimeError("HASS is already running")
 
         # _async_stop will set this instead of stopping the loop
         self._stopped = asyncio.Event()
@@ -712,14 +719,18 @@ class State:
 
         if not valid_entity_id(entity_id) and not temp_invalid_id_bypass:
             raise InvalidEntityFormatError(
-                f"Invalid entity id encountered: {entity_id}. "
-                "Format should be <domain>.<object_id>"
+                (
+                    "Invalid entity id encountered: {}. "
+                    "Format should be <domain>.<object_id>"
+                ).format(entity_id)
             )
 
         if not valid_state(state):
             raise InvalidStateError(
-                f"Invalid state encountered for entity id: {entity_id}. "
-                "State max length is 255 characters."
+                (
+                    "Invalid state encountered for entity id: {}. "
+                    "State max length is 255 characters."
+                ).format(entity_id)
             )
 
         self.entity_id = entity_id.lower()
@@ -1030,7 +1041,9 @@ class ServiceCall:
                 self.domain, self.service, self.context.id, util.repr_helper(self.data)
             )
 
-        return f"<ServiceCall {self.domain}.{self.service} (c:{self.context.id})>"
+        return "<ServiceCall {}.{} (c:{})>".format(
+            self.domain, self.service, self.context.id
+        )
 
 
 class ServiceRegistry:
@@ -1127,9 +1140,6 @@ class ServiceRegistry:
             return
 
         self._services[domain].pop(service)
-
-        if not self._services[domain]:
-            self._services.pop(domain)
 
         self._hass.bus.async_fire(
             EVENT_SERVICE_REMOVED, {ATTR_DOMAIN: domain, ATTR_SERVICE: service}

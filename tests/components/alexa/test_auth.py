@@ -1,6 +1,5 @@
 """Test Alexa auth endpoints."""
 from homeassistant.components.alexa.auth import Auth
-
 from . import TEST_TOKEN_URL
 
 

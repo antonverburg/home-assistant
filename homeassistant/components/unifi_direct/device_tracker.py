@@ -1,17 +1,16 @@
 """Support for Unifi AP direct access."""
-import json
 import logging
+import json
 
-from pexpect import exceptions, pxssh
 import voluptuous as vol
 
+import homeassistant.helpers.config_validation as cv
 from homeassistant.components.device_tracker import (
     DOMAIN,
     PLATFORM_SCHEMA,
     DeviceScanner,
 )
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
-import homeassistant.helpers.config_validation as cv
+from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME, CONF_PORT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -75,6 +74,7 @@ class UnifiDeviceScanner(DeviceScanner):
 
     def _connect(self):
         """Connect to the Unifi AP SSH server."""
+        from pexpect import pxssh, exceptions
 
         self.ssh = pxssh.pxssh()
         try:
@@ -98,6 +98,7 @@ class UnifiDeviceScanner(DeviceScanner):
         self.connected = False
 
     def _get_update(self):
+        from pexpect import pxssh, exceptions
 
         try:
             if not self.connected:

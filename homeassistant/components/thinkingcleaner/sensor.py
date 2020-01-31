@@ -1,8 +1,6 @@
 """Support for ThinkingCleaner sensors."""
-from datetime import timedelta
 import logging
-
-from pythinkingcleaner import Discovery
+from datetime import timedelta
 
 from homeassistant import util
 from homeassistant.helpers.entity import Entity
@@ -48,6 +46,7 @@ STATES = {
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the ThinkingCleaner platform."""
+    from pythinkingcleaner import Discovery
 
     discovery = Discovery()
     devices = discovery.discover()

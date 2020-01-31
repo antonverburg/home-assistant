@@ -1,8 +1,10 @@
 {
   "domain": "syncthru",
-  "name": "Samsung SyncThru Printer",
+  "name": "Syncthru",
   "documentation": "https://www.home-assistant.io/integrations/syncthru",
-  "requirements": ["pysyncthru==0.5.0"],
+  "requirements": [
+    "pysyncthru==0.5.0"
+  ],
   "dependencies": [],
   "codeowners": ["@nielstron"]
 }

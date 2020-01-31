@@ -1,15 +1,13 @@
 """Support for Samsung Printers with SyncThru web interface."""
 
 import logging
-
-from pysyncthru import SyncThru
 import voluptuous as vol
 
-from homeassistant.components.sensor import PLATFORM_SCHEMA
-from homeassistant.const import CONF_HOST, CONF_NAME, CONF_RESOURCE
+from homeassistant.const import CONF_RESOURCE, CONF_HOST, CONF_NAME
 from homeassistant.helpers import aiohttp_client
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity
+import homeassistant.helpers.config_validation as cv
+from homeassistant.components.sensor import PLATFORM_SCHEMA
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,6 +33,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the SyncThru component."""
+    from pysyncthru import SyncThru
 
     if discovery_info is not None:
         _LOGGER.info(

@@ -1,7 +1,7 @@
 """Merging of policies."""
-from typing import Dict, List, Set, cast
+from typing import cast, Dict, List, Set
 
-from .types import CategoryType, PolicyType
+from .types import PolicyType, CategoryType
 
 
 def merge_policies(policies: List[PolicyType]) -> PolicyType:

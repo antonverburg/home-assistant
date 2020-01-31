@@ -1,3 +1,4 @@
+// See https://aka.ms/vscode-remote/devcontainer.json for format details.
 {
   "name": "Home Assistant Dev",
   "context": "..",

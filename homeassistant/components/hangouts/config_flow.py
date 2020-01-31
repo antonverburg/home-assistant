@@ -1,8 +1,7 @@
 """Config flow to configure Google Hangouts."""
 import functools
-
-from hangups import get_auth
 import voluptuous as vol
+
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
@@ -10,15 +9,9 @@ from homeassistant.core import callback
 
 from .const import (
     CONF_2FA,
-    CONF_AUTH_CODE,
     CONF_REFRESH_TOKEN,
+    CONF_AUTH_CODE,
     DOMAIN as HANGOUTS_DOMAIN,
-)
-from .hangups_utils import (
-    Google2FAError,
-    GoogleAuthError,
-    HangoutsCredentials,
-    HangoutsRefreshToken,
 )
 
 
@@ -51,6 +44,14 @@ class HangoutsFlowHandler(config_entries.ConfigFlow):
             return self.async_abort(reason="already_configured")
 
         if user_input is not None:
+            from hangups import get_auth
+            from .hangups_utils import (
+                HangoutsCredentials,
+                HangoutsRefreshToken,
+                GoogleAuthError,
+                Google2FAError,
+            )
+
             user_email = user_input[CONF_EMAIL]
             user_password = user_input[CONF_PASSWORD]
             user_auth_code = user_input.get(CONF_AUTH_CODE)
@@ -98,6 +99,9 @@ class HangoutsFlowHandler(config_entries.ConfigFlow):
         errors = {}
 
         if user_input is not None:
+            from hangups import get_auth
+            from .hangups_utils import GoogleAuthError
+
             self._credentials.set_verification_code(user_input[CONF_2FA])
             try:
                 await self.hass.async_add_executor_job(

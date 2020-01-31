@@ -1,24 +1,25 @@
 """The tests for the Group components."""
 # pylint: disable=protected-access
+import asyncio
 from collections import OrderedDict
 import unittest
 from unittest.mock import patch
 
-import homeassistant.components.group as group
+from homeassistant.setup import setup_component, async_setup_component
 from homeassistant.const import (
-    ATTR_ASSUMED_STATE,
-    ATTR_FRIENDLY_NAME,
-    ATTR_HIDDEN,
-    ATTR_ICON,
-    STATE_HOME,
-    STATE_NOT_HOME,
-    STATE_OFF,
     STATE_ON,
+    STATE_OFF,
+    STATE_HOME,
     STATE_UNKNOWN,
+    ATTR_ICON,
+    ATTR_HIDDEN,
+    ATTR_ASSUMED_STATE,
+    STATE_NOT_HOME,
+    ATTR_FRIENDLY_NAME,
 )
-from homeassistant.setup import async_setup_component, setup_component
+import homeassistant.components.group as group
 
-from tests.common import assert_setup_component, get_test_home_assistant
+from tests.common import get_test_home_assistant, assert_setup_component
 from tests.components.group import common
 
 
@@ -480,23 +481,25 @@ class TestComponentsGroup(unittest.TestCase):
         assert group_state.attributes.get(ATTR_FRIENDLY_NAME) == "friendly_name"
 
 
-async def test_service_group_services(hass):
+@asyncio.coroutine
+def test_service_group_services(hass):
     """Check if service are available."""
     with assert_setup_component(0, "group"):
-        await async_setup_component(hass, "group", {"group": {}})
+        yield from async_setup_component(hass, "group", {"group": {}})
 
     assert hass.services.has_service("group", group.SERVICE_SET)
     assert hass.services.has_service("group", group.SERVICE_REMOVE)
 
 
 # pylint: disable=invalid-name
-async def test_service_group_set_group_remove_group(hass):
+@asyncio.coroutine
+def test_service_group_set_group_remove_group(hass):
     """Check if service are available."""
     with assert_setup_component(0, "group"):
-        await async_setup_component(hass, "group", {"group": {}})
+        yield from async_setup_component(hass, "group", {"group": {}})
 
     common.async_set_group(hass, "user_test_group", name="Test")
-    await hass.async_block_till_done()
+    yield from hass.async_block_till_done()
 
     group_state = hass.states.get("group.user_test_group")
     assert group_state
@@ -510,7 +513,7 @@ async def test_service_group_set_group_remove_group(hass):
         visible=False,
         entity_ids=["test.entity_bla1"],
     )
-    await hass.async_block_till_done()
+    yield from hass.async_block_till_done()
 
     group_state = hass.states.get("group.user_test_group")
     assert group_state
@@ -528,7 +531,7 @@ async def test_service_group_set_group_remove_group(hass):
         control="hidden",
         add=["test.entity_id2"],
     )
-    await hass.async_block_till_done()
+    yield from hass.async_block_till_done()
 
     group_state = hass.states.get("group.user_test_group")
     assert group_state
@@ -543,7 +546,7 @@ async def test_service_group_set_group_remove_group(hass):
     )
 
     common.async_remove(hass, "user_test_group")
-    await hass.async_block_till_done()
+    yield from hass.async_block_till_done()
 
     group_state = hass.states.get("group.user_test_group")
     assert group_state is None

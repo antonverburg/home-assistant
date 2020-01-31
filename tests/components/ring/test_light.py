@@ -1,9 +1,7 @@
 """The tests for the Ring light platform."""
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-
-from .common import setup_platform
-
 from tests.common import load_fixture
+from .common import setup_platform
 
 
 async def test_entity_registry(hass, requests_mock):

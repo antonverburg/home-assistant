@@ -5,11 +5,12 @@ from typing import Any, Dict, Optional, cast
 
 import voluptuous as vol
 
-from homeassistant.core import callback
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.core import callback
 
-from . import AUTH_PROVIDER_SCHEMA, AUTH_PROVIDERS, AuthProvider, LoginFlow
+from . import AuthProvider, AUTH_PROVIDER_SCHEMA, AUTH_PROVIDERS, LoginFlow
 from ..models import Credentials, UserMeta
+
 
 USER_SCHEMA = vol.Schema(
     {

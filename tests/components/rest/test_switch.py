@@ -4,10 +4,9 @@ import asyncio
 import aiohttp
 
 import homeassistant.components.rest.switch as rest
-from homeassistant.helpers.template import Template
 from homeassistant.setup import setup_component
-
-from tests.common import assert_setup_component, get_test_home_assistant
+from homeassistant.helpers.template import Template
+from tests.common import get_test_home_assistant, assert_setup_component
 
 
 class TestRestSwitchSetup:

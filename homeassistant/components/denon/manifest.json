@@ -1,6 +1,6 @@
 {
   "domain": "denon",
-  "name": "Denon Network Receivers",
+  "name": "Denon",
   "documentation": "https://www.home-assistant.io/integrations/denon",
   "requirements": [],
   "dependencies": [],

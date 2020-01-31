@@ -1,8 +1,6 @@
 """Common utilities for VeSync Component."""
 import logging
-
 from homeassistant.helpers.entity import ToggleEntity
-
 from .const import VS_SWITCHES
 
 _LOGGER = logging.getLogger(__name__)

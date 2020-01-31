@@ -35,8 +35,7 @@
                 "data": {
                     "scan_interval": "Aktualisierungsfrequenz"
                 },
-                "description": "Konfigurieren von Optionen f\u00fcr Transmission",
-                "title": "Konfigurieren Sie die Optionen f\u00fcr die \u00dcbertragung"
+                "description": "Konfigurieren von Optionen f\u00fcr Transmission"
             }
         }
     }

@@ -1,10 +1,10 @@
 """Support for interfacing with NAD receivers through RS-232."""
 import logging
 
-from nad_receiver import NADReceiver, NADReceiverTCP, NADReceiverTelnet
 import voluptuous as vol
 
-from homeassistant.components.media_player import PLATFORM_SCHEMA, MediaPlayerDevice
+import homeassistant.helpers.config_validation as cv
+from homeassistant.components.media_player import MediaPlayerDevice, PLATFORM_SCHEMA
 from homeassistant.components.media_player.const import (
     SUPPORT_SELECT_SOURCE,
     SUPPORT_TURN_OFF,
@@ -13,8 +13,7 @@ from homeassistant.components.media_player.const import (
     SUPPORT_VOLUME_SET,
     SUPPORT_VOLUME_STEP,
 )
-from homeassistant.const import CONF_HOST, CONF_NAME, STATE_OFF, STATE_ON
-import homeassistant.helpers.config_validation as cv
+from homeassistant.const import CONF_NAME, STATE_OFF, STATE_ON, CONF_HOST
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -65,6 +64,8 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the NAD platform."""
     if config.get(CONF_TYPE) == "RS232":
+        from nad_receiver import NADReceiver
+
         add_entities(
             [
                 NAD(
@@ -78,6 +79,8 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
             True,
         )
     elif config.get(CONF_TYPE) == "Telnet":
+        from nad_receiver import NADReceiverTelnet
+
         add_entities(
             [
                 NAD(
@@ -91,6 +94,8 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
             True,
         )
     else:
+        from nad_receiver import NADReceiverTCP
+
         add_entities(
             [
                 NADtcp(

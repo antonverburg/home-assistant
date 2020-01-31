@@ -1,13 +1,14 @@
 """The tests for the WUnderground platform."""
+import asyncio
 import aiohttp
+
 from pytest import raises
 
 import homeassistant.components.wunderground.sensor as wunderground
-from homeassistant.const import LENGTH_INCHES, STATE_UNKNOWN, TEMP_CELSIUS
+from homeassistant.const import TEMP_CELSIUS, LENGTH_INCHES, STATE_UNKNOWN
 from homeassistant.exceptions import PlatformNotReady
 from homeassistant.setup import async_setup_component
-
-from tests.common import assert_setup_component, load_fixture
+from tests.common import load_fixture, assert_setup_component
 
 VALID_CONFIG_PWS = {
     "platform": "wunderground",
@@ -49,41 +50,47 @@ URL = (
     "http://api.wunderground.com/api/foo/alerts/conditions/forecast/lang"
     ":EN/q/32.87336,-117.22743.json"
 )
-PWS_URL = "http://api.wunderground.com/api/foo/alerts/conditions/lang:EN/q/pws:bar.json"
+PWS_URL = (
+    "http://api.wunderground.com/api/foo/alerts/conditions/" "lang:EN/q/pws:bar.json"
+)
 INVALID_URL = (
-    "http://api.wunderground.com/api/BOB/alerts/conditions/lang:foo/q/pws:bar.json"
+    "http://api.wunderground.com/api/BOB/alerts/conditions/" "lang:foo/q/pws:bar.json"
 )
 
 
-async def test_setup(hass, aioclient_mock):
+@asyncio.coroutine
+def test_setup(hass, aioclient_mock):
     """Test that the component is loaded."""
     aioclient_mock.get(URL, text=load_fixture("wunderground-valid.json"))
 
     with assert_setup_component(1, "sensor"):
-        await async_setup_component(hass, "sensor", {"sensor": VALID_CONFIG})
+        yield from async_setup_component(hass, "sensor", {"sensor": VALID_CONFIG})
 
 
-async def test_setup_pws(hass, aioclient_mock):
+@asyncio.coroutine
+def test_setup_pws(hass, aioclient_mock):
     """Test that the component is loaded with PWS id."""
     aioclient_mock.get(PWS_URL, text=load_fixture("wunderground-valid.json"))
 
     with assert_setup_component(1, "sensor"):
-        await async_setup_component(hass, "sensor", {"sensor": VALID_CONFIG_PWS})
+        yield from async_setup_component(hass, "sensor", {"sensor": VALID_CONFIG_PWS})
 
 
-async def test_setup_invalid(hass, aioclient_mock):
+@asyncio.coroutine
+def test_setup_invalid(hass, aioclient_mock):
     """Test that the component is not loaded with invalid config."""
     aioclient_mock.get(INVALID_URL, text=load_fixture("wunderground-error.json"))
 
     with assert_setup_component(0, "sensor"):
-        await async_setup_component(hass, "sensor", {"sensor": INVALID_CONFIG})
+        yield from async_setup_component(hass, "sensor", {"sensor": INVALID_CONFIG})
 
 
-async def test_sensor(hass, aioclient_mock):
+@asyncio.coroutine
+def test_sensor(hass, aioclient_mock):
     """Test the WUnderground sensor class and methods."""
     aioclient_mock.get(URL, text=load_fixture("wunderground-valid.json"))
 
-    await async_setup_component(hass, "sensor", {"sensor": VALID_CONFIG})
+    yield from async_setup_component(hass, "sensor", {"sensor": VALID_CONFIG})
 
     state = hass.states.get("sensor.pws_weather")
     assert state.state == "Clear"
@@ -124,18 +131,20 @@ async def test_sensor(hass, aioclient_mock):
     assert state.attributes["unit_of_measurement"] == LENGTH_INCHES
 
 
-async def test_connect_failed(hass, aioclient_mock):
+@asyncio.coroutine
+def test_connect_failed(hass, aioclient_mock):
     """Test the WUnderground connection error."""
     aioclient_mock.get(URL, exc=aiohttp.ClientError())
     with raises(PlatformNotReady):
-        await wunderground.async_setup_platform(hass, VALID_CONFIG, lambda _: None)
+        yield from wunderground.async_setup_platform(hass, VALID_CONFIG, lambda _: None)
 
 
-async def test_invalid_data(hass, aioclient_mock):
+@asyncio.coroutine
+def test_invalid_data(hass, aioclient_mock):
     """Test the WUnderground invalid data."""
     aioclient_mock.get(URL, text=load_fixture("wunderground-invalid.json"))
 
-    await async_setup_component(hass, "sensor", {"sensor": VALID_CONFIG})
+    yield from async_setup_component(hass, "sensor", {"sensor": VALID_CONFIG})
 
     for condition in VALID_CONFIG["monitored_conditions"]:
         state = hass.states.get("sensor.pws_" + condition)

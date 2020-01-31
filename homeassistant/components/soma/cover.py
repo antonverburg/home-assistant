@@ -2,8 +2,9 @@
 
 import logging
 
-from homeassistant.components.cover import ATTR_POSITION, CoverDevice
-from homeassistant.components.soma import API, DEVICES, DOMAIN, SomaEntity
+from homeassistant.components.cover import CoverDevice, ATTR_POSITION
+from homeassistant.components.soma import DOMAIN, SomaEntity, DEVICES, API
+
 
 _LOGGER = logging.getLogger(__name__)
 

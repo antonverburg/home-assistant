@@ -1,31 +1,33 @@
 """The tests for the Unifi direct device tracker platform."""
-from datetime import timedelta
 import os
-
+from datetime import timedelta
 from asynctest import mock, patch
+
 import pytest
 import voluptuous as vol
 
-from homeassistant.components.device_tracker import (
-    CONF_AWAY_HIDE,
-    CONF_CONSIDER_HOME,
-    CONF_NEW_DEVICE_DEFAULTS,
-    CONF_TRACK_NEW,
-)
+from homeassistant.setup import async_setup_component
 from homeassistant.components.device_tracker.legacy import YAML_DEVICES
+from homeassistant.components.device_tracker import (
+    CONF_CONSIDER_HOME,
+    CONF_TRACK_NEW,
+    CONF_AWAY_HIDE,
+    CONF_NEW_DEVICE_DEFAULTS,
+)
 from homeassistant.components.unifi_direct.device_tracker import (
-    CONF_PORT,
     DOMAIN,
+    CONF_PORT,
     PLATFORM_SCHEMA,
     _response_to_json,
     get_scanner,
 )
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PLATFORM, CONF_USERNAME
-from homeassistant.setup import async_setup_component
+from homeassistant.const import CONF_PLATFORM, CONF_PASSWORD, CONF_USERNAME, CONF_HOST
 
-from tests.common import assert_setup_component, load_fixture, mock_component
+from tests.common import assert_setup_component, mock_component, load_fixture
 
-scanner_path = "homeassistant.components.unifi_direct.device_tracker.UnifiDeviceScanner"
+scanner_path = (
+    "homeassistant.components.unifi_direct.device_tracker." + "UnifiDeviceScanner"
+)
 
 
 @pytest.fixture(autouse=True)

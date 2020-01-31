@@ -4,6 +4,7 @@ import re
 import unittest
 
 import requests_mock
+from tests.common import get_test_home_assistant, load_fixture
 
 import homeassistant.components.wsdot.sensor as wsdot
 from homeassistant.components.wsdot.sensor import (
@@ -17,8 +18,6 @@ from homeassistant.components.wsdot.sensor import (
     SCAN_INTERVAL,
 )
 from homeassistant.setup import setup_component
-
-from tests.common import get_test_home_assistant, load_fixture
 
 
 class TestWSDOT(unittest.TestCase):

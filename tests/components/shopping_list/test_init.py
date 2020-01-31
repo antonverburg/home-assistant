@@ -1,13 +1,27 @@
 """Test shopping list component."""
 import asyncio
+from unittest.mock import patch
 
-from homeassistant.components.websocket_api.const import TYPE_RESULT
+import pytest
+
+from homeassistant.bootstrap import async_setup_component
 from homeassistant.helpers import intent
+from homeassistant.components.websocket_api.const import TYPE_RESULT
+
+
+@pytest.fixture(autouse=True)
+def mock_shopping_list_io():
+    """Stub out the persistence."""
+    with patch("homeassistant.components.shopping_list.ShoppingData.save"), patch(
+        "homeassistant.components.shopping_list." "ShoppingData.async_load"
+    ):
+        yield
 
 
 @asyncio.coroutine
-def test_add_item(hass, sl_setup):
+def test_add_item(hass):
     """Test adding an item intent."""
+    yield from async_setup_component(hass, "shopping_list", {})
 
     response = yield from intent.async_handle(
         hass, "test", "HassShoppingListAddItem", {"item": {"value": "beer"}}
@@ -17,8 +31,9 @@ def test_add_item(hass, sl_setup):
 
 
 @asyncio.coroutine
-def test_recent_items_intent(hass, sl_setup):
+def test_recent_items_intent(hass):
     """Test recent items."""
+    yield from async_setup_component(hass, "shopping_list", {})
 
     yield from intent.async_handle(
         hass, "test", "HassShoppingListAddItem", {"item": {"value": "beer"}}
@@ -39,8 +54,9 @@ def test_recent_items_intent(hass, sl_setup):
 
 
 @asyncio.coroutine
-def test_deprecated_api_get_all(hass, hass_client, sl_setup):
+def test_deprecated_api_get_all(hass, hass_client):
     """Test the API."""
+    yield from async_setup_component(hass, "shopping_list", {})
 
     yield from intent.async_handle(
         hass, "test", "HassShoppingListAddItem", {"item": {"value": "beer"}}
@@ -61,8 +77,9 @@ def test_deprecated_api_get_all(hass, hass_client, sl_setup):
     assert not data[1]["complete"]
 
 
-async def test_ws_get_items(hass, hass_ws_client, sl_setup):
+async def test_ws_get_items(hass, hass_ws_client):
     """Test get shopping_list items websocket command."""
+    await async_setup_component(hass, "shopping_list", {})
 
     await intent.async_handle(
         hass, "test", "HassShoppingListAddItem", {"item": {"value": "beer"}}
@@ -89,8 +106,9 @@ async def test_ws_get_items(hass, hass_ws_client, sl_setup):
 
 
 @asyncio.coroutine
-def test_deprecated_api_update(hass, hass_client, sl_setup):
+def test_deprecated_api_update(hass, hass_client):
     """Test the API."""
+    yield from async_setup_component(hass, "shopping_list", {})
 
     yield from intent.async_handle(
         hass, "test", "HassShoppingListAddItem", {"item": {"value": "beer"}}
@@ -124,8 +142,9 @@ def test_deprecated_api_update(hass, hass_client, sl_setup):
     assert wine == {"id": wine_id, "name": "wine", "complete": True}
 
 
-async def test_ws_update_item(hass, hass_ws_client, sl_setup):
+async def test_ws_update_item(hass, hass_ws_client):
     """Test update shopping_list item websocket command."""
+    await async_setup_component(hass, "shopping_list", {})
     await intent.async_handle(
         hass, "test", "HassShoppingListAddItem", {"item": {"value": "beer"}}
     )
@@ -167,8 +186,9 @@ async def test_ws_update_item(hass, hass_ws_client, sl_setup):
 
 
 @asyncio.coroutine
-def test_api_update_fails(hass, hass_client, sl_setup):
+def test_api_update_fails(hass, hass_client):
     """Test the API."""
+    yield from async_setup_component(hass, "shopping_list", {})
 
     yield from intent.async_handle(
         hass, "test", "HassShoppingListAddItem", {"item": {"value": "beer"}}
@@ -189,8 +209,9 @@ def test_api_update_fails(hass, hass_client, sl_setup):
     assert resp.status == 400
 
 
-async def test_ws_update_item_fail(hass, hass_ws_client, sl_setup):
+async def test_ws_update_item_fail(hass, hass_ws_client):
     """Test failure of update shopping_list item websocket command."""
+    await async_setup_component(hass, "shopping_list", {})
     await intent.async_handle(
         hass, "test", "HassShoppingListAddItem", {"item": {"value": "beer"}}
     )
@@ -213,8 +234,9 @@ async def test_ws_update_item_fail(hass, hass_ws_client, sl_setup):
 
 
 @asyncio.coroutine
-def test_deprecated_api_clear_completed(hass, hass_client, sl_setup):
+def test_deprecated_api_clear_completed(hass, hass_client):
     """Test the API."""
+    yield from async_setup_component(hass, "shopping_list", {})
 
     yield from intent.async_handle(
         hass, "test", "HassShoppingListAddItem", {"item": {"value": "beer"}}
@@ -243,8 +265,9 @@ def test_deprecated_api_clear_completed(hass, hass_client, sl_setup):
     assert items[0] == {"id": wine_id, "name": "wine", "complete": False}
 
 
-async def test_ws_clear_items(hass, hass_ws_client, sl_setup):
+async def test_ws_clear_items(hass, hass_ws_client):
     """Test clearing shopping_list items websocket command."""
+    await async_setup_component(hass, "shopping_list", {})
     await intent.async_handle(
         hass, "test", "HassShoppingListAddItem", {"item": {"value": "beer"}}
     )
@@ -273,8 +296,9 @@ async def test_ws_clear_items(hass, hass_ws_client, sl_setup):
 
 
 @asyncio.coroutine
-def test_deprecated_api_create(hass, hass_client, sl_setup):
+def test_deprecated_api_create(hass, hass_client):
     """Test the API."""
+    yield from async_setup_component(hass, "shopping_list", {})
 
     client = yield from hass_client()
     resp = yield from client.post("/api/shopping_list/item", json={"name": "soda"})
@@ -291,8 +315,9 @@ def test_deprecated_api_create(hass, hass_client, sl_setup):
 
 
 @asyncio.coroutine
-def test_deprecated_api_create_fail(hass, hass_client, sl_setup):
+def test_deprecated_api_create_fail(hass, hass_client):
     """Test the API."""
+    yield from async_setup_component(hass, "shopping_list", {})
 
     client = yield from hass_client()
     resp = yield from client.post("/api/shopping_list/item", json={"name": 1234})
@@ -301,8 +326,9 @@ def test_deprecated_api_create_fail(hass, hass_client, sl_setup):
     assert len(hass.data["shopping_list"].items) == 0
 
 
-async def test_ws_add_item(hass, hass_ws_client, sl_setup):
+async def test_ws_add_item(hass, hass_ws_client):
     """Test adding shopping_list item websocket command."""
+    await async_setup_component(hass, "shopping_list", {})
     client = await hass_ws_client(hass)
     await client.send_json({"id": 5, "type": "shopping_list/items/add", "name": "soda"})
     msg = await client.receive_json()
@@ -316,8 +342,9 @@ async def test_ws_add_item(hass, hass_ws_client, sl_setup):
     assert items[0]["complete"] is False
 
 
-async def test_ws_add_item_fail(hass, hass_ws_client, sl_setup):
+async def test_ws_add_item_fail(hass, hass_ws_client):
     """Test adding shopping_list item failure websocket command."""
+    await async_setup_component(hass, "shopping_list", {})
     client = await hass_ws_client(hass)
     await client.send_json({"id": 5, "type": "shopping_list/items/add", "name": 123})
     msg = await client.receive_json()

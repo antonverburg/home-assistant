@@ -8,10 +8,11 @@ from homeassistant.components.device_automation.const import (
     CONF_TURNED_ON,
 )
 from homeassistant.const import ATTR_DEVICE_CLASS, CONF_ENTITY_ID, CONF_FOR, CONF_TYPE
-from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.entity_registry import async_entries_for_device
+from homeassistant.helpers import config_validation as cv
 
 from . import (
+    DOMAIN,
     DEVICE_CLASS_BATTERY,
     DEVICE_CLASS_COLD,
     DEVICE_CLASS_CONNECTIVITY,
@@ -35,8 +36,8 @@ from . import (
     DEVICE_CLASS_SOUND,
     DEVICE_CLASS_VIBRATION,
     DEVICE_CLASS_WINDOW,
-    DOMAIN,
 )
+
 
 # mypy: allow-untyped-defs, no-check-untyped-defs
 
@@ -91,7 +92,7 @@ TURNED_ON = [
     CONF_GAS,
     CONF_HOT,
     CONF_LIGHT,
-    CONF_NOT_LOCKED,
+    CONF_LOCKED,
     CONF_MOIST,
     CONF_MOTION,
     CONF_MOVING,
@@ -113,7 +114,7 @@ TURNED_OFF = [
     CONF_NOT_COLD,
     CONF_NOT_CONNECTED,
     CONF_NOT_HOT,
-    CONF_LOCKED,
+    CONF_NOT_LOCKED,
     CONF_NOT_MOIST,
     CONF_NOT_MOVING,
     CONF_NOT_OCCUPIED,

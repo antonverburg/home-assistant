@@ -551,9 +551,7 @@ async def test_set_turn_off(hass, air_conditioner):
     await setup_platform(hass, CLIMATE_DOMAIN, devices=[air_conditioner])
     state = hass.states.get("climate.air_conditioner")
     assert state.state == HVAC_MODE_HEAT_COOL
-    await hass.services.async_call(
-        CLIMATE_DOMAIN, SERVICE_TURN_OFF, {"entity_id": "all"}, blocking=True
-    )
+    await hass.services.async_call(CLIMATE_DOMAIN, SERVICE_TURN_OFF, blocking=True)
     state = hass.states.get("climate.air_conditioner")
     assert state.state == HVAC_MODE_OFF
 
@@ -564,9 +562,7 @@ async def test_set_turn_on(hass, air_conditioner):
     await setup_platform(hass, CLIMATE_DOMAIN, devices=[air_conditioner])
     state = hass.states.get("climate.air_conditioner")
     assert state.state == HVAC_MODE_OFF
-    await hass.services.async_call(
-        CLIMATE_DOMAIN, SERVICE_TURN_ON, {"entity_id": "all"}, blocking=True
-    )
+    await hass.services.async_call(CLIMATE_DOMAIN, SERVICE_TURN_ON, blocking=True)
     state = hass.states.get("climate.air_conditioner")
     assert state.state == HVAC_MODE_HEAT_COOL
 

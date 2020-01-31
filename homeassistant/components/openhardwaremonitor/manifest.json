@@ -1,6 +1,6 @@
 {
   "domain": "openhardwaremonitor",
-  "name": "Open Hardware Monitor",
+  "name": "Openhardwaremonitor",
   "documentation": "https://www.home-assistant.io/integrations/openhardwaremonitor",
   "requirements": [],
   "dependencies": [],

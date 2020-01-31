@@ -1,8 +1,6 @@
 """Support for Ecovacs Ecovacs Vaccums."""
 import logging
 
-import sucks
-
 from homeassistant.components.vacuum import (
     SUPPORT_BATTERY,
     SUPPORT_CLEAN_SPOT,
@@ -44,7 +42,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     vacuums = []
     for device in hass.data[ECOVACS_DEVICES]:
         vacuums.append(EcovacsVacuum(device))
-    _LOGGER.debug("Adding Ecovacs Vacuums to Home Assistant: %s", vacuums)
+    _LOGGER.debug("Adding Ecovacs Vacuums to Hass: %s", vacuums)
     add_entities(vacuums, True)
 
 
@@ -125,8 +123,9 @@ class EcovacsVacuum(VacuumDevice):
 
     def return_to_base(self, **kwargs):
         """Set the vacuum cleaner to return to the dock."""
+        from sucks import Charge
 
-        self.device.run(sucks.Charge())
+        self.device.run(Charge())
 
     @property
     def battery_icon(self):
@@ -151,13 +150,15 @@ class EcovacsVacuum(VacuumDevice):
     @property
     def fan_speed_list(self):
         """Get the list of available fan speed steps of the vacuum cleaner."""
+        from sucks import FAN_SPEED_NORMAL, FAN_SPEED_HIGH
 
-        return [sucks.FAN_SPEED_NORMAL, sucks.FAN_SPEED_HIGH]
+        return [FAN_SPEED_NORMAL, FAN_SPEED_HIGH]
 
     def turn_on(self, **kwargs):
         """Turn the vacuum on and start cleaning."""
+        from sucks import Clean
 
-        self.device.run(sucks.Clean())
+        self.device.run(Clean())
 
     def turn_off(self, **kwargs):
         """Turn the vacuum off stopping the cleaning and returning home."""
@@ -165,28 +166,34 @@ class EcovacsVacuum(VacuumDevice):
 
     def stop(self, **kwargs):
         """Stop the vacuum cleaner."""
+        from sucks import Stop
 
-        self.device.run(sucks.Stop())
+        self.device.run(Stop())
 
     def clean_spot(self, **kwargs):
         """Perform a spot clean-up."""
+        from sucks import Spot
 
-        self.device.run(sucks.Spot())
+        self.device.run(Spot())
 
     def locate(self, **kwargs):
         """Locate the vacuum cleaner."""
+        from sucks import PlaySound
 
-        self.device.run(sucks.PlaySound())
+        self.device.run(PlaySound())
 
     def set_fan_speed(self, fan_speed, **kwargs):
         """Set fan speed."""
         if self.is_on:
+            from sucks import Clean
 
-            self.device.run(sucks.Clean(mode=self.device.clean_status, speed=fan_speed))
+            self.device.run(Clean(mode=self.device.clean_status, speed=fan_speed))
 
     def send_command(self, command, params=None, **kwargs):
         """Send a command to a vacuum cleaner."""
-        self.device.run(sucks.VacBotCommand(command, params))
+        from sucks import VacBotCommand
+
+        self.device.run(VacBotCommand(command, params))
 
     @property
     def device_state_attributes(self):

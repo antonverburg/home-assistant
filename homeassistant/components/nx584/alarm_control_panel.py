@@ -1,16 +1,11 @@
 """Support for NX584 alarm control panels."""
 import logging
 
-from nx584 import client
 import requests
 import voluptuous as vol
 
 import homeassistant.components.alarm_control_panel as alarm
 from homeassistant.components.alarm_control_panel import PLATFORM_SCHEMA
-from homeassistant.components.alarm_control_panel.const import (
-    SUPPORT_ALARM_ARM_AWAY,
-    SUPPORT_ALARM_ARM_HOME,
-)
 from homeassistant.const import (
     CONF_HOST,
     CONF_NAME,
@@ -57,6 +52,7 @@ class NX584Alarm(alarm.AlarmControlPanel):
 
     def __init__(self, hass, url, name):
         """Init the nx584 alarm panel."""
+        from nx584 import client
 
         self._hass = hass
         self._name = name
@@ -82,11 +78,6 @@ class NX584Alarm(alarm.AlarmControlPanel):
     def state(self):
         """Return the state of the device."""
         return self._state
-
-    @property
-    def supported_features(self) -> int:
-        """Return the list of supported features."""
-        return SUPPORT_ALARM_ARM_HOME | SUPPORT_ALARM_ARM_AWAY
 
     def update(self):
         """Process new events from panel."""

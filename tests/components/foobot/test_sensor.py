@@ -1,17 +1,16 @@
 """The tests for the Foobot sensor platform."""
 
-import asyncio
 import re
+import asyncio
 from unittest.mock import MagicMock
-
 import pytest
 
-from homeassistant.components.foobot import sensor as foobot
+
 import homeassistant.components.sensor as sensor
+from homeassistant.components.foobot import sensor as foobot
 from homeassistant.const import TEMP_CELSIUS
 from homeassistant.exceptions import PlatformNotReady
 from homeassistant.setup import async_setup_component
-
 from tests.common import load_fixture
 
 VALID_CONFIG = {

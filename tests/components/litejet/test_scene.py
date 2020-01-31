@@ -20,7 +20,7 @@ ENTITY_OTHER_SCENE_NUMBER = 2
 class TestLiteJetScene(unittest.TestCase):
     """Test the litejet component."""
 
-    @mock.patch("homeassistant.components.litejet.LiteJet")
+    @mock.patch("pylitejet.LiteJet")
     def setup_method(self, method, mock_pylitejet):
         """Set up things to be run when tests are started."""
         self.hass = get_test_home_assistant()

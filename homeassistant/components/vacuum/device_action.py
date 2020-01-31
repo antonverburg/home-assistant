@@ -1,20 +1,18 @@
 """Provides device automations for Vacuum."""
-from typing import List, Optional
-
+from typing import Optional, List
 import voluptuous as vol
 
 from homeassistant.const import (
     ATTR_ENTITY_ID,
-    CONF_DEVICE_ID,
     CONF_DOMAIN,
-    CONF_ENTITY_ID,
     CONF_TYPE,
+    CONF_DEVICE_ID,
+    CONF_ENTITY_ID,
 )
-from homeassistant.core import Context, HomeAssistant
+from homeassistant.core import HomeAssistant, Context
 from homeassistant.helpers import entity_registry
 import homeassistant.helpers.config_validation as cv
-
-from . import DOMAIN, SERVICE_RETURN_TO_BASE, SERVICE_START
+from . import DOMAIN, SERVICE_START, SERVICE_RETURN_TO_BASE
 
 ACTION_TYPES = {"clean", "dock"}
 

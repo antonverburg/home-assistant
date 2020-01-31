@@ -6,7 +6,7 @@ from sqlalchemy import Table, text
 from sqlalchemy.engine import reflection
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 
-from .models import SCHEMA_VERSION, Base, SchemaChanges
+from .models import SchemaChanges, SCHEMA_VERSION, Base
 from .util import session_scope
 
 _LOGGER = logging.getLogger(__name__)

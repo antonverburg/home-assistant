@@ -1,30 +1,29 @@
 """The tests for the geojson platform."""
-from asynctest.mock import MagicMock, call, patch
+from asynctest.mock import patch, MagicMock, call
 
 from homeassistant.components import geo_location
+from homeassistant.components.geo_location import ATTR_SOURCE
 from homeassistant.components.geo_json_events.geo_location import (
-    ATTR_EXTERNAL_ID,
     SCAN_INTERVAL,
+    ATTR_EXTERNAL_ID,
     SIGNAL_DELETE_ENTITY,
     SIGNAL_UPDATE_ENTITY,
 )
-from homeassistant.components.geo_location import ATTR_SOURCE
 from homeassistant.const import (
-    ATTR_FRIENDLY_NAME,
+    CONF_URL,
+    EVENT_HOMEASSISTANT_START,
+    CONF_RADIUS,
     ATTR_LATITUDE,
     ATTR_LONGITUDE,
+    ATTR_FRIENDLY_NAME,
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_LATITUDE,
     CONF_LONGITUDE,
-    CONF_RADIUS,
-    CONF_URL,
-    EVENT_HOMEASSISTANT_START,
 )
 from homeassistant.helpers.dispatcher import DATA_DISPATCHER
 from homeassistant.setup import async_setup_component
-import homeassistant.util.dt as dt_util
-
 from tests.common import assert_setup_component, async_fire_time_changed
+import homeassistant.util.dt as dt_util
 
 URL = "http://geo.json.local/geo_json_events.json"
 CONFIG = {

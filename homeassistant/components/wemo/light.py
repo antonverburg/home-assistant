@@ -1,7 +1,7 @@
 """Support for Belkin WeMo lights."""
 import asyncio
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
 import async_timeout
 from pywemo import discovery
@@ -9,15 +9,15 @@ import requests
 
 from homeassistant import util
 from homeassistant.components.light import (
+    Light,
     ATTR_BRIGHTNESS,
     ATTR_COLOR_TEMP,
     ATTR_HS_COLOR,
     ATTR_TRANSITION,
     SUPPORT_BRIGHTNESS,
-    SUPPORT_COLOR,
     SUPPORT_COLOR_TEMP,
+    SUPPORT_COLOR,
     SUPPORT_TRANSITION,
-    Light,
 )
 from homeassistant.exceptions import PlatformNotReady
 import homeassistant.util.color as color_util
@@ -96,7 +96,7 @@ class WemoLight(Light):
         self._unique_id = self.wemo.uniqueID
 
     async def async_added_to_hass(self):
-        """Wemo light added to Home Assistant."""
+        """Wemo light added to HASS."""
         # Define inside async context so we know our event loop
         self._update_lock = asyncio.Lock()
 
@@ -231,7 +231,7 @@ class WemoDimmer(Light):
         self.async_schedule_update_ha_state()
 
     async def async_added_to_hass(self):
-        """Wemo dimmer added to Home Assistant."""
+        """Wemo dimmer added to HASS."""
         # Define inside async context so we know our event loop
         self._update_lock = asyncio.Lock()
 

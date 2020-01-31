@@ -4,6 +4,7 @@
   "documentation": "https://www.home-assistant.io/integrations/sun",
   "requirements": [],
   "dependencies": [],
-  "codeowners": ["@Swamp-Ig"],
-  "quality_scale": "internal"
+  "codeowners": [
+    "@Swamp-Ig"
+  ]
 }

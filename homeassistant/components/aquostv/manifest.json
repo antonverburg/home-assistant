@@ -1,8 +1,10 @@
 {
   "domain": "aquostv",
-  "name": "Sharp Aquos TV",
+  "name": "Aquostv",
   "documentation": "https://www.home-assistant.io/integrations/aquostv",
-  "requirements": ["sharp_aquos_rc==0.3.2"],
+  "requirements": [
+    "sharp_aquos_rc==0.3.2"
+  ],
   "dependencies": [],
   "codeowners": []
 }

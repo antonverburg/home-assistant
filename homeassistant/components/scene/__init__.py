@@ -4,10 +4,11 @@ import logging
 
 import voluptuous as vol
 
-from homeassistant.const import CONF_PLATFORM, SERVICE_TURN_ON
 from homeassistant.core import DOMAIN as HA_DOMAIN
+from homeassistant.const import CONF_PLATFORM, SERVICE_TURN_ON
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_component import EntityComponent
+
 
 # mypy: allow-untyped-defs, no-check-untyped-defs
 

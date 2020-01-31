@@ -4,10 +4,10 @@ import logging
 from homeassistant.helpers.entity import Entity
 
 from .const import (
-    ATTR_BLOCKED_DOMAINS,
     DOMAIN as PIHOLE_DOMAIN,
-    SENSOR_DICT,
+    ATTR_BLOCKED_DOMAINS,
     SENSOR_LIST,
+    SENSOR_DICT,
 )
 
 LOGGER = logging.getLogger(__name__)
@@ -18,12 +18,10 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     if discovery_info is None:
         return
 
+    pi_hole = hass.data[PIHOLE_DOMAIN]
+
     sensors = []
-    for pi_hole in hass.data[PIHOLE_DOMAIN].values():
-        for sensor in [
-            PiHoleSensor(pi_hole, sensor_name) for sensor_name in SENSOR_LIST
-        ]:
-            sensors.append(sensor)
+    sensors = [PiHoleSensor(pi_hole, sensor_name) for sensor_name in SENSOR_LIST]
 
     async_add_entities(sensors, True)
 

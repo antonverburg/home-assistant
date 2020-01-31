@@ -1,23 +1,22 @@
 """Support for IPMA weather service."""
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
 import async_timeout
-from pyipma import Station
 import voluptuous as vol
 
 from homeassistant.components.weather import (
+    WeatherEntity,
+    PLATFORM_SCHEMA,
     ATTR_FORECAST_CONDITION,
     ATTR_FORECAST_PRECIPITATION,
     ATTR_FORECAST_TEMP,
     ATTR_FORECAST_TEMP_LOW,
     ATTR_FORECAST_TIME,
-    PLATFORM_SCHEMA,
-    WeatherEntity,
 )
-from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME, TEMP_CELSIUS
-from homeassistant.helpers import config_validation as cv
+from homeassistant.const import CONF_NAME, TEMP_CELSIUS, CONF_LATITUDE, CONF_LONGITUDE
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers import config_validation as cv
 from homeassistant.util import Throttle
 
 _LOGGER = logging.getLogger(__name__)
@@ -85,6 +84,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 async def async_get_station(hass, latitude, longitude):
     """Retrieve weather station, station name to be used as the entity name."""
+    from pyipma import Station
 
     websession = async_get_clientsession(hass)
     with async_timeout.timeout(10):

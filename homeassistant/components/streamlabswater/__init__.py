@@ -1,7 +1,6 @@
 """Support for Streamlabs Water Monitor devices."""
 import logging
 
-from streamlabswater import streamlabswater
 import voluptuous as vol
 
 from homeassistant.const import CONF_API_KEY
@@ -40,6 +39,7 @@ SET_AWAY_MODE_SCHEMA = vol.Schema(
 
 def setup(hass, config):
     """Set up the streamlabs water component."""
+    from streamlabswater import streamlabswater
 
     conf = config[DOMAIN]
     api_key = conf.get(CONF_API_KEY)

@@ -3,24 +3,24 @@ import logging
 import threading
 
 from pyflic import (
+    FlicClient,
     ButtonConnectionChannel,
     ClickType,
     ConnectionStatus,
-    FlicClient,
     ScanWizard,
     ScanWizardResult,
 )
 import voluptuous as vol
 
-from homeassistant.components.binary_sensor import PLATFORM_SCHEMA, BinarySensorDevice
+import homeassistant.helpers.config_validation as cv
 from homeassistant.const import (
-    CONF_DISCOVERY,
     CONF_HOST,
     CONF_PORT,
+    CONF_DISCOVERY,
     CONF_TIMEOUT,
     EVENT_HOMEASSISTANT_STOP,
 )
-import homeassistant.helpers.config_validation as cv
+from homeassistant.components.binary_sensor import BinarySensorDevice, PLATFORM_SCHEMA
 
 _LOGGER = logging.getLogger(__name__)
 

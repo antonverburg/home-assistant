@@ -9,7 +9,7 @@
             "user": {
                 "data": {
                     "password": "Adgangskode",
-                    "username": "Brugernavn/e-mailadresse"
+                    "username": "Brugernavn/e-mail adresse"
                 },
                 "title": "Udfyld dine oplysninger"
             }

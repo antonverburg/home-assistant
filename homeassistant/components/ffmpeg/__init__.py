@@ -2,20 +2,20 @@
 import logging
 import re
 
-from haffmpeg.tools import FFVersion
 import voluptuous as vol
+from haffmpeg.tools import FFVersion
 
+from homeassistant.core import callback
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     EVENT_HOMEASSISTANT_START,
     EVENT_HOMEASSISTANT_STOP,
 )
-from homeassistant.core import callback
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.dispatcher import (
-    async_dispatcher_connect,
     async_dispatcher_send,
+    async_dispatcher_connect,
 )
+import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity
 
 DOMAIN = "ffmpeg"

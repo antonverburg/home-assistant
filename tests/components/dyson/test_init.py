@@ -3,7 +3,6 @@ import unittest
 from unittest import mock
 
 from homeassistant.components import dyson
-
 from tests.common import get_test_home_assistant
 
 

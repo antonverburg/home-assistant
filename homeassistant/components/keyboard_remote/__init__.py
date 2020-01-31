@@ -1,15 +1,13 @@
 """Receive signals from a keyboard and use it as a remote control."""
 # pylint: disable=import-error
-import asyncio
 import logging
-import os
+import asyncio
 
-import aionotify
 from evdev import InputDevice, categorize, ecodes, list_devices
+import aionotify
 import voluptuous as vol
-
-from homeassistant.const import EVENT_HOMEASSISTANT_START, EVENT_HOMEASSISTANT_STOP
 import homeassistant.helpers.config_validation as cv
+from homeassistant.const import EVENT_HOMEASSISTANT_START, EVENT_HOMEASSISTANT_STOP
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -120,11 +118,9 @@ class KeyboardRemote:
         # add initial devices (do this AFTER starting watcher in order to
         # avoid race conditions leading to missing device connections)
         initial_start_monitoring = set()
-        descriptors = await self.hass.async_add_executor_job(list_devices, DEVINPUT)
+        descriptors = list_devices(DEVINPUT)
         for descriptor in descriptors:
-            dev, handler = await self.hass.async_add_executor_job(
-                self.get_device_handler, descriptor
-            )
+            dev, handler = self.get_device_handler(descriptor)
 
             if handler is None:
                 continue
@@ -168,15 +164,6 @@ class KeyboardRemote:
             handler = self.handlers_by_descriptor[descriptor]
         elif dev.name in self.handlers_by_name:
             handler = self.handlers_by_name[dev.name]
-        else:
-            # check for symlinked paths matching descriptor
-            for test_descriptor, test_handler in self.handlers_by_descriptor.items():
-                if test_handler.dev is not None:
-                    fullpath = test_handler.dev.path
-                else:
-                    fullpath = os.path.realpath(test_descriptor)
-                if fullpath == descriptor:
-                    handler = test_handler
 
         return (dev, handler)
 
@@ -198,9 +185,7 @@ class KeyboardRemote:
                     (event.flags & aionotify.Flags.CREATE)
                     or (event.flags & aionotify.Flags.ATTRIB)
                 ) and not descriptor_active:
-                    dev, handler = await self.hass.async_add_executor_job(
-                        self.get_device_handler, descriptor
-                    )
+                    dev, handler = self.get_device_handler(descriptor)
                     if handler is None:
                         continue
                     self.active_handlers_by_descriptor[descriptor] = handler
@@ -256,7 +241,7 @@ class KeyboardRemote:
             """Stop event monitoring task and issue event."""
             if self.monitor_task is not None:
                 try:
-                    await self.hass.async_add_executor_job(self.dev.ungrab)
+                    self.dev.ungrab()
                 except OSError:
                     pass
                 # monitoring of the device form the event loop and closing of the
@@ -286,7 +271,7 @@ class KeyboardRemote:
 
             try:
                 _LOGGER.debug("Start device monitoring")
-                await self.hass.async_add_executor_job(dev.grab)
+                dev.grab()
                 async for event in dev.async_read_loop():
                     if event.type is ecodes.EV_KEY:
                         if event.value in self.key_values:

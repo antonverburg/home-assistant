@@ -3,7 +3,6 @@ from datetime import timedelta
 import logging
 from typing import Optional
 
-from georss_ign_sismologia_client import IgnSismologiaFeedManager
 import voluptuous as vol
 
 from homeassistant.components.geo_location import PLATFORM_SCHEMA, GeolocationEvent
@@ -88,6 +87,7 @@ class IgnSismologiaFeedEntityManager:
         minimum_magnitude,
     ):
         """Initialize the Feed Entity Manager."""
+        from georss_ign_sismologia_client import IgnSismologiaFeedManager
 
         self._hass = hass
         self._feed_manager = IgnSismologiaFeedManager(

@@ -1,13 +1,12 @@
 """Support for Sense HAT sensors."""
-from datetime import timedelta
-import logging
 import os
+import logging
+from datetime import timedelta
 
-from sense_hat import SenseHat
 import voluptuous as vol
 
 from homeassistant.components.sensor import PLATFORM_SCHEMA
-from homeassistant.const import CONF_DISPLAY_OPTIONS, CONF_NAME, TEMP_CELSIUS
+from homeassistant.const import TEMP_CELSIUS, CONF_DISPLAY_OPTIONS, CONF_NAME
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle
@@ -118,6 +117,7 @@ class SenseHatData:
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     def update(self):
         """Get the latest data from Sense HAT."""
+        from sense_hat import SenseHat
 
         sense = SenseHat()
         temp_from_h = sense.get_temperature_from_humidity()

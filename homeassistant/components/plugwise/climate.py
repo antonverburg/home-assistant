@@ -1,18 +1,19 @@
-"""Plugwise Climate component for Home Assistant."""
+"""Plugwise Climate component for HomeAssistant."""
 
 import logging
 
-import haanna
 import voluptuous as vol
+import haanna
 
+import homeassistant.helpers.config_validation as cv
 from homeassistant.components.climate import PLATFORM_SCHEMA, ClimateDevice
 from homeassistant.components.climate.const import (
-    CURRENT_HVAC_COOL,
     CURRENT_HVAC_HEAT,
+    CURRENT_HVAC_COOL,
     CURRENT_HVAC_IDLE,
-    HVAC_MODE_AUTO,
     HVAC_MODE_HEAT,
     HVAC_MODE_HEAT_COOL,
+    HVAC_MODE_AUTO,
     SUPPORT_PRESET_MODE,
     SUPPORT_TARGET_TEMPERATURE,
 )
@@ -26,7 +27,6 @@ from homeassistant.const import (
     TEMP_CELSIUS,
 )
 from homeassistant.exceptions import PlatformNotReady
-import homeassistant.helpers.config_validation as cv
 
 SUPPORT_FLAGS = SUPPORT_TARGET_TEMPERATURE | SUPPORT_PRESET_MODE
 

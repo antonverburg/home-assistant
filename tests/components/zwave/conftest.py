@@ -1,5 +1,5 @@
 """Fixtures for Z-Wave tests."""
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch, MagicMock
 
 import pytest
 

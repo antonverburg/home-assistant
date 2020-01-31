@@ -1,6 +1,6 @@
 {
   "domain": "itunes",
-  "name": "Apple iTunes",
+  "name": "Itunes",
   "documentation": "https://www.home-assistant.io/integrations/itunes",
   "requirements": [],
   "dependencies": [],

@@ -1,18 +1,18 @@
 """The tests for Fan device actions."""
 import pytest
 
-import homeassistant.components.automation as automation
 from homeassistant.components.fan import DOMAIN
-from homeassistant.helpers import device_registry
 from homeassistant.setup import async_setup_component
+import homeassistant.components.automation as automation
+from homeassistant.helpers import device_registry
 
 from tests.common import (
     MockConfigEntry,
     assert_lists_same,
-    async_get_device_automations,
     async_mock_service,
     mock_device_registry,
     mock_registry,
+    async_get_device_automations,
 )
 
 

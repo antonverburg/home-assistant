@@ -1,14 +1,13 @@
 """Tests for the Cert Expiry config flow."""
-import socket
-import ssl
-from unittest.mock import patch
-
 import pytest
+import ssl
+import socket
+from unittest.mock import patch
 
 from homeassistant import data_entry_flow
 from homeassistant.components.cert_expiry import config_flow
 from homeassistant.components.cert_expiry.const import DEFAULT_NAME, DEFAULT_PORT
-from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT
+from homeassistant.const import CONF_PORT, CONF_NAME, CONF_HOST
 
 from tests.common import MockConfigEntry, mock_coro
 

@@ -6,18 +6,17 @@ from unittest.mock import patch
 from homeassistant.components.filter.sensor import (
     LowPassFilter,
     OutlierFilter,
-    RangeFilter,
     ThrottleFilter,
     TimeSMAFilter,
+    RangeFilter,
     TimeThrottleFilter,
 )
-import homeassistant.core as ha
-from homeassistant.setup import setup_component
 import homeassistant.util.dt as dt_util
-
+from homeassistant.setup import setup_component
+import homeassistant.core as ha
 from tests.common import (
-    assert_setup_component,
     get_test_home_assistant,
+    assert_setup_component,
     init_recorder_component,
 )
 
@@ -28,7 +27,6 @@ class TestFilterSensor(unittest.TestCase):
     def setup_method(self, method):
         """Set up things to be run when tests are started."""
         self.hass = get_test_home_assistant()
-        self.hass.config.components.add("history")
         raw_values = [20, 19, 18, 21, 22, 0]
         self.values = []
 
@@ -117,11 +115,11 @@ class TestFilterSensor(unittest.TestCase):
             }
 
         with patch(
-            "homeassistant.components.history.state_changes_during_period",
+            "homeassistant.components.history." "state_changes_during_period",
             return_value=fake_states,
         ):
             with patch(
-                "homeassistant.components.history.get_last_state_changes",
+                "homeassistant.components.history." "get_last_state_changes",
                 return_value=fake_states,
             ):
                 with assert_setup_component(1, "sensor"):
@@ -165,11 +163,11 @@ class TestFilterSensor(unittest.TestCase):
             ]
         }
         with patch(
-            "homeassistant.components.history.state_changes_during_period",
+            "homeassistant.components.history." "state_changes_during_period",
             return_value=fake_states,
         ):
             with patch(
-                "homeassistant.components.history.get_last_state_changes",
+                "homeassistant.components.history." "get_last_state_changes",
                 return_value=fake_states,
             ):
                 with assert_setup_component(1, "sensor"):
@@ -207,13 +205,6 @@ class TestFilterSensor(unittest.TestCase):
         for state in [out] + self.values:
             filtered = filt.filter_state(state)
         assert 21 == filtered.state
-
-    def test_precision_zero(self):
-        """Test if precision of zero returns an integer."""
-        filt = LowPassFilter(window_size=10, precision=0, entity=None, time_constant=10)
-        for state in self.values:
-            filtered = filt.filter_state(state)
-        assert isinstance(filtered.state, int)
 
     def test_lowpass(self):
         """Test if lowpass filter works."""

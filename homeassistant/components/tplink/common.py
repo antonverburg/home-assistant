@@ -32,7 +32,7 @@ class SmartDevices:
     def __init__(
         self, lights: List[SmartDevice] = None, switches: List[SmartDevice] = None
     ):
-        """Initialize device holder."""
+        """Constructor."""
         self._lights = lights or []
         self._switches = switches or []
 

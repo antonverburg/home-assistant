@@ -17,6 +17,7 @@ from . import (
     SENSOR_WINDOW_HINGED_VERTICAL,
     NotionEntity,
 )
+
 from .const import DATA_CLIENT, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)

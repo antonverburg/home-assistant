@@ -1,14 +1,13 @@
 """Support for SleepIQ from SleepNumber."""
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
-from sleepyq import Sleepyq
 import voluptuous as vol
 
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.helpers import discovery
 import homeassistant.helpers.config_validation as cv
+from homeassistant.helpers import discovery
 from homeassistant.helpers.entity import Entity
+from homeassistant.const import CONF_USERNAME, CONF_PASSWORD
 from homeassistant.util import Throttle
 
 DOMAIN = "sleepiq"
@@ -47,6 +46,8 @@ def setup(hass, config):
     devices discovered on the account.
     """
     global DATA
+
+    from sleepyq import Sleepyq
 
     username = config[DOMAIN][CONF_USERNAME]
     password = config[DOMAIN][CONF_PASSWORD]

@@ -4,7 +4,7 @@ import logging
 
 import voluptuous as vol
 
-from homeassistant.helpers import config_validation as cv, intent, script, template
+from homeassistant.helpers import intent, template, script, config_validation as cv
 
 DOMAIN = "intent_script"
 
@@ -80,9 +80,7 @@ class ScriptIntentHandler(intent.IntentHandler):
 
         if action is not None:
             if is_async_action:
-                intent_obj.hass.async_create_task(
-                    action.async_run(slots, intent_obj.context)
-                )
+                intent_obj.hass.async_create_task(action.async_run(slots))
             else:
                 await action.async_run(slots)
 

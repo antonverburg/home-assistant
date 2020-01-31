@@ -1,5 +1,4 @@
 """Locks on Zigbee Home Automation networks."""
-import functools
 import logging
 
 from zigpy.zcl.foundation import Status
@@ -20,7 +19,6 @@ from .core.const import (
     SIGNAL_ATTR_UPDATED,
     ZHA_DISCOVERY_NEW,
 )
-from .core.registries import ZHA_ENTITIES
 from .entity import ZhaEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -28,7 +26,6 @@ _LOGGER = logging.getLogger(__name__)
 """ The first state is Zigbee 'Not fully locked' """
 
 STATE_LIST = [STATE_UNLOCKED, STATE_LOCKED, STATE_UNLOCKED]
-STRICT_MATCH = functools.partial(ZHA_ENTITIES.strict_match, DOMAIN)
 
 VALUE_TO_STATE = dict(enumerate(STATE_LIST))
 
@@ -65,20 +62,15 @@ async def _async_setup_entities(
     """Set up the ZHA locks."""
     entities = []
     for discovery_info in discovery_infos:
-        zha_dev = discovery_info["zha_device"]
-        channels = discovery_info["channels"]
+        entities.append(ZhaDoorLock(**discovery_info))
 
-        entity = ZHA_ENTITIES.get_entity(DOMAIN, zha_dev, channels, ZhaDoorLock)
-        if entity:
-            entities.append(entity(**discovery_info))
-
-    if entities:
-        async_add_entities(entities, update_before_add=True)
+    async_add_entities(entities, update_before_add=True)
 
 
-@STRICT_MATCH(channel_names=CHANNEL_DOORLOCK)
 class ZhaDoorLock(ZhaEntity, LockDevice):
     """Representation of a ZHA lock."""
+
+    _domain = DOMAIN
 
     def __init__(self, unique_id, zha_device, channels, **kwargs):
         """Init this sensor."""

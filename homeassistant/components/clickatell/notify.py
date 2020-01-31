@@ -4,9 +4,10 @@ import logging
 import requests
 import voluptuous as vol
 
-from homeassistant.components.notify import PLATFORM_SCHEMA, BaseNotificationService
 from homeassistant.const import CONF_API_KEY, CONF_RECIPIENT
 import homeassistant.helpers.config_validation as cv
+
+from homeassistant.components.notify import PLATFORM_SCHEMA, BaseNotificationService
 
 _LOGGER = logging.getLogger(__name__)
 

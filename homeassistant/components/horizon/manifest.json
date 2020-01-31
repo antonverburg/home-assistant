@@ -1,8 +1,10 @@
 {
   "domain": "horizon",
-  "name": "Unitymedia Horizon HD Recorder",
+  "name": "Horizon",
   "documentation": "https://www.home-assistant.io/integrations/horizon",
-  "requirements": ["horimote==0.4.1"],
+  "requirements": [
+    "horimote==0.4.1"
+  ],
   "dependencies": [],
   "codeowners": []
 }

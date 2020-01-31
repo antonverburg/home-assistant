@@ -1,12 +1,13 @@
 """The totalconnect component."""
 import logging
 
-from total_connect_client import TotalConnectClient
 import voluptuous as vol
+from total_connect_client import TotalConnectClient
 
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.helpers import discovery
 import homeassistant.helpers.config_validation as cv
+from homeassistant.helpers import discovery
+from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
+
 
 _LOGGER = logging.getLogger(__name__)
 

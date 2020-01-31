@@ -1,5 +1,5 @@
 """Tests for Vanderbilt SPC component."""
-from unittest.mock import Mock, PropertyMock, patch
+from unittest.mock import patch, PropertyMock, Mock
 
 from homeassistant.bootstrap import async_setup_component
 from homeassistant.components.spc import DATA_API
@@ -13,8 +13,7 @@ async def test_valid_device_config(hass, monkeypatch):
     config = {"spc": {"api_url": "http://localhost/", "ws_url": "ws://localhost/"}}
 
     with patch(
-        "homeassistant.components.spc.SpcWebGateway.async_load_parameters",
-        return_value=mock_coro(True),
+        "pyspcwebgw.SpcWebGateway.async_load_parameters", return_value=mock_coro(True)
     ):
         assert await async_setup_component(hass, "spc", config) is True
 
@@ -24,8 +23,7 @@ async def test_invalid_device_config(hass, monkeypatch):
     config = {"spc": {"api_url": "http://localhost/"}}
 
     with patch(
-        "homeassistant.components.spc.SpcWebGateway.async_load_parameters",
-        return_value=mock_coro(True),
+        "pyspcwebgw.SpcWebGateway.async_load_parameters", return_value=mock_coro(True)
     ):
         assert await async_setup_component(hass, "spc", config) is False
 
@@ -47,11 +45,11 @@ async def test_update_alarm_device(hass):
     area_mock.verified_alarm = False
 
     with patch(
-        "homeassistant.components.spc.SpcWebGateway.areas", new_callable=PropertyMock
+        "pyspcwebgw.SpcWebGateway.areas", new_callable=PropertyMock
     ) as mock_areas:
         mock_areas.return_value = {"1": area_mock}
         with patch(
-            "homeassistant.components.spc.SpcWebGateway.async_load_parameters",
+            "pyspcwebgw.SpcWebGateway.async_load_parameters",
             return_value=mock_coro(True),
         ):
             assert await async_setup_component(hass, "spc", config) is True

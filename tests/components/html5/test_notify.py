@@ -1,12 +1,11 @@
 """Test HTML5 notify platform."""
 import json
-from unittest.mock import MagicMock, mock_open, patch
-
+from unittest.mock import patch, MagicMock, mock_open
 from aiohttp.hdrs import AUTHORIZATION
 
-import homeassistant.components.html5.notify as html5
-from homeassistant.exceptions import HomeAssistantError
 from homeassistant.setup import async_setup_component
+from homeassistant.exceptions import HomeAssistantError
+import homeassistant.components.html5.notify as html5
 
 CONFIG_FILE = "file.conf"
 

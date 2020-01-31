@@ -3,6 +3,8 @@
   "name": "Snips",
   "documentation": "https://www.home-assistant.io/integrations/snips",
   "requirements": [],
-  "dependencies": ["mqtt"],
+  "dependencies": [
+    "mqtt"
+  ],
   "codeowners": []
 }

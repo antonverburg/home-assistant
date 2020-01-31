@@ -1,5 +1,4 @@
 """Test configuration and mocks for the SmartThings component."""
-import secrets
 from uuid import uuid4
 
 from asynctest import Mock, patch
@@ -161,7 +160,7 @@ def installed_apps_fixture(installed_app, locations, app):
 @pytest.fixture(name="config_file")
 def config_file_fixture():
     """Fixture representing the local config file contents."""
-    return {CONF_INSTANCE_ID: str(uuid4()), CONF_WEBHOOK_ID: secrets.token_hex()}
+    return {CONF_INSTANCE_ID: str(uuid4()), CONF_WEBHOOK_ID: webhook.generate_secret()}
 
 
 @pytest.fixture(name="smartthings_mock")

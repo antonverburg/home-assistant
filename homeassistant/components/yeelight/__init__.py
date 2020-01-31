@@ -1,25 +1,24 @@
 """Support for Xiaomi Yeelight WiFi color bulb."""
 
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
 import voluptuous as vol
 from yeelight import Bulb, BulbException
-
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
 from homeassistant.components.discovery import SERVICE_YEELIGHT
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.const import (
-    ATTR_ENTITY_ID,
     CONF_DEVICES,
-    CONF_HOST,
     CONF_NAME,
     CONF_SCAN_INTERVAL,
+    CONF_HOST,
+    ATTR_ENTITY_ID,
 )
+from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
+from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
 from homeassistant.helpers import discovery
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.discovery import load_platform
-from homeassistant.helpers.dispatcher import dispatcher_connect, dispatcher_send
+import homeassistant.helpers.config_validation as cv
+from homeassistant.helpers.dispatcher import dispatcher_send, dispatcher_connect
 from homeassistant.helpers.event import track_time_interval
 
 _LOGGER = logging.getLogger(__name__)
@@ -49,7 +48,6 @@ ACTION_STAY = "stay"
 ACTION_OFF = "off"
 
 ACTIVE_MODE_NIGHTLIGHT = "1"
-ACTIVE_COLOR_FLOWING = "1"
 
 NIGHTLIGHT_SWITCH_TYPE_LIGHT = "light"
 
@@ -125,7 +123,6 @@ UPDATE_REQUEST_PROPERTIES = [
     "hue",
     "sat",
     "color_mode",
-    "flowing",
     "bg_power",
     "bg_lmode",
     "bg_flowing",
@@ -254,17 +251,8 @@ class YeelightDevice:
         return self._active_mode is not None
 
     @property
-    def is_color_flow_enabled(self) -> bool:
-        """Return true / false if color flow is currently running."""
-        return self._color_flow == ACTIVE_COLOR_FLOWING
-
-    @property
     def _active_mode(self):
         return self.bulb.last_properties.get("active_mode")
-
-    @property
-    def _color_flow(self):
-        return self.bulb.last_properties.get("flowing")
 
     @property
     def type(self):

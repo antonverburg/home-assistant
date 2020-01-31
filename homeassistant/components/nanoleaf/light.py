@@ -1,7 +1,6 @@
 """Support for Nanoleaf Lights."""
 import logging
 
-from pynanoleaf import Nanoleaf, Unavailable
 import voluptuous as vol
 
 from homeassistant.components.light import (
@@ -55,6 +54,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the Nanoleaf light."""
+    from pynanoleaf import Nanoleaf, Unavailable
 
     if DATA_NANOLEAF not in hass.data:
         hass.data[DATA_NANOLEAF] = dict()
@@ -222,6 +222,7 @@ class NanoleafLight(Light):
 
     def update(self):
         """Fetch new state data for this light."""
+        from pynanoleaf import Unavailable
 
         try:
             self._available = self._light.available

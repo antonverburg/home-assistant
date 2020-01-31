@@ -61,6 +61,7 @@ async def async_setup_entry(hass: HomeAssistantType, entry: ConfigEntry) -> bool
         password=entry.data[CONF_PASSWORD],
         tls=entry.data[CONF_SSL],
         verify_ssl=entry.data[CONF_VERIFY_SSL],
+        loop=hass.loop,
         session=session,
     )
 

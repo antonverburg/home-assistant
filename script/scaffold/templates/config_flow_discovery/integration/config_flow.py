@@ -1,9 +1,8 @@
 """Config flow for NEW_NAME."""
 import my_pypi_dependency
 
-from homeassistant import config_entries
 from homeassistant.helpers import config_entry_flow
-
+from homeassistant import config_entries
 from .const import DOMAIN
 
 

@@ -1,9 +1,7 @@
 """Support for the Fibaro devices."""
-from collections import defaultdict
 import logging
+from collections import defaultdict
 from typing import Optional
-
-from fiblary3.client.v4.client import Client as FibaroClient, StateHandler
 import voluptuous as vol
 
 from homeassistant.const import (
@@ -111,6 +109,7 @@ class FibaroController:
 
     def __init__(self, config):
         """Initialize the Fibaro controller."""
+        from fiblary3.client.v4.client import Client as FibaroClient
 
         self._client = FibaroClient(
             config[CONF_URL], config[CONF_USERNAME], config[CONF_PASSWORD]
@@ -134,11 +133,11 @@ class FibaroController:
             info = self._client.info.get()
             self.hub_serial = slugify(info.serialNumber)
         except AssertionError:
-            _LOGGER.error("Can't connect to Fibaro HC. Please check URL.")
+            _LOGGER.error("Can't connect to Fibaro HC. " "Please check URL.")
             return False
         if login is None or login.status is False:
             _LOGGER.error(
-                "Invalid login for Fibaro HC. Please check username and password"
+                "Invalid login for Fibaro HC. " "Please check username and password"
             )
             return False
 
@@ -149,6 +148,8 @@ class FibaroController:
 
     def enable_state_handler(self):
         """Start StateHandler thread for monitoring updates."""
+        from fiblary3.client.v4.client import StateHandler
+
         self._state_handler = StateHandler(self._client, self._on_state_change)
 
     def disable_state_handler(self):
@@ -268,7 +269,7 @@ class FibaroController:
                 else:
                     room_name = self._room_map[device.roomID].name
                 device.room_name = room_name
-                device.friendly_name = f"{room_name} {device.name}"
+                device.friendly_name = room_name + " " + device.name
                 device.ha_id = "{}_{}_{}".format(
                     slugify(room_name), slugify(device.name), device.id
                 )
@@ -380,7 +381,7 @@ class FibaroDevice(Entity):
     def dont_know_message(self, action):
         """Make a warning in case we don't know how to perform an action."""
         _LOGGER.warning(
-            "Not sure how to setValue: %s (available actions: %s)",
+            "Not sure how to setValue: %s " "(available actions: %s)",
             str(self.ha_id),
             str(self.fibaro_device.actions),
         )

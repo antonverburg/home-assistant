@@ -29,7 +29,6 @@ SENSOR_TYPES_CLASS = {
     "SmokeV2": DEVICE_CLASS_SMOKE,
     "TiltSensor": None,
     "WeatherSensor": None,
-    "IPContact": DEVICE_CLASS_OPENING,
 }
 
 

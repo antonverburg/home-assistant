@@ -4,7 +4,7 @@ import logging
 
 import voluptuous as vol
 
-from homeassistant.components.media_player import PLATFORM_SCHEMA, MediaPlayerDevice
+from homeassistant.components.media_player import MediaPlayerDevice, PLATFORM_SCHEMA
 from homeassistant.components.media_player.const import (
     ATTR_APP_ID,
     ATTR_APP_NAME,
@@ -255,10 +255,7 @@ class UniversalMediaPlayer(MediaPlayerDevice):
     @property
     def volume_level(self):
         """Volume level of entity specified in attributes or active child."""
-        try:
-            return float(self._override_or_child_attr(ATTR_MEDIA_VOLUME_LEVEL))
-        except (TypeError, ValueError):
-            return None
+        return self._override_or_child_attr(ATTR_MEDIA_VOLUME_LEVEL)
 
     @property
     def is_volume_muted(self):

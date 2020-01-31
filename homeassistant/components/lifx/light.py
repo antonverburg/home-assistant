@@ -35,12 +35,7 @@ from homeassistant.components.light import (
     Light,
     preprocess_turn_on_alternatives,
 )
-from homeassistant.const import (
-    ATTR_ENTITY_ID,
-    ATTR_MODE,
-    ENTITY_MATCH_ALL,
-    EVENT_HOMEASSISTANT_STOP,
-)
+from homeassistant.const import ATTR_ENTITY_ID, ATTR_MODE, EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import callback
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.device_registry as dr
@@ -65,24 +60,23 @@ MESSAGE_TIMEOUT = 1.0
 MESSAGE_RETRIES = 8
 UNAVAILABLE_GRACE = 90
 
-SERVICE_LIFX_SET_STATE = "set_state"
+SERVICE_LIFX_SET_STATE = "lifx_set_state"
 
 ATTR_INFRARED = "infrared"
 ATTR_ZONES = "zones"
 ATTR_POWER = "power"
 
-LIFX_SET_STATE_SCHEMA = cv.make_entity_service_schema(
+LIFX_SET_STATE_SCHEMA = LIGHT_TURN_ON_SCHEMA.extend(
     {
-        **LIGHT_TURN_ON_SCHEMA,
         ATTR_INFRARED: vol.All(vol.Coerce(int), vol.Clamp(min=0, max=255)),
         ATTR_ZONES: vol.All(cv.ensure_list, [cv.positive_int]),
         ATTR_POWER: cv.boolean,
     }
 )
 
-SERVICE_EFFECT_PULSE = "effect_pulse"
-SERVICE_EFFECT_COLORLOOP = "effect_colorloop"
-SERVICE_EFFECT_STOP = "effect_stop"
+SERVICE_EFFECT_PULSE = "lifx_effect_pulse"
+SERVICE_EFFECT_COLORLOOP = "lifx_effect_colorloop"
+SERVICE_EFFECT_STOP = "lifx_effect_stop"
 
 ATTR_POWER_ON = "power_on"
 ATTR_PERIOD = "period"
@@ -288,7 +282,7 @@ class LIFXManager:
             SERVICE_EFFECT_PULSE,
             SERVICE_EFFECT_COLORLOOP,
         ]:
-            self.hass.services.async_remove(LIFX_DOMAIN, service)
+            self.hass.services.async_remove(DOMAIN, service)
 
     def register_set_state(self):
         """Register the LIFX set_state service call."""
@@ -304,7 +298,7 @@ class LIFXManager:
                 await asyncio.wait(tasks)
 
         self.hass.services.async_register(
-            LIFX_DOMAIN,
+            DOMAIN,
             SERVICE_LIFX_SET_STATE,
             service_handler,
             schema=LIFX_SET_STATE_SCHEMA,
@@ -320,24 +314,21 @@ class LIFXManager:
                 await self.start_effect(entities, service.service, **service.data)
 
         self.hass.services.async_register(
-            LIFX_DOMAIN,
+            DOMAIN,
             SERVICE_EFFECT_PULSE,
             service_handler,
             schema=LIFX_EFFECT_PULSE_SCHEMA,
         )
 
         self.hass.services.async_register(
-            LIFX_DOMAIN,
+            DOMAIN,
             SERVICE_EFFECT_COLORLOOP,
             service_handler,
             schema=LIFX_EFFECT_COLORLOOP_SCHEMA,
         )
 
         self.hass.services.async_register(
-            LIFX_DOMAIN,
-            SERVICE_EFFECT_STOP,
-            service_handler,
-            schema=LIFX_EFFECT_STOP_SCHEMA,
+            DOMAIN, SERVICE_EFFECT_STOP, service_handler, schema=LIFX_EFFECT_STOP_SCHEMA
         )
 
     async def start_effect(self, entities, service, **kwargs):
@@ -374,15 +365,17 @@ class LIFXManager:
 
     async def async_service_to_entities(self, service):
         """Return the known entities that a service call mentions."""
-        if service.data.get(ATTR_ENTITY_ID) == ENTITY_MATCH_ALL:
-            return self.entities.values()
-
         entity_ids = await async_extract_entity_ids(self.hass, service)
-        return [
-            entity
-            for entity in self.entities.values()
-            if entity.entity_id in entity_ids
-        ]
+        if entity_ids:
+            entities = [
+                entity
+                for entity in self.entities.values()
+                if entity.entity_id in entity_ids
+            ]
+        else:
+            entities = list(self.entities.values())
+
+        return entities
 
     @callback
     def register(self, bulb):
@@ -562,7 +555,7 @@ class LIFXLight(Light):
         """Return the name of the currently running effect."""
         effect = self.effects_conductor.effect(self.bulb)
         if effect:
-            return f"lifx_effect_{effect.name}"
+            return "lifx_effect_" + effect.name
         return None
 
     async def update_hass(self, now=None):
@@ -659,7 +652,7 @@ class LIFXLight(Light):
         """Start an effect with default parameters."""
         service = kwargs[ATTR_EFFECT]
         data = {ATTR_ENTITY_ID: self.entity_id}
-        await self.hass.services.async_call(LIFX_DOMAIN, service, data)
+        await self.hass.services.async_call(DOMAIN, service, data)
 
     async def async_update(self):
         """Update bulb status."""

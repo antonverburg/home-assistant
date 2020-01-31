@@ -3,9 +3,6 @@ from datetime import timedelta
 import logging
 from typing import Optional
 
-from geojson_client.usgs_earthquake_hazards_program_feed import (
-    UsgsEarthquakeHazardsProgramFeedManager,
-)
 import voluptuous as vol
 
 from homeassistant.components.geo_location import PLATFORM_SCHEMA, GeolocationEvent
@@ -125,6 +122,9 @@ class UsgsEarthquakesFeedEntityManager:
         minimum_magnitude,
     ):
         """Initialize the Feed Entity Manager."""
+        from geojson_client.usgs_earthquake_hazards_program_feed import (
+            UsgsEarthquakeHazardsProgramFeedManager,
+        )
 
         self._hass = hass
         self._feed_manager = UsgsEarthquakeHazardsProgramFeedManager(

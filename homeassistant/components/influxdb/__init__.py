@@ -1,12 +1,11 @@
 """Support for sending data to an Influx database."""
 import logging
-import math
-import queue
 import re
+import queue
 import threading
 import time
+import math
 
-from influxdb import InfluxDBClient, exceptions
 import requests.exceptions
 import voluptuous as vol
 
@@ -21,12 +20,12 @@ from homeassistant.const import (
     CONF_SSL,
     CONF_USERNAME,
     CONF_VERIFY_SSL,
-    EVENT_HOMEASSISTANT_STOP,
     EVENT_STATE_CHANGED,
+    EVENT_HOMEASSISTANT_STOP,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.helpers import event as event_helper, state as state_helper
+from homeassistant.helpers import state as state_helper, event as event_helper
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity_values import EntityValues
 
@@ -119,6 +118,7 @@ RE_DECIMAL = re.compile(r"[^\d.]+")
 
 def setup(hass, config):
     """Set up the InfluxDB component."""
+    from influxdb import InfluxDBClient, exceptions
 
     conf = config[DOMAIN]
 
@@ -341,6 +341,7 @@ class InfluxThread(threading.Thread):
 
     def write_to_influxdb(self, json):
         """Write preprocessed events to influxdb, with retry."""
+        from influxdb import exceptions
 
         for retry in range(self.max_tries + 1):
             try:

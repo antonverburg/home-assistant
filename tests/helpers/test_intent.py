@@ -1,10 +1,11 @@
 """Tests for the intent helpers."""
 
-import pytest
 import voluptuous as vol
 
+import pytest
+
 from homeassistant.core import State
-from homeassistant.helpers import config_validation as cv, intent
+from homeassistant.helpers import intent, config_validation as cv
 
 
 class MockIntentHandler(intent.IntentHandler):

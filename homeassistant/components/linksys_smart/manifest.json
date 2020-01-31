@@ -1,6 +1,6 @@
 {
   "domain": "linksys_smart",
-  "name": "Linksys Smart Wi-Fi",
+  "name": "Linksys smart",
   "documentation": "https://www.home-assistant.io/integrations/linksys_smart",
   "requirements": [],
   "dependencies": [],

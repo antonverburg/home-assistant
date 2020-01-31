@@ -1,6 +1,5 @@
 """The test for the Facebook notify module."""
 import unittest
-
 import requests_mock
 
 # import homeassistant.components.facebook as facebook

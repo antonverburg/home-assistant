@@ -3,7 +3,12 @@
   "name": "Automation",
   "documentation": "https://www.home-assistant.io/integrations/automation",
   "requirements": [],
-  "dependencies": ["device_automation", "group", "webhook"],
-  "codeowners": ["@home-assistant/core"],
-  "quality_scale": "internal"
+  "dependencies": [
+    "device_automation",
+    "group",
+    "webhook"
+  ],
+  "codeowners": [
+    "@home-assistant/core"
+  ]
 }

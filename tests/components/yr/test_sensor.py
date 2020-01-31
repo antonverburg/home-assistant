@@ -1,27 +1,29 @@
 """The tests for the Yr sensor platform."""
+import asyncio
 from datetime import datetime
 from unittest.mock import patch
 
 from homeassistant.bootstrap import async_setup_component
 import homeassistant.util.dt as dt_util
-
 from tests.common import assert_setup_component, load_fixture
+
 
 NOW = datetime(2016, 6, 9, 1, tzinfo=dt_util.UTC)
 
 
-async def test_default_setup(hass, aioclient_mock):
+@asyncio.coroutine
+def test_default_setup(hass, aioclient_mock):
     """Test the default setup."""
     aioclient_mock.get(
-        "https://aa015h6buqvih86i1.api.met.no/weatherapi/locationforecast/1.9/",
-        text=load_fixture("yr.no.xml"),
+        "https://aa015h6buqvih86i1.api.met.no/" "weatherapi/locationforecast/1.9/",
+        text=load_fixture("yr.no.json"),
     )
     config = {"platform": "yr", "elevation": 0}
     hass.allow_pool = True
     with patch(
         "homeassistant.components.yr.sensor.dt_util.utcnow", return_value=NOW
     ), assert_setup_component(1):
-        await async_setup_component(hass, "sensor", {"sensor": config})
+        yield from async_setup_component(hass, "sensor", {"sensor": config})
 
     state = hass.states.get("sensor.yr_symbol")
 
@@ -29,11 +31,12 @@ async def test_default_setup(hass, aioclient_mock):
     assert state.attributes.get("unit_of_measurement") is None
 
 
-async def test_custom_setup(hass, aioclient_mock):
+@asyncio.coroutine
+def test_custom_setup(hass, aioclient_mock):
     """Test a custom setup."""
     aioclient_mock.get(
-        "https://aa015h6buqvih86i1.api.met.no/weatherapi/locationforecast/1.9/",
-        text=load_fixture("yr.no.xml"),
+        "https://aa015h6buqvih86i1.api.met.no/" "weatherapi/locationforecast/1.9/",
+        text=load_fixture("yr.no.json"),
     )
 
     config = {
@@ -51,7 +54,7 @@ async def test_custom_setup(hass, aioclient_mock):
     with patch(
         "homeassistant.components.yr.sensor.dt_util.utcnow", return_value=NOW
     ), assert_setup_component(1):
-        await async_setup_component(hass, "sensor", {"sensor": config})
+        yield from async_setup_component(hass, "sensor", {"sensor": config})
 
     state = hass.states.get("sensor.yr_pressure")
     assert state.attributes.get("unit_of_measurement") == "hPa"
@@ -74,11 +77,12 @@ async def test_custom_setup(hass, aioclient_mock):
     assert state.state == "3.5"
 
 
-async def test_forecast_setup(hass, aioclient_mock):
+@asyncio.coroutine
+def test_forecast_setup(hass, aioclient_mock):
     """Test a custom setup with 24h forecast."""
     aioclient_mock.get(
-        "https://aa015h6buqvih86i1.api.met.no/weatherapi/locationforecast/1.9/",
-        text=load_fixture("yr.no.xml"),
+        "https://aa015h6buqvih86i1.api.met.no/" "weatherapi/locationforecast/1.9/",
+        text=load_fixture("yr.no.json"),
     )
 
     config = {
@@ -97,7 +101,7 @@ async def test_forecast_setup(hass, aioclient_mock):
     with patch(
         "homeassistant.components.yr.sensor.dt_util.utcnow", return_value=NOW
     ), assert_setup_component(1):
-        await async_setup_component(hass, "sensor", {"sensor": config})
+        yield from async_setup_component(hass, "sensor", {"sensor": config})
 
     state = hass.states.get("sensor.yr_pressure")
     assert state.attributes.get("unit_of_measurement") == "hPa"

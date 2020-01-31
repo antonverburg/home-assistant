@@ -14,6 +14,7 @@ from homeassistant.util.json import load_json
 
 from .const import DOMAIN
 
+
 DATA_FLOW_IMPL = "nest_flow_implementation"
 _LOGGER = logging.getLogger(__name__)
 

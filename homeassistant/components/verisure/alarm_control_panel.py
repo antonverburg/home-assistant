@@ -3,10 +3,6 @@ import logging
 from time import sleep
 
 import homeassistant.components.alarm_control_panel as alarm
-from homeassistant.components.alarm_control_panel.const import (
-    SUPPORT_ALARM_ARM_AWAY,
-    SUPPORT_ALARM_ARM_HOME,
-)
 from homeassistant.const import (
     STATE_ALARM_ARMED_AWAY,
     STATE_ALARM_ARMED_HOME,
@@ -37,6 +33,7 @@ def set_arm_state(state, code=None):
     while "result" not in transaction:
         sleep(0.5)
         transaction = hub.session.get_arm_state_transaction(transaction_id)
+    # pylint: disable=unexpected-keyword-arg
     hub.update_overview(no_throttle=True)
 
 
@@ -66,11 +63,6 @@ class VerisureAlarm(alarm.AlarmControlPanel):
     def state(self):
         """Return the state of the device."""
         return self._state
-
-    @property
-    def supported_features(self) -> int:
-        """Return the list of supported features."""
-        return SUPPORT_ALARM_ARM_HOME | SUPPORT_ALARM_ARM_AWAY
 
     @property
     def code_format(self):

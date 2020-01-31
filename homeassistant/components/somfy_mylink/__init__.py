@@ -1,7 +1,6 @@
 """Component for the Somfy MyLink device supporting the Synergy API."""
 import logging
 
-from somfy_mylink_synergy import SomfyMyLinkSynergy
 import voluptuous as vol
 
 from homeassistant.const import CONF_HOST, CONF_PORT
@@ -49,6 +48,7 @@ CONFIG_SCHEMA = vol.Schema(
 
 async def async_setup(hass, config):
     """Set up the MyLink platform."""
+    from somfy_mylink_synergy import SomfyMyLinkSynergy
 
     host = config[DOMAIN][CONF_HOST]
     port = config[DOMAIN][CONF_PORT]

@@ -2,18 +2,18 @@
 import logging
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import ENERGY_KILO_WATT_HOUR, POWER_WATT
 from homeassistant.helpers.typing import HomeAssistantType
+from homeassistant.const import ENERGY_KILO_WATT_HOUR, POWER_WATT
 
 from . import (
-    ToonBoilerDeviceEntity,
     ToonData,
-    ToonElectricityMeterDeviceEntity,
     ToonEntity,
+    ToonElectricityMeterDeviceEntity,
     ToonGasMeterDeviceEntity,
     ToonSolarDeviceEntity,
+    ToonBoilerDeviceEntity,
 )
-from .const import CURRENCY_EUR, DATA_TOON, DOMAIN, RATIO_PERCENT, VOLUME_CM3, VOLUME_M3
+from .const import CURRENCY_EUR, DATA_TOON, DOMAIN, VOLUME_CM3, VOLUME_M3, RATIO_PERCENT
 
 _LOGGER = logging.getLogger(__name__)
 

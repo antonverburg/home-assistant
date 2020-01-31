@@ -2,7 +2,6 @@
 from datetime import timedelta
 import logging
 
-from influxdb import InfluxDBClient, exceptions
 import voluptuous as vol
 
 from homeassistant.components.sensor import PLATFORM_SCHEMA
@@ -95,6 +94,7 @@ class InfluxSensor(Entity):
 
     def __init__(self, hass, influx_conf, query):
         """Initialize the sensor."""
+        from influxdb import InfluxDBClient, exceptions
 
         self._name = query.get(CONF_NAME)
         self._unit_of_measurement = query.get(CONF_UNIT_OF_MEASUREMENT)
@@ -205,13 +205,14 @@ class InfluxSensorData:
         points = list(self.influx.query(self.query).get_points())
         if not points:
             _LOGGER.warning(
-                "Query returned no points, sensor state set to UNKNOWN: %s", self.query,
+                "Query returned no points, sensor state set " "to UNKNOWN: %s",
+                self.query,
             )
             self.value = None
         else:
             if len(points) > 1:
                 _LOGGER.warning(
-                    "Query returned multiple points, only first one shown: %s",
+                    "Query returned multiple points, only first " "one shown: %s",
                     self.query,
                 )
             self.value = points[0].get("value")

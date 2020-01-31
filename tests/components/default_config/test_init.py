@@ -1,9 +1,9 @@
 """Test the default_config init."""
 from unittest.mock import patch
 
-import pytest
-
 from homeassistant.setup import async_setup_component
+
+import pytest
 
 from tests.common import MockDependency, mock_coro
 

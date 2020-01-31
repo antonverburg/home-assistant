@@ -4,12 +4,12 @@ import re
 
 import voluptuous as vol
 
+from homeassistant.core import callback
 from homeassistant.components.http import HomeAssistantView
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.const import CONF_EMAIL, CONF_NAME
-from homeassistant.core import callback
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity
+import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
 

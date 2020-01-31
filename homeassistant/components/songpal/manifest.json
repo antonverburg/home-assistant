@@ -1,8 +1,12 @@
 {
   "domain": "songpal",
-  "name": "Sony Songpal",
+  "name": "Songpal",
   "documentation": "https://www.home-assistant.io/integrations/songpal",
-  "requirements": ["python-songpal==0.11.2"],
+  "requirements": [
+    "python-songpal==0.11.2"
+  ],
   "dependencies": [],
-  "codeowners": ["@rytilahti"]
+  "codeowners": [
+    "@rytilahti"
+  ]
 }

@@ -1,6 +1,6 @@
 {
   "domain": "picotts",
-  "name": "Pico TTS",
+  "name": "Picotts",
   "documentation": "https://www.home-assistant.io/integrations/picotts",
   "requirements": [],
   "dependencies": [],

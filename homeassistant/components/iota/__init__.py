@@ -1,8 +1,7 @@
 """Support for IOTA wallets."""
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
-from iota import Iota
 import voluptuous as vol
 
 import homeassistant.helpers.config_validation as cv
@@ -78,5 +77,6 @@ class IotaDevice(Entity):
     @property
     def api(self):
         """Construct API object for interaction with the IRI node."""
+        from iota import Iota
 
         return Iota(adapter=self.iri, seed=self._seed)

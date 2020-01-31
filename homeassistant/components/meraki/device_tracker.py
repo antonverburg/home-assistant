@@ -5,16 +5,15 @@ For more details about this platform, please refer to the documentation at
 https://home-assistant.io/components/device_tracker.meraki/
 
 """
-import json
 import logging
+import json
 
 import voluptuous as vol
-
-from homeassistant.components.device_tracker import PLATFORM_SCHEMA, SOURCE_TYPE_ROUTER
-from homeassistant.components.http import HomeAssistantView
+import homeassistant.helpers.config_validation as cv
 from homeassistant.const import HTTP_BAD_REQUEST, HTTP_UNPROCESSABLE_ENTITY
 from homeassistant.core import callback
-import homeassistant.helpers.config_validation as cv
+from homeassistant.components.http import HomeAssistantView
+from homeassistant.components.device_tracker import PLATFORM_SCHEMA, SOURCE_TYPE_ROUTER
 
 CONF_VALIDATOR = "validator"
 CONF_SECRET = "secret"

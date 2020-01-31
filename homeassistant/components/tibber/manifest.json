@@ -2,8 +2,11 @@
   "domain": "tibber",
   "name": "Tibber",
   "documentation": "https://www.home-assistant.io/integrations/tibber",
-  "requirements": ["pyTibber==0.12.0"],
+  "requirements": [
+    "pyTibber==0.11.7"
+  ],
   "dependencies": [],
-  "codeowners": ["@danielhiversen"],
-  "quality_scale": "silver"
+  "codeowners": [
+    "@danielhiversen"
+  ]
 }

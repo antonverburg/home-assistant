@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Inspect all component SCHEMAS."""
-import importlib
 import os
+import importlib
 import pkgutil
 
 from homeassistant.config import _identify_config_schema
@@ -39,7 +39,8 @@ def main():
             if hasattr(module, "CONFIG_SCHEMA"):
                 add_msg(
                     "WARNING",
-                    f"Module {module_name} contains PLATFORM and CONFIG schemas",
+                    "Module {} contains PLATFORM and CONFIG "
+                    "schemas".format(module_name),
                 )
             add_msg("PLATFORM SCHEMA", module_name)
             continue
@@ -51,7 +52,7 @@ def main():
         schema_type, schema = _identify_config_schema(module)
 
         add_msg(
-            f"CONFIG_SCHEMA {schema_type}",
+            "CONFIG_SCHEMA " + str(schema_type),
             module_name + " " + color("cyan", str(schema)[:60]),
         )
 

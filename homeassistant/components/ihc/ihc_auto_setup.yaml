@@ -1,5 +1,5 @@
 # IHC auto setup configuration.
-# To customize this, copy this file to the Home Assistant configuration
+# To customize this, copy this file to the home assistant configuration
 # folder and make your changes.
 
 binary_sensor:

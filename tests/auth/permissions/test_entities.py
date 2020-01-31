@@ -3,14 +3,14 @@ import pytest
 import voluptuous as vol
 
 from homeassistant.auth.permissions.entities import (
-    ENTITY_POLICY_SCHEMA,
     compile_entities,
+    ENTITY_POLICY_SCHEMA,
 )
 from homeassistant.auth.permissions.models import PermissionLookup
-from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
+from homeassistant.helpers.device_registry import DeviceEntry
 
-from tests.common import mock_device_registry, mock_registry
+from tests.common import mock_registry, mock_device_registry
 
 
 def test_entities_none():

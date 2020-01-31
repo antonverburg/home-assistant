@@ -2,28 +2,10 @@
 import pathlib
 import sys
 
-from . import (
-    codeowners,
-    config_flow,
-    dependencies,
-    json,
-    manifest,
-    services,
-    ssdp,
-    zeroconf,
-)
-from .model import Config, Integration
+from .model import Integration, Config
+from . import codeowners, config_flow, dependencies, manifest, services, ssdp, zeroconf
 
-PLUGINS = [
-    json,
-    codeowners,
-    config_flow,
-    dependencies,
-    manifest,
-    services,
-    ssdp,
-    zeroconf,
-]
+PLUGINS = [codeowners, config_flow, dependencies, manifest, services, ssdp, zeroconf]
 
 
 def get_config() -> Config:

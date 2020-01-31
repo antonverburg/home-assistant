@@ -2,10 +2,7 @@
 import asyncio
 import logging
 
-from aiohttp.client_exceptions import ClientResponseError
 import async_timeout
-from logi_circle import LogiCircle
-from logi_circle.exception import AuthorizationFailed
 import voluptuous as vol
 
 from homeassistant import config_entries
@@ -119,6 +116,9 @@ async def async_setup(hass, config):
 
 async def async_setup_entry(hass, entry):
     """Set up Logi Circle from a config entry."""
+    from logi_circle import LogiCircle
+    from logi_circle.exception import AuthorizationFailed
+    from aiohttp.client_exceptions import ClientResponseError
 
     logi_circle = LogiCircle(
         client_id=entry.data[CONF_CLIENT_ID],

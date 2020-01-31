@@ -1,8 +1,8 @@
 """The tests for the demo light component."""
 import pytest
 
-from homeassistant.components import light
 from homeassistant.setup import async_setup_component
+from homeassistant.components import light
 
 from tests.components.light import common
 
@@ -62,14 +62,10 @@ async def test_turn_off(hass):
 
 async def test_turn_off_without_entity_id(hass):
     """Test light turn off all lights."""
-    await hass.services.async_call(
-        "light", "turn_on", {"entity_id": "all"}, blocking=True
-    )
+    await hass.services.async_call("light", "turn_on", {}, blocking=True)
 
     assert light.is_on(hass, ENTITY_LIGHT)
 
-    await hass.services.async_call(
-        "light", "turn_off", {"entity_id": "all"}, blocking=True
-    )
+    await hass.services.async_call("light", "turn_off", {}, blocking=True)
 
     assert not light.is_on(hass, ENTITY_LIGHT)

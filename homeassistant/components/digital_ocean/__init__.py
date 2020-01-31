@@ -1,13 +1,13 @@
 """Support for Digital Ocean."""
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
 import digitalocean
 import voluptuous as vol
 
 from homeassistant.const import CONF_ACCESS_TOKEN
-import homeassistant.helpers.config_validation as cv
 from homeassistant.util import Throttle
+import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
 

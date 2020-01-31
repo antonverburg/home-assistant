@@ -1,8 +1,10 @@
 {
   "domain": "sabnzbd",
-  "name": "SABnzbd",
+  "name": "Sabnzbd",
   "documentation": "https://www.home-assistant.io/integrations/sabnzbd",
-  "requirements": ["pysabnzbd==1.1.0"],
+  "requirements": [
+    "pysabnzbd==1.1.0"
+  ],
   "dependencies": ["configurator"],
   "codeowners": []
 }

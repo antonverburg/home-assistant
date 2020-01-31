@@ -1,6 +1,5 @@
 """Support for showing random numbers."""
 import logging
-from random import randrange
 
 import voluptuous as vol
 
@@ -83,5 +82,6 @@ class RandomSensor(Entity):
 
     async def async_update(self):
         """Get a new number and updates the states."""
+        from random import randrange
 
         self._state = randrange(self._minimum, self._maximum + 1)

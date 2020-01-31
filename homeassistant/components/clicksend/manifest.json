@@ -1,6 +1,6 @@
 {
   "domain": "clicksend",
-  "name": "ClickSend SMS",
+  "name": "Clicksend",
   "documentation": "https://www.home-assistant.io/integrations/clicksend",
   "requirements": [],
   "dependencies": [],

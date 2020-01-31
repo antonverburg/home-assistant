@@ -1,9 +1,9 @@
 """Support for monitoring the qBittorrent API."""
 import logging
 
-from qbittorrent.client import Client, LoginRequired
-from requests.exceptions import RequestException
 import voluptuous as vol
+
+from requests.exceptions import RequestException
 
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.const import (
@@ -13,9 +13,9 @@ from homeassistant.const import (
     CONF_USERNAME,
     STATE_IDLE,
 )
-from homeassistant.exceptions import PlatformNotReady
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity
+import homeassistant.helpers.config_validation as cv
+from homeassistant.exceptions import PlatformNotReady
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,6 +43,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the qBittorrent sensors."""
+    from qbittorrent.client import Client, LoginRequired
 
     try:
         client = Client(config[CONF_URL])
@@ -107,7 +108,7 @@ class QBittorrentSensor(Entity):
     def update(self):
         """Get the latest data from qBittorrent and updates the state."""
         try:
-            data = self.client.sync_main_data()
+            data = self.client.sync()
             self._available = True
         except RequestException:
             _LOGGER.error("Connection lost")

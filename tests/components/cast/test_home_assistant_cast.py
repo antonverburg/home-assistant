@@ -1,6 +1,5 @@
 """Test Home Assistant Cast."""
 from unittest.mock import Mock, patch
-
 from homeassistant.components.cast import home_assistant_cast
 
 from tests.common import MockConfigEntry, async_mock_signal

@@ -3,12 +3,9 @@ import logging
 import re
 from typing import Optional
 
-from homeassistant import core, setup
-from homeassistant.components.cover.intent import INTENT_CLOSE_COVER, INTENT_OPEN_COVER
-from homeassistant.components.shopping_list.intent import (
-    INTENT_ADD_ITEM,
-    INTENT_LAST_ITEMS,
-)
+from homeassistant import core
+from homeassistant.components.cover import INTENT_CLOSE_COVER, INTENT_OPEN_COVER
+from homeassistant.components.shopping_list import INTENT_ADD_ITEM, INTENT_LAST_ITEMS
 from homeassistant.const import EVENT_COMPONENT_LOADED
 from homeassistant.core import callback
 from homeassistant.helpers import intent
@@ -61,9 +58,6 @@ class DefaultAgent(AbstractConversationAgent):
 
     async def async_initialize(self, config):
         """Initialize the default agent."""
-        if "intent" not in self.hass.config.components:
-            await setup.async_setup_component(self.hass, "intent", {})
-
         config = config.get(DOMAIN, {})
         intents = self.hass.data.setdefault(DOMAIN, {})
 
@@ -115,7 +109,7 @@ class DefaultAgent(AbstractConversationAgent):
             async_register(self.hass, intent_type, sentences)
 
     async def async_process(
-        self, text: str, context: core.Context, conversation_id: Optional[str] = None
+        self, text: str, conversation_id: Optional[str] = None
     ) -> intent.IntentResponse:
         """Process a sentence."""
         intents = self.hass.data[DOMAIN]
@@ -133,5 +127,4 @@ class DefaultAgent(AbstractConversationAgent):
                     intent_type,
                     {key: {"value": value} for key, value in match.groupdict().items()},
                     text,
-                    context,
                 )

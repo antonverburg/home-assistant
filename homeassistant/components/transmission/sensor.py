@@ -8,6 +8,7 @@ from homeassistant.helpers.entity import Entity
 
 from .const import DOMAIN, SENSOR_TYPES, STATE_ATTR_TORRENT_INFO
 
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -51,7 +52,6 @@ class TransmissionSensor(Entity):
         self._data = None
         self.client_name = client_name
         self.type = sensor_type
-        self.unsub_update = None
 
     @property
     def name(self):
@@ -92,21 +92,15 @@ class TransmissionSensor(Entity):
 
     async def async_added_to_hass(self):
         """Handle entity which will be added."""
-        self.unsub_update = async_dispatcher_connect(
+        async_dispatcher_connect(
             self.hass,
-            self._tm_client.api.signal_update,
+            self._tm_client.api.signal_options_update,
             self._schedule_immediate_update,
         )
 
     @callback
     def _schedule_immediate_update(self):
         self.async_schedule_update_ha_state(True)
-
-    async def will_remove_from_hass(self):
-        """Unsubscribe from update dispatcher."""
-        if self.unsub_update:
-            self.unsub_update()
-            self.unsub_update = None
 
     def update(self):
         """Get the latest data from Transmission and updates the state."""

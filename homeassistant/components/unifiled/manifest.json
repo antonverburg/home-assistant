@@ -1,6 +1,6 @@
 {
   "domain": "unifiled",
-  "name": "Ubiquiti UniFi LED",
+  "name": "Unifi LED",
   "documentation": "https://www.home-assistant.io/integrations/unifiled",
   "dependencies": [],
   "codeowners": ["@florisvdk"],

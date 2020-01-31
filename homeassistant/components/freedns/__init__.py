@@ -1,14 +1,14 @@
 """Integrate with FreeDNS Dynamic DNS service at freedns.afraid.org."""
 import asyncio
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
 import aiohttp
 import async_timeout
 import voluptuous as vol
 
-from homeassistant.const import CONF_ACCESS_TOKEN, CONF_SCAN_INTERVAL, CONF_URL
 import homeassistant.helpers.config_validation as cv
+from homeassistant.const import CONF_ACCESS_TOKEN, CONF_SCAN_INTERVAL, CONF_URL
 
 _LOGGER = logging.getLogger(__name__)
 

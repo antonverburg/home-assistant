@@ -1,4 +1,6 @@
 """Demo fan platform that has a fake fan."""
+from homeassistant.const import STATE_OFF
+
 from homeassistant.components.fan import (
     SPEED_HIGH,
     SPEED_LOW,
@@ -8,7 +10,6 @@ from homeassistant.components.fan import (
     SUPPORT_SET_SPEED,
     FanEntity,
 )
-from homeassistant.const import STATE_OFF
 
 FULL_SUPPORT = SUPPORT_SET_SPEED | SUPPORT_OSCILLATE | SUPPORT_DIRECTION
 LIMITED_SUPPORT = SUPPORT_SET_SPEED

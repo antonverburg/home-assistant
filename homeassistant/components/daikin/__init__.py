@@ -5,7 +5,6 @@ import logging
 
 from aiohttp import ClientConnectionError
 from async_timeout import timeout
-from pydaikin.appliance import Appliance
 import voluptuous as vol
 
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
@@ -88,6 +87,7 @@ async def async_unload_entry(hass, config_entry):
 
 async def daikin_api_setup(hass, host):
     """Create a Daikin instance only once."""
+    from pydaikin.appliance import Appliance
 
     session = hass.helpers.aiohttp_client.async_get_clientsession()
     try:

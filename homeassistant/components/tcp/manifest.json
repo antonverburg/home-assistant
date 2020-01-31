@@ -1,6 +1,6 @@
 {
   "domain": "tcp",
-  "name": "TCP",
+  "name": "Tcp",
   "documentation": "https://www.home-assistant.io/integrations/tcp",
   "requirements": [],
   "dependencies": [],

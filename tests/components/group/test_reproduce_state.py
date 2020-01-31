@@ -2,7 +2,6 @@
 
 from asyncio import Future
 from unittest.mock import patch
-
 from homeassistant.components.group.reproduce_state import async_reproduce_states
 from homeassistant.core import Context, State
 
@@ -22,9 +21,7 @@ async def test_reproduce_group(hass):
             context=state.context,
         )
 
-    with patch(
-        "homeassistant.components.group.reproduce_state.async_reproduce_state"
-    ) as fun:
+    with patch("homeassistant.helpers.state.async_reproduce_state") as fun:
         fun.return_value = Future()
         fun.return_value.set_result(None)
 

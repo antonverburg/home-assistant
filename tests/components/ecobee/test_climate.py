@@ -1,9 +1,8 @@
 """The test for the Ecobee thermostat module."""
 import unittest
 from unittest import mock
-
-from homeassistant.components.ecobee import climate as ecobee
 import homeassistant.const as const
+from homeassistant.components.ecobee import climate as ecobee
 from homeassistant.const import STATE_OFF
 
 

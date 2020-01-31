@@ -1,10 +1,10 @@
 """The test for the moon sensor platform."""
-from datetime import datetime
 import unittest
+from datetime import datetime
 from unittest.mock import patch
 
-from homeassistant.setup import setup_component
 import homeassistant.util.dt as dt_util
+from homeassistant.setup import setup_component
 
 from tests.common import get_test_home_assistant
 

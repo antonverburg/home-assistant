@@ -2,11 +2,9 @@
 import logging
 from urllib.error import HTTPError
 
-from doorbirdpy import DoorBird
 import voluptuous as vol
 
 from homeassistant.components.http import HomeAssistantView
-from homeassistant.components.logbook import log_entry
 from homeassistant.const import (
     CONF_DEVICES,
     CONF_HOST,
@@ -53,6 +51,7 @@ CONFIG_SCHEMA = vol.Schema(
 
 def setup(hass, config):
     """Set up the DoorBird component."""
+    from doorbirdpy import DoorBird
 
     # Provide an endpoint for the doorstations to call to trigger events
     hass.http.register_view(DoorBirdRequestView)
@@ -68,14 +67,8 @@ def setup(hass, config):
         token = doorstation_config.get(CONF_TOKEN)
         name = doorstation_config.get(CONF_NAME) or "DoorBird {}".format(index + 1)
 
-        try:
-            device = DoorBird(device_ip, username, password)
-            status = device.ready()
-        except OSError as oserr:
-            _LOGGER.error(
-                "Failed to setup doorbird at %s: %s; not retrying", device_ip, oserr
-            )
-            continue
+        device = DoorBird(device_ip, username, password)
+        status = device.ready()
 
         if status[0]:
             doorstation = ConfiguredDoorBird(device, name, events, custom_url, token)
@@ -271,6 +264,7 @@ class DoorBirdRequestView(HomeAssistantView):
     name = API_URL[1:].replace("/", ":")
     extra_urls = [API_URL + "/{event}"]
 
+    # pylint: disable=no-self-use
     async def get(self, request, event):
         """Respond to requests from the device."""
         from aiohttp import web
@@ -296,7 +290,5 @@ class DoorBirdRequestView(HomeAssistantView):
             return web.Response(status=200, text=message)
 
         hass.bus.async_fire(f"{DOMAIN}_{event}", event_data)
-
-        log_entry(hass, "Doorbird {}".format(event), "event was fired.", DOMAIN)
 
         return web.Response(status=200, text="OK")

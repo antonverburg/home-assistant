@@ -1,12 +1,9 @@
 """The tests for the Ring component."""
-from asyncio import run_coroutine_threadsafe
 from copy import deepcopy
-from datetime import timedelta
 import os
 import unittest
-
 import requests_mock
-
+from datetime import timedelta
 from homeassistant import setup
 import homeassistant.components.ring as ring
 
@@ -60,10 +57,7 @@ class TestRing(unittest.TestCase):
             "https://api.ring.com/clients_api/doorbots/987652/health",
             text=load_fixture("ring_doorboot_health_attrs.json"),
         )
-        response = run_coroutine_threadsafe(
-            ring.async_setup(self.hass, self.config), self.hass.loop
-        ).result()
-
+        response = ring.setup(self.hass, self.config)
         assert response
 
     @requests_mock.Mocker()

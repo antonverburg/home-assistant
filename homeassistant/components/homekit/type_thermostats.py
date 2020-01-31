@@ -7,7 +7,6 @@ from homeassistant.components.climate.const import (
     ATTR_CURRENT_TEMPERATURE,
     ATTR_HVAC_ACTION,
     ATTR_HVAC_MODE,
-    ATTR_HVAC_MODES,
     ATTR_MAX_TEMP,
     ATTR_MIN_TEMP,
     ATTR_TARGET_TEMP_HIGH,
@@ -20,9 +19,7 @@ from homeassistant.components.climate.const import (
     DEFAULT_MAX_TEMP,
     DEFAULT_MIN_TEMP,
     DOMAIN as DOMAIN_CLIMATE,
-    HVAC_MODE_AUTO,
     HVAC_MODE_COOL,
-    HVAC_MODE_FAN_ONLY,
     HVAC_MODE_HEAT,
     HVAC_MODE_HEAT_COOL,
     HVAC_MODE_OFF,
@@ -63,18 +60,13 @@ from .util import temperature_to_homekit, temperature_to_states
 
 _LOGGER = logging.getLogger(__name__)
 
-HC_HOMEKIT_VALID_MODES_WATER_HEATER = {
-    "Heat": 1,
-}
 UNIT_HASS_TO_HOMEKIT = {TEMP_CELSIUS: 0, TEMP_FAHRENHEIT: 1}
 UNIT_HOMEKIT_TO_HASS = {c: s for s, c in UNIT_HASS_TO_HOMEKIT.items()}
 HC_HASS_TO_HOMEKIT = {
     HVAC_MODE_OFF: 0,
     HVAC_MODE_HEAT: 1,
     HVAC_MODE_COOL: 2,
-    HVAC_MODE_AUTO: 3,
     HVAC_MODE_HEAT_COOL: 3,
-    HVAC_MODE_FAN_ONLY: 2,
 }
 HC_HOMEKIT_TO_HASS = {c: s for s, c in HC_HASS_TO_HOMEKIT.items()}
 
@@ -105,9 +97,9 @@ class Thermostat(HomeAccessory):
 
         # Add additional characteristics if auto mode is supported
         self.chars = []
-        state = self.hass.states.get(self.entity_id)
-        features = state.attributes.get(ATTR_SUPPORTED_FEATURES, 0)
-
+        features = self.hass.states.get(self.entity_id).attributes.get(
+            ATTR_SUPPORTED_FEATURES, 0
+        )
         if features & SUPPORT_TARGET_TEMPERATURE_RANGE:
             self.chars.extend(
                 (CHAR_COOLING_THRESHOLD_TEMPERATURE, CHAR_HEATING_THRESHOLD_TEMPERATURE)
@@ -115,44 +107,12 @@ class Thermostat(HomeAccessory):
 
         serv_thermostat = self.add_preload_service(SERV_THERMOSTAT, self.chars)
 
-        # Current mode characteristics
+        # Current and target mode characteristics
         self.char_current_heat_cool = serv_thermostat.configure_char(
             CHAR_CURRENT_HEATING_COOLING, value=0
         )
-
-        # Target mode characteristics
-        hc_modes = state.attributes.get(ATTR_HVAC_MODES, None)
-        if hc_modes is None:
-            _LOGGER.error(
-                "%s: HVAC modes not yet available. Please disable auto start for homekit.",
-                self.entity_id,
-            )
-            hc_modes = (
-                HVAC_MODE_HEAT,
-                HVAC_MODE_COOL,
-                HVAC_MODE_HEAT_COOL,
-                HVAC_MODE_OFF,
-            )
-
-        # determine available modes for this entity, prefer AUTO over HEAT_COOL and COOL over FAN_ONLY
-        self.hc_homekit_to_hass = {
-            c: s
-            for s, c in HC_HASS_TO_HOMEKIT.items()
-            if (
-                s in hc_modes
-                and not (
-                    (s == HVAC_MODE_HEAT_COOL and HVAC_MODE_AUTO in hc_modes)
-                    or (s == HVAC_MODE_FAN_ONLY and HVAC_MODE_COOL in hc_modes)
-                )
-            )
-        }
-        hc_valid_values = {k: v for v, k in self.hc_homekit_to_hass.items()}
-
         self.char_target_heat_cool = serv_thermostat.configure_char(
-            CHAR_TARGET_HEATING_COOLING,
-            value=0,
-            setter_callback=self.set_heat_cool,
-            valid_values=hc_valid_values,
+            CHAR_TARGET_HEATING_COOLING, value=0, setter_callback=self.set_heat_cool
         )
 
         # Current and target temperature characteristics
@@ -225,7 +185,7 @@ class Thermostat(HomeAccessory):
         """Change operation mode to value if call came from HomeKit."""
         _LOGGER.debug("%s: Set heat-cool to %d", self.entity_id, value)
         self._flag_heat_cool = True
-        hass_value = self.hc_homekit_to_hass[value]
+        hass_value = HC_HOMEKIT_TO_HASS[value]
         params = {ATTR_ENTITY_ID: self.entity_id, ATTR_HVAC_MODE: hass_value}
         self.call_service(
             DOMAIN_CLIMATE, SERVICE_SET_HVAC_MODE_THERMOSTAT, params, hass_value
@@ -358,10 +318,7 @@ class WaterHeater(HomeAccessory):
             CHAR_CURRENT_HEATING_COOLING, value=1
         )
         self.char_target_heat_cool = serv_thermostat.configure_char(
-            CHAR_TARGET_HEATING_COOLING,
-            value=1,
-            setter_callback=self.set_heat_cool,
-            valid_values=HC_HOMEKIT_VALID_MODES_WATER_HEATER,
+            CHAR_TARGET_HEATING_COOLING, value=1, setter_callback=self.set_heat_cool
         )
 
         self.char_current_temp = serv_thermostat.configure_char(

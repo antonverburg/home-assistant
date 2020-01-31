@@ -1,8 +1,8 @@
 """Support for Velbus sensors."""
 import logging
 
-from . import VelbusEntity
 from .const import DOMAIN
+from . import VelbusEntity
 
 _LOGGER = logging.getLogger(__name__)
 

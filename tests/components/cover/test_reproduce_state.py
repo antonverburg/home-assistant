@@ -16,7 +16,6 @@ from homeassistant.const import (
     STATE_OPEN,
 )
 from homeassistant.core import State
-
 from tests.common import async_mock_service
 
 

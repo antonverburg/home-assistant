@@ -1,16 +1,14 @@
 """The tests for the MQTT automation."""
+import pytest
 from unittest import mock
 
-import pytest
-
-import homeassistant.components.automation as automation
 from homeassistant.setup import async_setup_component
-
+import homeassistant.components.automation as automation
 from tests.common import (
     async_fire_mqtt_message,
-    async_mock_mqtt_component,
-    async_mock_service,
     mock_component,
+    async_mock_service,
+    async_mock_mqtt_component,
 )
 from tests.components.automation import common
 

@@ -1,12 +1,11 @@
 """Demo platform that has a couple of fake sensors."""
 from homeassistant.const import (
     ATTR_BATTERY_LEVEL,
+    TEMP_CELSIUS,
     DEVICE_CLASS_HUMIDITY,
     DEVICE_CLASS_TEMPERATURE,
-    TEMP_CELSIUS,
 )
 from homeassistant.helpers.entity import Entity
-
 from . import DOMAIN
 
 

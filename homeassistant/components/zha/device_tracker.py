@@ -1,5 +1,4 @@
 """Support for the ZHA platform."""
-import functools
 import logging
 import time
 
@@ -15,11 +14,9 @@ from .core.const import (
     SIGNAL_ATTR_UPDATED,
     ZHA_DISCOVERY_NEW,
 )
-from .core.registries import ZHA_ENTITIES
 from .entity import ZhaEntity
-from .sensor import Battery
+from .sensor import battery_percentage_remaining_formatter
 
-STRICT_MATCH = functools.partial(ZHA_ENTITIES.strict_match, DOMAIN)
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -50,20 +47,11 @@ async def _async_setup_entities(
     """Set up the ZHA device trackers."""
     entities = []
     for discovery_info in discovery_infos:
-        zha_dev = discovery_info["zha_device"]
-        channels = discovery_info["channels"]
+        entities.append(ZHADeviceScannerEntity(**discovery_info))
 
-        entity = ZHA_ENTITIES.get_entity(
-            DOMAIN, zha_dev, channels, ZHADeviceScannerEntity
-        )
-        if entity:
-            entities.append(entity(**discovery_info))
-
-    if entities:
-        async_add_entities(entities, update_before_add=True)
+    async_add_entities(entities, update_before_add=True)
 
 
-@STRICT_MATCH(channel_names=CHANNEL_POWER_CONFIGURATION)
 class ZHADeviceScannerEntity(ScannerEntity, ZhaEntity):
     """Represent a tracked device."""
 
@@ -112,7 +100,7 @@ class ZHADeviceScannerEntity(ScannerEntity, ZhaEntity):
         """Handle tracking."""
         self.debug("battery_percentage_remaining updated: %s", value)
         self._connected = True
-        self._battery_level = Battery.formatter(value)
+        self._battery_level = battery_percentage_remaining_formatter(value)
         self.async_schedule_update_ha_state()
 
     @property

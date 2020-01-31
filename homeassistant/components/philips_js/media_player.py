@@ -2,14 +2,11 @@
 from datetime import timedelta
 import logging
 
-from haphilipsjs import PhilipsTV
 import voluptuous as vol
 
-from homeassistant.components.media_player import PLATFORM_SCHEMA, MediaPlayerDevice
+from homeassistant.components.media_player import MediaPlayerDevice, PLATFORM_SCHEMA
 from homeassistant.components.media_player.const import (
-    MEDIA_TYPE_CHANNEL,
     SUPPORT_NEXT_TRACK,
-    SUPPORT_PLAY_MEDIA,
     SUPPORT_PREVIOUS_TRACK,
     SUPPORT_SELECT_SOURCE,
     SUPPORT_TURN_OFF,
@@ -17,6 +14,8 @@ from homeassistant.components.media_player.const import (
     SUPPORT_VOLUME_MUTE,
     SUPPORT_VOLUME_SET,
     SUPPORT_VOLUME_STEP,
+    MEDIA_TYPE_CHANNEL,
+    SUPPORT_PLAY_MEDIA,
 )
 from homeassistant.const import (
     CONF_API_VERSION,
@@ -71,18 +70,20 @@ def _inverted(data):
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the Philips TV platform."""
+    import haphilipsjs
+
     name = config.get(CONF_NAME)
     host = config.get(CONF_HOST)
     api_version = config.get(CONF_API_VERSION)
     turn_on_action = config.get(CONF_ON_ACTION)
 
-    tvapi = PhilipsTV(host, api_version)
+    tvapi = haphilipsjs.PhilipsTV(host, api_version)
     on_script = Script(hass, turn_on_action) if turn_on_action else None
 
-    add_entities([PhilipsTVMediaPlayer(tvapi, name, on_script)])
+    add_entities([PhilipsTV(tvapi, name, on_script)])
 
 
-class PhilipsTVMediaPlayer(MediaPlayerDevice):
+class PhilipsTV(MediaPlayerDevice):
     """Representation of a Philips TV exposing the JointSpace API."""
 
     def __init__(self, tv, name, on_script):

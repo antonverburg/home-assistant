@@ -1,9 +1,8 @@
 """Support for devices connected to UniFi POE."""
 import logging
-from pprint import pformat
 
-from homeassistant.components.switch import SwitchDevice
 from homeassistant.components.unifi.config_flow import get_controller_from_config_entry
+from homeassistant.components.switch import SwitchDevice
 from homeassistant.core import callback
 from homeassistant.helpers import entity_registry
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
@@ -42,15 +41,12 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
             _, mac = entity.unique_id.split("-", 1)
 
-            if mac in controller.api.clients:
-                switches_off.append(entity.unique_id)
+            if mac in controller.api.clients or mac not in controller.api.clients_all:
                 continue
 
-            if mac in controller.api.clients_all:
-                client = controller.api.clients_all[mac]
-                controller.api.clients.process_raw([client.raw])
-                switches_off.append(entity.unique_id)
-                continue
+            client = controller.api.clients_all[mac]
+            controller.api.clients.process_raw([client.raw])
+            switches_off.append(entity.unique_id)
 
     @callback
     def update_controller():
@@ -77,13 +73,12 @@ def update_items(controller, async_add_entities, switches, switches_off):
         block_client_id = f"block-{client_id}"
 
         if block_client_id in switches:
-            if switches[block_client_id].enabled:
-                LOGGER.debug(
-                    "Updating UniFi block switch %s (%s)",
-                    switches[block_client_id].entity_id,
-                    switches[block_client_id].client.mac,
-                )
-                switches[block_client_id].async_schedule_update_ha_state()
+            LOGGER.debug(
+                "Updating UniFi block switch %s (%s)",
+                switches[block_client_id].entity_id,
+                switches[block_client_id].client.mac,
+            )
+            switches[block_client_id].async_schedule_update_ha_state()
             continue
 
         if client_id not in controller.api.clients_all:
@@ -92,6 +87,7 @@ def update_items(controller, async_add_entities, switches, switches_off):
         client = controller.api.clients_all[client_id]
         switches[block_client_id] = UniFiBlockClientSwitch(client, controller)
         new_switches.append(switches[block_client_id])
+        LOGGER.debug("New UniFi Block switch %s (%s)", client.hostname, client.mac)
 
     # control POE
     for client_id in controller.api.clients:
@@ -99,13 +95,12 @@ def update_items(controller, async_add_entities, switches, switches_off):
         poe_client_id = f"poe-{client_id}"
 
         if poe_client_id in switches:
-            if switches[poe_client_id].enabled:
-                LOGGER.debug(
-                    "Updating UniFi POE switch %s (%s)",
-                    switches[poe_client_id].entity_id,
-                    switches[poe_client_id].client.mac,
-                )
-                switches[poe_client_id].async_schedule_update_ha_state()
+            LOGGER.debug(
+                "Updating UniFi POE switch %s (%s)",
+                switches[poe_client_id].entity_id,
+                switches[poe_client_id].client.mac,
+            )
+            switches[poe_client_id].async_schedule_update_ha_state()
             continue
 
         client = controller.api.clients[client_id]
@@ -143,6 +138,7 @@ def update_items(controller, async_add_entities, switches, switches_off):
 
         switches[poe_client_id] = UniFiPOEClientSwitch(client, controller)
         new_switches.append(switches[poe_client_id])
+        LOGGER.debug("New UniFi POE switch %s (%s)", client.hostname, client.mac)
 
     if new_switches:
         async_add_entities(new_switches)
@@ -183,7 +179,6 @@ class UniFiPOEClientSwitch(UniFiClient, SwitchDevice, RestoreEntity):
 
     async def async_added_to_hass(self):
         """Call when entity about to be added to Home Assistant."""
-        LOGGER.debug("New UniFi POE switch %s (%s)", self.name, self.client.mac)
         state = await self.async_get_last_state()
 
         if state is None:
@@ -197,16 +192,6 @@ class UniFiPOEClientSwitch(UniFiClient, SwitchDevice, RestoreEntity):
 
         if not self.client.sw_port:
             self.client.raw["sw_port"] = state.attributes["port"]
-
-    async def async_update(self):
-        """Log client information after update."""
-        await super().async_update()
-
-        LOGGER.debug(
-            "Updating UniFi POE controlled client %s\n%s",
-            self.entity_id,
-            pformat(self.client.raw),
-        )
 
     @property
     def unique_id(self):
@@ -266,10 +251,6 @@ class UniFiPOEClientSwitch(UniFiClient, SwitchDevice, RestoreEntity):
 
 class UniFiBlockClientSwitch(UniFiClient, SwitchDevice):
     """Representation of a blockable client."""
-
-    async def async_added_to_hass(self):
-        """Call when entity about to be added to Home Assistant."""
-        LOGGER.debug("New UniFi Block switch %s (%s)", self.name, self.client.mac)
 
     @property
     def unique_id(self):

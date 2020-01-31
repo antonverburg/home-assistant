@@ -1,19 +1,17 @@
 """Test the cloud.iot module."""
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch, MagicMock
 
 from aiohttp import web
 import pytest
 
-from homeassistant.components.cloud import DOMAIN
-from homeassistant.components.cloud.client import CloudClient
-from homeassistant.components.cloud.const import PREF_ENABLE_ALEXA, PREF_ENABLE_GOOGLE
 from homeassistant.core import State
 from homeassistant.setup import async_setup_component
-
-from . import mock_cloud, mock_cloud_prefs
-
-from tests.common import mock_coro
+from homeassistant.components.cloud import DOMAIN
+from homeassistant.components.cloud.const import PREF_ENABLE_ALEXA, PREF_ENABLE_GOOGLE
 from tests.components.alexa import test_smart_home as test_alexa
+from tests.common import mock_coro
+
+from . import mock_cloud_prefs, mock_cloud
 
 
 @pytest.fixture
@@ -107,7 +105,6 @@ async def test_handler_google_actions(hass):
         "hass_nabucasa.Cloud._decode_claims",
         return_value={"cognito:username": "myUserName"},
     ):
-        await cloud.client.get_google_config()
         resp = await cloud.client.async_google_message(data)
 
     assert resp["requestId"] == reqid
@@ -190,42 +187,25 @@ async def test_google_config_expose_entity(hass, mock_cloud_setup, mock_cloud_lo
     """Test Google config exposing entity method uses latest config."""
     cloud_client = hass.data[DOMAIN].client
     state = State("light.kitchen", "on")
-    gconf = await cloud_client.get_google_config()
 
-    assert gconf.should_expose(state)
+    assert cloud_client.google_config.should_expose(state)
 
     await cloud_client.prefs.async_update_google_entity_config(
         entity_id="light.kitchen", should_expose=False
     )
 
-    assert not gconf.should_expose(state)
+    assert not cloud_client.google_config.should_expose(state)
 
 
 async def test_google_config_should_2fa(hass, mock_cloud_setup, mock_cloud_login):
     """Test Google config disabling 2FA method uses latest config."""
     cloud_client = hass.data[DOMAIN].client
-    gconf = await cloud_client.get_google_config()
     state = State("light.kitchen", "on")
 
-    assert gconf.should_2fa(state)
+    assert cloud_client.google_config.should_2fa(state)
 
     await cloud_client.prefs.async_update_google_entity_config(
         entity_id="light.kitchen", disable_2fa=True
     )
 
-    assert not gconf.should_2fa(state)
-
-
-async def test_set_username(hass):
-    """Test we set username during loggin."""
-    prefs = MagicMock(
-        alexa_enabled=False,
-        google_enabled=False,
-        async_set_username=MagicMock(return_value=mock_coro()),
-    )
-    client = CloudClient(hass, prefs, None, {}, {})
-    client.cloud = MagicMock(is_logged_in=True, username="mock-username")
-    await client.logged_in()
-
-    assert len(prefs.async_set_username.mock_calls) == 1
-    assert prefs.async_set_username.mock_calls[0][1][0] == "mock-username"
+    assert not cloud_client.google_config.should_2fa(state)

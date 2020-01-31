@@ -1,17 +1,19 @@
 """Support for binary sensor using RPi GPIO."""
 import logging
 
-import requests
 import voluptuous as vol
 
-from homeassistant.components.binary_sensor import PLATFORM_SCHEMA, BinarySensorDevice
+import requests
+
 from homeassistant.const import CONF_HOST
+from homeassistant.components.binary_sensor import BinarySensorDevice, PLATFORM_SCHEMA
+
 import homeassistant.helpers.config_validation as cv
 
 from . import (
     CONF_BOUNCETIME,
-    CONF_INVERT_LOGIC,
     CONF_PULL_MODE,
+    CONF_INVERT_LOGIC,
     DEFAULT_BOUNCETIME,
     DEFAULT_INVERT_LOGIC,
     DEFAULT_PULL_MODE,

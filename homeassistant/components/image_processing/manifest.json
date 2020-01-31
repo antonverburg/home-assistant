@@ -1,8 +1,12 @@
 {
   "domain": "image_processing",
-  "name": "Image Processing",
+  "name": "Image processing",
   "documentation": "https://www.home-assistant.io/integrations/image_processing",
-  "requirements": [],
-  "dependencies": ["camera"],
+  "requirements": [
+    "pillow==6.2.1"
+  ],
+  "dependencies": [
+    "camera"
+  ],
   "codeowners": []
 }

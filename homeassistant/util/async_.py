@@ -1,12 +1,33 @@
 """Asyncio backports for Python 3.6 compatibility."""
-from asyncio import coroutines, ensure_future
-from asyncio.events import AbstractEventLoop
 import concurrent.futures
-import logging
 import threading
-from typing import Any, Callable, Coroutine
+import logging
+from asyncio import coroutines
+from asyncio.events import AbstractEventLoop
+
+import asyncio
+from asyncio import ensure_future
+from typing import Any, Coroutine, Callable, TypeVar, Awaitable
 
 _LOGGER = logging.getLogger(__name__)
+
+
+try:
+    # pylint: disable=invalid-name
+    asyncio_run = asyncio.run  # type: ignore
+except AttributeError:
+    _T = TypeVar("_T")
+
+    def asyncio_run(main: Awaitable[_T], *, debug: bool = False) -> _T:
+        """Minimal re-implementation of asyncio.run (since 3.7)."""
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.set_debug(debug)
+        try:
+            return loop.run_until_complete(main)
+        finally:
+            asyncio.set_event_loop(None)
+            loop.close()
 
 
 def fire_coroutine_threadsafe(coro: Coroutine, loop: AbstractEventLoop) -> None:

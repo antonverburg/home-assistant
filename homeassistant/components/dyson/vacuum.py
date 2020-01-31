@@ -1,9 +1,6 @@
 """Support for the Dyson 360 eye vacuum cleaner robot."""
 import logging
 
-from libpurecool.const import Dyson360EyeMode, PowerMode
-from libpurecool.dyson_360_eye import Dyson360Eye
-
 from homeassistant.components.vacuum import (
     SUPPORT_BATTERY,
     SUPPORT_FAN_SPEED,
@@ -41,6 +38,8 @@ SUPPORT_DYSON = (
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the Dyson 360 Eye robot vacuum platform."""
+    from libpurecool.dyson_360_eye import Dyson360Eye
+
     _LOGGER.debug("Creating new Dyson 360 Eye robot vacuum")
     if DYSON_360_EYE_DEVICES not in hass.data:
         hass.data[DYSON_360_EYE_DEVICES] = []
@@ -87,6 +86,8 @@ class Dyson360EyeDevice(VacuumDevice):
     @property
     def status(self):
         """Return the status of the vacuum cleaner."""
+        from libpurecool.const import Dyson360EyeMode
+
         dyson_labels = {
             Dyson360EyeMode.INACTIVE_CHARGING: "Stopped - Charging",
             Dyson360EyeMode.INACTIVE_CHARGED: "Stopped - Charged",
@@ -109,6 +110,8 @@ class Dyson360EyeDevice(VacuumDevice):
     @property
     def fan_speed(self):
         """Return the fan speed of the vacuum cleaner."""
+        from libpurecool.const import PowerMode
+
         speed_labels = {PowerMode.MAX: "Max", PowerMode.QUIET: "Quiet"}
         return speed_labels[self._device.state.power_mode]
 
@@ -125,6 +128,8 @@ class Dyson360EyeDevice(VacuumDevice):
     @property
     def is_on(self) -> bool:
         """Return True if entity is on."""
+        from libpurecool.const import Dyson360EyeMode
+
         return self._device.state.state in [
             Dyson360EyeMode.FULL_CLEAN_INITIATED,
             Dyson360EyeMode.FULL_CLEAN_ABORTED,
@@ -144,6 +149,8 @@ class Dyson360EyeDevice(VacuumDevice):
     @property
     def battery_icon(self):
         """Return the battery icon for the vacuum cleaner."""
+        from libpurecool.const import Dyson360EyeMode
+
         charging = self._device.state.state in [Dyson360EyeMode.INACTIVE_CHARGING]
         return icon_for_battery_level(
             battery_level=self.battery_level, charging=charging
@@ -151,6 +158,8 @@ class Dyson360EyeDevice(VacuumDevice):
 
     def turn_on(self, **kwargs):
         """Turn the vacuum on."""
+        from libpurecool.const import Dyson360EyeMode
+
         _LOGGER.debug("Turn on device %s", self.name)
         if self._device.state.state in [Dyson360EyeMode.FULL_CLEAN_PAUSED]:
             self._device.resume()
@@ -169,12 +178,16 @@ class Dyson360EyeDevice(VacuumDevice):
 
     def set_fan_speed(self, fan_speed, **kwargs):
         """Set fan speed."""
+        from libpurecool.const import PowerMode
+
         _LOGGER.debug("Set fan speed %s on device %s", fan_speed, self.name)
         power_modes = {"Quiet": PowerMode.QUIET, "Max": PowerMode.MAX}
         self._device.set_power_mode(power_modes[fan_speed])
 
     def start_pause(self, **kwargs):
         """Start, pause or resume the cleaning task."""
+        from libpurecool.const import Dyson360EyeMode
+
         if self._device.state.state in [Dyson360EyeMode.FULL_CLEAN_PAUSED]:
             _LOGGER.debug("Resume device %s", self.name)
             self._device.resume()

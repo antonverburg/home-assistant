@@ -3,8 +3,8 @@ import logging
 
 from homeassistant.components.binary_sensor import BinarySensorDevice
 
-from . import VelbusEntity
 from .const import DOMAIN
+from . import VelbusEntity
 
 _LOGGER = logging.getLogger(__name__)
 

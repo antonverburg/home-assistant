@@ -1,17 +1,15 @@
 """Tests for the yandex transport platform."""
 
 import json
-
 import pytest
 
 import homeassistant.components.sensor as sensor
-from homeassistant.const import CONF_NAME
 import homeassistant.util.dt as dt_util
-
+from homeassistant.const import CONF_NAME
 from tests.common import (
-    MockDependency,
     assert_setup_component,
     async_setup_component,
+    MockDependency,
     load_fixture,
 )
 

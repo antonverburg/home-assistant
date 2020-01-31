@@ -20,14 +20,14 @@ from homeassistant.const import (
     CONF_USERNAME,
     EVENT_HOMEASSISTANT_STOP,
 )
-from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.dispatcher import dispatcher_send
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.entity import Entity
 
 from .const import (
     ATTRIBUTION,
-    DEFAULT_CACHEDB,
     DOMAIN,
+    DEFAULT_CACHEDB,
     SIGNAL_CAPTURE_IMAGE,
     SIGNAL_TRIGGER_QUICK_ACTION,
 )
@@ -170,7 +170,7 @@ async def async_unload_entry(hass, config_entry):
 
 
 def setup_hass_services(hass):
-    """Home Assistant services."""
+    """Home assistant services."""
 
     def change_setting(call):
         """Change an Abode system setting."""

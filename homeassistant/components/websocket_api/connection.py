@@ -1,13 +1,14 @@
 """Connection session."""
 import asyncio
-from typing import Any, Callable, Dict, Hashable, Optional
+from typing import Any, Callable, Dict, Hashable
 
 import voluptuous as vol
 
-from homeassistant.core import Context, callback
+from homeassistant.core import callback, Context
 from homeassistant.exceptions import Unauthorized
 
 from . import const, messages
+
 
 # mypy: allow-untyped-calls, allow-untyped-defs
 
@@ -37,7 +38,7 @@ class ActiveConnection:
         return Context(user_id=user.id)
 
     @callback
-    def send_result(self, msg_id: int, result: Optional[Any] = None) -> None:
+    def send_result(self, msg_id, result=None):
         """Send a result message."""
         self.send_message(messages.result_message(msg_id, result))
 
@@ -49,7 +50,7 @@ class ActiveConnection:
         self.send_message(content)
 
     @callback
-    def send_error(self, msg_id: int, code: str, message: str) -> None:
+    def send_error(self, msg_id, code, message):
         """Send a error message."""
         self.send_message(messages.error_message(msg_id, code, message))
 

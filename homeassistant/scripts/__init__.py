@@ -10,7 +10,8 @@ from typing import List, Optional, Sequence, Text
 from homeassistant.bootstrap import async_mount_local_lib_path
 from homeassistant.config import get_default_config_dir
 from homeassistant.requirements import pip_kwargs
-from homeassistant.util.package import install_package, is_installed, is_virtual_env
+from homeassistant.util.package import install_package, is_virtual_env, is_installed
+
 
 # mypy: allow-untyped-defs, no-warn-return-any
 
@@ -38,7 +39,7 @@ def run(args: List) -> int:
         print("Available scripts:", ", ".join(scripts))
         return 1
 
-    script = importlib.import_module(f"homeassistant.scripts.{args[0]}")
+    script = importlib.import_module("homeassistant.scripts." + args[0])
 
     config_dir = extract_config_dir()
 

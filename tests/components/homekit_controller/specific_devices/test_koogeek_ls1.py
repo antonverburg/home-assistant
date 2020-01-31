@@ -3,18 +3,17 @@
 from datetime import timedelta
 from unittest import mock
 
-from homekit.exceptions import AccessoryDisconnectedError, EncryptionError
 import pytest
 
-from homeassistant.components.light import SUPPORT_BRIGHTNESS, SUPPORT_COLOR
+from homekit.exceptions import AccessoryDisconnectedError, EncryptionError
 import homeassistant.util.dt as dt_util
-
+from homeassistant.components.light import SUPPORT_BRIGHTNESS, SUPPORT_COLOR
 from tests.common import async_fire_time_changed
 from tests.components.homekit_controller.common import (
-    FakePairing,
-    Helper,
     setup_accessories_from_file,
     setup_test_accessories,
+    FakePairing,
+    Helper,
 )
 
 LIGHT_ON = ("lightbulb", "on")

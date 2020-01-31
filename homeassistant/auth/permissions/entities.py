@@ -4,10 +4,11 @@ from typing import Callable, Optional
 
 import voluptuous as vol
 
-from .const import POLICY_CONTROL, POLICY_EDIT, POLICY_READ, SUBCAT_ALL
+from .const import SUBCAT_ALL, POLICY_READ, POLICY_CONTROL, POLICY_EDIT
 from .models import PermissionLookup
 from .types import CategoryType, SubCategoryDict, ValueType
-from .util import SubCatLookupType, compile_policy, lookup_all
+
+from .util import SubCatLookupType, lookup_all, compile_policy
 
 SINGLE_ENTITY_SCHEMA = vol.Any(
     True,

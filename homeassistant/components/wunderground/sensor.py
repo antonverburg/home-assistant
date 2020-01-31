@@ -9,27 +9,27 @@ import aiohttp
 import async_timeout
 import voluptuous as vol
 
+from homeassistant.helpers.typing import HomeAssistantType, ConfigType
 from homeassistant.components import sensor
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.const import (
-    ATTR_ATTRIBUTION,
+    CONF_MONITORED_CONDITIONS,
     CONF_API_KEY,
     CONF_LATITUDE,
     CONF_LONGITUDE,
-    CONF_MONITORED_CONDITIONS,
-    LENGTH_FEET,
+    TEMP_FAHRENHEIT,
+    TEMP_CELSIUS,
     LENGTH_INCHES,
     LENGTH_KILOMETERS,
     LENGTH_MILES,
-    TEMP_CELSIUS,
-    TEMP_FAHRENHEIT,
+    LENGTH_FEET,
+    ATTR_ATTRIBUTION,
 )
 from homeassistant.exceptions import PlatformNotReady
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity
-from homeassistant.helpers.typing import ConfigType, HomeAssistantType
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.util import Throttle
+import homeassistant.helpers.config_validation as cv
 
 _RESOURCE = "http://api.wunderground.com/api/{}/{}/{}/q/"
 _LOGGER = logging.getLogger(__name__)
@@ -66,7 +66,7 @@ class WUSensorConfig:
         device_state_attributes=None,
         device_class=None,
     ):
-        """Initialize sensor configuration.
+        """Constructor.
 
         :param friendly_name: Friendly name
         :param feature: WU feature. See:
@@ -98,7 +98,7 @@ class WUCurrentConditionsSensorConfig(WUSensorConfig):
         unit_of_measurement: Optional[str] = None,
         device_class=None,
     ):
-        """Initialize current conditions sensor configuration.
+        """Constructor.
 
         :param friendly_name: Friendly name of sensor
         :field: Field name in the "current_observation" dictionary.
@@ -127,7 +127,7 @@ class WUDailyTextForecastSensorConfig(WUSensorConfig):
     def __init__(
         self, period: int, field: str, unit_of_measurement: Optional[str] = None
     ):
-        """Initialize daily text forecast sensor configuration.
+        """Constructor.
 
         :param period: forecast period number
         :param field: field name to use as value
@@ -164,14 +164,14 @@ class WUDailySimpleForecastSensorConfig(WUSensorConfig):
         icon=None,
         device_class=None,
     ):
-        """Initialize daily simple forecast sensor configuration.
+        """Constructor.
 
         :param friendly_name: friendly_name of the sensor
         :param period: forecast period number
         :param field: field name to use as value
         :param wu_unit: "fahrenheit", "celsius", "degrees" etc. see the example json at:
                 https://www.wunderground.com/weather/api/d/docs?d=data/forecast&MR=1
-        :param ha_unit: corresponding unit in Home Assistant
+        :param ha_unit: corresponding unit in home assistant
         """
         super().__init__(
             friendly_name=friendly_name,
@@ -207,7 +207,7 @@ class WUHourlyForecastSensorConfig(WUSensorConfig):
     """Helper for defining sensor configurations for hourly text forecasts."""
 
     def __init__(self, period: int, field: int):
-        """Initialize hourly forecast sensor configuration.
+        """Constructor.
 
         :param period: forecast period number
         :param field: field name to use as value
@@ -274,7 +274,7 @@ class WUAlmanacSensorConfig(WUSensorConfig):
         icon: str,
         device_class=None,
     ):
-        """Initialize almanac sensor configuration.
+        """Constructor.
 
         :param friendly_name: Friendly name
         :param field: value name returned in 'almanac' dict as returned by the WU API
@@ -297,7 +297,7 @@ class WUAlertsSensorConfig(WUSensorConfig):
     """Helper for defining field configuration for alerts."""
 
     def __init__(self, friendly_name: Union[str, Callable]):
-        """Initialiize alerts sensor configuration.
+        """Constructor.
 
         :param friendly_name: Friendly name
         """
@@ -998,7 +998,7 @@ class WUndergroundSensor(Entity):
         self.rest.request_feature(SENSOR_TYPES[condition].feature)
         # This is only the suggested entity id, it might get changed by
         # the entity registry later.
-        self.entity_id = sensor.ENTITY_ID_FORMAT.format(f"pws_{condition}")
+        self.entity_id = sensor.ENTITY_ID_FORMAT.format("pws_" + condition)
         self._unique_id = f"{unique_id_base},{condition}"
         self._device_class = self._cfg_expand("device_class")
 
@@ -1012,7 +1012,7 @@ class WUndergroundSensor(Entity):
             val = val(self.rest)
         except (KeyError, IndexError, TypeError, ValueError) as err:
             _LOGGER.warning(
-                "Failed to expand cfg from WU API. Condition: %s Attr: %s Error: %s",
+                "Failed to expand cfg from WU API." " Condition: %s Attr: %s Error: %s",
                 self._condition,
                 what,
                 repr(err),
@@ -1122,11 +1122,11 @@ class WUndergroundData:
             self._api_key, "/".join(sorted(self._features)), self._lang
         )
         if self._pws_id:
-            url = f"{url}pws:{self._pws_id}"
+            url = url + f"pws:{self._pws_id}"
         else:
-            url = f"{url}{self._latitude},{self._longitude}"
+            url = url + f"{self._latitude},{self._longitude}"
 
-        return f"{url}.json"
+        return url + ".json"
 
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     async def async_update(self):

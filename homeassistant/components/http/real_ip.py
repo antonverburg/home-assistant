@@ -8,6 +8,7 @@ from homeassistant.core import callback
 
 from .const import KEY_REAL_IP
 
+
 # mypy: allow-untyped-defs
 
 

@@ -4,6 +4,7 @@ import json
 
 import voluptuous as vol
 
+from homeassistant.core import callback
 from homeassistant.components.mqtt import valid_publish_topic, valid_subscribe_topic
 from homeassistant.const import (
     ATTR_SERVICE_DATA,
@@ -12,7 +13,7 @@ from homeassistant.const import (
     EVENT_TIME_CHANGED,
     MATCH_ALL,
 )
-from homeassistant.core import EventOrigin, State, callback
+from homeassistant.core import EventOrigin, State
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.json import JSONEncoder
 

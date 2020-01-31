@@ -27,11 +27,6 @@ SSDP = {
             "manufacturer": "Royal Philips Electronics"
         }
     ],
-    "samsungtv": [
-        {
-            "deviceType": "urn:samsung.com:device:RemoteControlReceiver:1"
-        }
-    ],
     "sonos": [
         {
             "st": "urn:schemas-upnp-org:device:ZonePlayer:1"

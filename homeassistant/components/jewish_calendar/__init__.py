@@ -1,12 +1,13 @@
 """The jewish_calendar component."""
 import logging
 
-import hdate
 import voluptuous as vol
+import hdate
 
 from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.discovery import async_load_platform
+import homeassistant.helpers.config_validation as cv
+
 
 _LOGGER = logging.getLogger(__name__)
 

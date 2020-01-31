@@ -1,8 +1,10 @@
 {
   "domain": "dht",
-  "name": "DHT Sensor",
+  "name": "Dht",
   "documentation": "https://www.home-assistant.io/integrations/dht",
-  "requirements": ["Adafruit-DHT==1.4.0"],
+  "requirements": [
+    "Adafruit-DHT==1.4.0"
+  ],
   "dependencies": [],
   "codeowners": []
 }

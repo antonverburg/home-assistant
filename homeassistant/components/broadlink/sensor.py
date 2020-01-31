@@ -1,22 +1,23 @@
 """Support for the Broadlink RM2 Pro (only temperature) and A1 devices."""
 import binascii
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
 import broadlink
+
 import voluptuous as vol
 
+import homeassistant.helpers.config_validation as cv
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.const import (
     CONF_HOST,
     CONF_MAC,
     CONF_MONITORED_CONDITIONS,
     CONF_NAME,
-    CONF_SCAN_INTERVAL,
-    CONF_TIMEOUT,
     TEMP_CELSIUS,
+    CONF_TIMEOUT,
+    CONF_SCAN_INTERVAL,
 )
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle
 

@@ -1,30 +1,30 @@
 """Support for repeating alerts when conditions are met."""
 import asyncio
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
 import voluptuous as vol
 
+import homeassistant.helpers.config_validation as cv
 from homeassistant.components.notify import (
-    ATTR_DATA,
     ATTR_MESSAGE,
     ATTR_TITLE,
+    ATTR_DATA,
     DOMAIN as DOMAIN_NOTIFY,
 )
 from homeassistant.const import (
-    ATTR_ENTITY_ID,
     CONF_ENTITY_ID,
+    STATE_IDLE,
     CONF_NAME,
     CONF_STATE,
-    SERVICE_TOGGLE,
-    SERVICE_TURN_OFF,
-    SERVICE_TURN_ON,
-    STATE_IDLE,
-    STATE_OFF,
     STATE_ON,
+    STATE_OFF,
+    SERVICE_TURN_ON,
+    SERVICE_TURN_OFF,
+    SERVICE_TOGGLE,
+    ATTR_ENTITY_ID,
 )
-from homeassistant.helpers import event, service
-import homeassistant.helpers.config_validation as cv
+from homeassistant.helpers import service, event
 from homeassistant.helpers.entity import ToggleEntity
 from homeassistant.util.dt import now
 
@@ -213,7 +213,7 @@ class Alert(ToggleEntity):
 
     @property
     def should_poll(self):
-        """Home Assistant need not poll these entities."""
+        """HASS need not poll these entities."""
         return False
 
     @property

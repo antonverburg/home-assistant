@@ -1,12 +1,13 @@
 """The tests for the Season sensor platform."""
 # pylint: disable=protected-access
-from datetime import datetime
 import unittest
+from datetime import datetime
 
-import homeassistant.components.season.sensor as season
 from homeassistant.setup import setup_component
+import homeassistant.components.season.sensor as season
 
 from tests.common import get_test_home_assistant
+
 
 HEMISPHERE_NORTHERN = {
     "homeassistant": {"latitude": "48.864716", "longitude": "2.349014"},

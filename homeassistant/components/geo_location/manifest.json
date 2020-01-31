@@ -1,6 +1,6 @@
 {
   "domain": "geo_location",
-  "name": "Geolocation",
+  "name": "Geo location",
   "documentation": "https://www.home-assistant.io/integrations/geo_location",
   "requirements": [],
   "dependencies": [],

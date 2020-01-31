@@ -1,8 +1,10 @@
 {
   "domain": "smtp",
-  "name": "SMTP",
+  "name": "Smtp",
   "documentation": "https://www.home-assistant.io/integrations/smtp",
   "requirements": [],
   "dependencies": [],
-  "codeowners": ["@fabaff"]
+  "codeowners": [
+    "@fabaff"
+  ]
 }

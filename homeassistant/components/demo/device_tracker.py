@@ -1,7 +1,7 @@
 """Demo platform for the Device tracker component."""
 import random
 
-from .const import DOMAIN, SERVICE_RANDOMIZE_DEVICE_TRACKER_DATA
+from homeassistant.components.device_tracker import DOMAIN
 
 
 def setup_scanner(hass, config, see, discovery_info=None):
@@ -36,6 +36,6 @@ def setup_scanner(hass, config, see, discovery_info=None):
         battery=53,
     )
 
-    hass.services.register(DOMAIN, SERVICE_RANDOMIZE_DEVICE_TRACKER_DATA, observe)
+    hass.services.register(DOMAIN, "demo", observe)
 
     return True

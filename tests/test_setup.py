@@ -1,32 +1,32 @@
 """Test component/platform setup."""
 # pylint: disable=protected-access
 import asyncio
-import logging
 import os
-import threading
 from unittest import mock
+import threading
+import logging
 
 import voluptuous as vol
 
-from homeassistant import setup
-import homeassistant.config as config_util
-from homeassistant.const import EVENT_COMPONENT_LOADED, EVENT_HOMEASSISTANT_START
 from homeassistant.core import callback
-from homeassistant.helpers import discovery
+from homeassistant.const import EVENT_HOMEASSISTANT_START, EVENT_COMPONENT_LOADED
+import homeassistant.config as config_util
+from homeassistant import setup
+import homeassistant.util.dt as dt_util
 from homeassistant.helpers.config_validation import (
     PLATFORM_SCHEMA,
     PLATFORM_SCHEMA_BASE,
 )
-import homeassistant.util.dt as dt_util
+from homeassistant.helpers import discovery
 
 from tests.common import (
+    get_test_home_assistant,
     MockModule,
     MockPlatform,
     assert_setup_component,
     get_test_config_dir,
-    get_test_home_assistant,
-    mock_entity_platform,
     mock_integration,
+    mock_entity_platform,
 )
 
 ORIG_TIMEZONE = dt_util.DEFAULT_TIME_ZONE
@@ -327,7 +327,7 @@ class TestSetup:
             """Test that config is passed in."""
             if config.get("comp_a", {}).get("valid", False):
                 return True
-            raise Exception(f"Config not passed in: {config}")
+            raise Exception("Config not passed in: {}".format(config))
 
         platform = MockPlatform()
 

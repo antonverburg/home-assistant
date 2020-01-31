@@ -2,16 +2,15 @@
 
 import logging
 
+from homeassistant.const import ATTR_ID
 from homeassistant.components.cover import (
     ATTR_POSITION,
-    DEVICE_CLASS_CURTAIN,
     STATE_CLOSED,
-    STATE_CLOSING,
     STATE_OPENING,
+    STATE_CLOSING,
+    DEVICE_CLASS_CURTAIN,
     CoverDevice,
 )
-from homeassistant.const import ATTR_ID
-
 from .const import API, DOMAIN, SLIDES
 
 _LOGGER = logging.getLogger(__name__)

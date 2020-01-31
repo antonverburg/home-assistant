@@ -2,7 +2,6 @@
 from datetime import datetime, timedelta
 import logging
 
-from enturclient import EnturPublicTransportData
 import voluptuous as vol
 
 from homeassistant.components.sensor import PLATFORM_SCHEMA
@@ -88,6 +87,7 @@ def due_in_minutes(timestamp: datetime) -> int:
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the Entur public transport sensor."""
+    from enturclient import EnturPublicTransportData
 
     expand = config.get(CONF_EXPAND_PLATFORMS)
     line_whitelist = config.get(CONF_WHITELIST_LINES)

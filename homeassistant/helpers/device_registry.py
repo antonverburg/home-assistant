@@ -1,9 +1,9 @@
 """Provide a way to connect entities belonging to one device."""
+import logging
+import uuid
 from asyncio import Event
 from collections import OrderedDict
-import logging
-from typing import Any, Dict, List, Optional, cast
-import uuid
+from typing import List, Optional, cast
 
 import attr
 
@@ -12,7 +12,9 @@ from homeassistant.loader import bind_hass
 
 from .typing import HomeAssistantType
 
-# mypy: allow-untyped-calls, allow-untyped-defs, no-check-untyped-defs
+
+# mypy: allow-untyped-calls, allow-untyped-defs
+# mypy: no-check-untyped-defs, no-warn-return-any
 
 _LOGGER = logging.getLogger(__name__)
 _UNDEF = object()
@@ -47,7 +49,7 @@ class DeviceEntry:
     is_new = attr.ib(type=bool, default=False)
 
 
-def format_mac(mac: str) -> str:
+def format_mac(mac):
     """Format the mac address string for entry into dev reg."""
     to_test = mac
 
@@ -70,11 +72,10 @@ def format_mac(mac: str) -> str:
 class DeviceRegistry:
     """Class to hold a registry of devices."""
 
-    devices: Dict[str, DeviceEntry]
-
-    def __init__(self, hass: HomeAssistantType) -> None:
+    def __init__(self, hass):
         """Initialize the device registry."""
         self.hass = hass
+        self.devices = None
         self._store = hass.helpers.storage.Store(STORAGE_VERSION, STORAGE_KEY)
 
     @callback
@@ -260,7 +261,7 @@ class DeviceRegistry:
 
         return new
 
-    def async_remove_device(self, device_id: str) -> None:
+    def async_remove_device(self, device_id):
         """Remove a device from the device registry."""
         del self.devices[device_id]
         self.hass.bus.async_fire(
@@ -298,12 +299,12 @@ class DeviceRegistry:
         self.devices = devices
 
     @callback
-    def async_schedule_save(self) -> None:
+    def async_schedule_save(self):
         """Schedule saving the device registry."""
         self._store.async_delay_save(self._data_to_save, SAVE_DELAY)
 
     @callback
-    def _data_to_save(self) -> Dict[str, List[Dict[str, Any]]]:
+    def _data_to_save(self):
         """Return data of device registry to store in a file."""
         data = {}
 
@@ -327,7 +328,7 @@ class DeviceRegistry:
         return data
 
     @callback
-    def async_clear_config_entry(self, config_entry_id: str) -> None:
+    def async_clear_config_entry(self, config_entry_id):
         """Clear config entry from registry entries."""
         remove = []
         for dev_id, device in self.devices.items():
@@ -375,15 +376,3 @@ async def async_get_registry(hass: HomeAssistantType) -> DeviceRegistry:
 def async_entries_for_area(registry: DeviceRegistry, area_id: str) -> List[DeviceEntry]:
     """Return entries that match an area."""
     return [device for device in registry.devices.values() if device.area_id == area_id]
-
-
-@callback
-def async_entries_for_config_entry(
-    registry: DeviceRegistry, config_entry_id: str
-) -> List[DeviceEntry]:
-    """Return entries that match a config entry."""
-    return [
-        device
-        for device in registry.devices.values()
-        if config_entry_id in device.config_entries
-    ]

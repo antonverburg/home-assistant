@@ -1,29 +1,27 @@
 """Viessmann ViCare climate device."""
 import logging
-
 import requests
+import simplejson
 
 from homeassistant.components.climate import ClimateDevice
 from homeassistant.components.climate.const import (
-    CURRENT_HVAC_HEAT,
-    CURRENT_HVAC_IDLE,
-    HVAC_MODE_AUTO,
-    HVAC_MODE_HEAT,
-    HVAC_MODE_OFF,
-    PRESET_COMFORT,
-    PRESET_ECO,
     SUPPORT_PRESET_MODE,
     SUPPORT_TARGET_TEMPERATURE,
+    PRESET_ECO,
+    PRESET_COMFORT,
+    HVAC_MODE_OFF,
+    HVAC_MODE_HEAT,
+    HVAC_MODE_AUTO,
+    CURRENT_HVAC_HEAT,
+    CURRENT_HVAC_IDLE,
 )
-from homeassistant.const import ATTR_TEMPERATURE, PRECISION_WHOLE, TEMP_CELSIUS
+from homeassistant.const import TEMP_CELSIUS, ATTR_TEMPERATURE, PRECISION_WHOLE
 
-from . import (
-    DOMAIN as VICARE_DOMAIN,
-    VICARE_API,
-    VICARE_HEATING_TYPE,
-    VICARE_NAME,
-    HeatingType,
-)
+from . import DOMAIN as VICARE_DOMAIN
+from . import VICARE_API
+from . import VICARE_NAME
+from . import VICARE_HEATING_TYPE
+from . import HeatingType
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -171,7 +169,7 @@ class ViCareClimate(ClimateDevice):
                 ] = self._api.getReturnTemperature()
         except requests.exceptions.ConnectionError:
             _LOGGER.error("Unable to retrieve data from ViCare server")
-        except ValueError:
+        except simplejson.errors.JSONDecodeError:
             _LOGGER.error("Unable to decode data from ViCare server")
 
     @property

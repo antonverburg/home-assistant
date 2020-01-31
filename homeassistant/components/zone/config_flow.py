@@ -4,20 +4,21 @@ from typing import Set
 
 import voluptuous as vol
 
+import homeassistant.helpers.config_validation as cv
 from homeassistant import config_entries
 from homeassistant.const import (
-    CONF_ICON,
+    CONF_NAME,
     CONF_LATITUDE,
     CONF_LONGITUDE,
-    CONF_NAME,
+    CONF_ICON,
     CONF_RADIUS,
 )
 from homeassistant.core import callback
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.typing import HomeAssistantType
 from homeassistant.util import slugify
 
 from .const import CONF_PASSIVE, DOMAIN, HOME_ZONE
+
 
 # mypy: allow-untyped-defs, no-check-untyped-defs
 

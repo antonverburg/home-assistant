@@ -1,20 +1,21 @@
 """Support for retrieving status info from Google Wifi/OnHub routers."""
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
-import requests
 import voluptuous as vol
+import requests
 
+from homeassistant.util import dt
+import homeassistant.helpers.config_validation as cv
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.const import (
+    CONF_NAME,
     CONF_HOST,
     CONF_MONITORED_CONDITIONS,
-    CONF_NAME,
     STATE_UNKNOWN,
 )
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity
-from homeassistant.util import Throttle, dt
+from homeassistant.util import Throttle
 
 _LOGGER = logging.getLogger(__name__)
 

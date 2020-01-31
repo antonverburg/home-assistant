@@ -1,8 +1,8 @@
 """Axis network device abstraction."""
 
 import asyncio
-
 import async_timeout
+
 import axis
 from axis.streammanager import SIGNAL_PLAYING
 
@@ -21,6 +21,7 @@ from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 
 from .const import CONF_CAMERA, CONF_EVENTS, CONF_MODEL, DOMAIN, LOGGER
+
 from .errors import AuthenticationRequired, CannotConnect
 
 
@@ -56,8 +57,8 @@ class AxisNetworkDevice:
 
     @property
     def serial(self):
-        """Return the serial number of this device."""
-        return self.config_entry.unique_id
+        """Return the mac of this device."""
+        return self.config_entry.data[CONF_MAC]
 
     async def async_update_device_registry(self):
         """Update device registry."""

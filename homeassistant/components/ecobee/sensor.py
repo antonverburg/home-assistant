@@ -8,7 +8,7 @@ from homeassistant.const import (
 )
 from homeassistant.helpers.entity import Entity
 
-from .const import _LOGGER, DOMAIN, ECOBEE_MODEL_TO_NAME, MANUFACTURER
+from .const import DOMAIN, ECOBEE_MODEL_TO_NAME, MANUFACTURER, _LOGGER
 
 SENSOR_TYPES = {
     "temperature": ["Temperature", TEMP_FAHRENHEIT],

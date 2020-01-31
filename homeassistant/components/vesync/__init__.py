@@ -1,23 +1,20 @@
 """Etekcity VeSync integration."""
 import logging
-
-from pyvesync import VeSync
 import voluptuous as vol
-
-from homeassistant.config_entries import SOURCE_IMPORT
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
+from pyvesync import VeSync
+from homeassistant.const import CONF_USERNAME, CONF_PASSWORD
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.dispatcher import async_dispatcher_send
-
+from homeassistant.config_entries import SOURCE_IMPORT
 from .common import async_process_devices
 from .config_flow import configured_instances
 from .const import (
     DOMAIN,
-    SERVICE_UPDATE_DEVS,
-    VS_DISCOVERY,
     VS_DISPATCHERS,
-    VS_MANAGER,
+    VS_DISCOVERY,
     VS_SWITCHES,
+    SERVICE_UPDATE_DEVS,
+    VS_MANAGER,
 )
 
 _LOGGER = logging.getLogger(__name__)

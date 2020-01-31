@@ -17,6 +17,7 @@ from homeassistant.util.yaml import dump
 
 from .const import KEY_REAL_IP
 
+
 # mypy: allow-untyped-defs, no-check-untyped-defs
 
 _LOGGER = logging.getLogger(__name__)
@@ -96,7 +97,7 @@ async def process_wrong_login(request):
     """
     remote_addr = request[KEY_REAL_IP]
 
-    msg = "Login attempt or request with invalid authentication from {}".format(
+    msg = "Login attempt or request with invalid authentication " "from {}".format(
         remote_addr
     )
     _LOGGER.warning(msg)
@@ -150,7 +151,7 @@ async def process_success_login(request):
         and request.app[KEY_FAILED_LOGIN_ATTEMPTS][remote_addr] > 0
     ):
         _LOGGER.debug(
-            "Login success, reset failed login attempts counter from %s", remote_addr
+            "Login success, reset failed login attempts counter" " from %s", remote_addr
         )
         request.app[KEY_FAILED_LOGIN_ATTEMPTS].pop(remote_addr)
 

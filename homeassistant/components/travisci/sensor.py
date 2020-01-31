@@ -1,19 +1,17 @@
 """This component provides HA sensor support for Travis CI framework."""
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
-from travispy import TravisPy
-from travispy.errors import TravisError
 import voluptuous as vol
 
+import homeassistant.helpers.config_validation as cv
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.const import (
     ATTR_ATTRIBUTION,
     CONF_API_KEY,
-    CONF_MONITORED_CONDITIONS,
     CONF_SCAN_INTERVAL,
+    CONF_MONITORED_CONDITIONS,
 )
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity
 
 _LOGGER = logging.getLogger(__name__)
@@ -55,6 +53,8 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the Travis CI sensor."""
+    from travispy import TravisPy
+    from travispy.errors import TravisError
 
     token = config.get(CONF_API_KEY)
     repositories = config.get(CONF_REPOSITORY)

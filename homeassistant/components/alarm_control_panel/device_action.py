@@ -1,6 +1,5 @@
 """Provides device automations for Alarm control panel."""
-from typing import List, Optional
-
+from typing import Optional, List
 import voluptuous as vol
 
 from homeassistant.const import (
@@ -17,17 +16,10 @@ from homeassistant.const import (
     SERVICE_ALARM_DISARM,
     SERVICE_ALARM_TRIGGER,
 )
-from homeassistant.core import Context, HomeAssistant
+from homeassistant.core import HomeAssistant, Context
 from homeassistant.helpers import entity_registry
 import homeassistant.helpers.config_validation as cv
-
 from . import ATTR_CODE_ARM_REQUIRED, DOMAIN
-from .const import (
-    SUPPORT_ALARM_ARM_AWAY,
-    SUPPORT_ALARM_ARM_HOME,
-    SUPPORT_ALARM_ARM_NIGHT,
-    SUPPORT_ALARM_TRIGGER,
-)
 
 ACTION_TYPES = {"arm_away", "arm_home", "arm_night", "disarm", "trigger"}
 
@@ -50,42 +42,31 @@ async def async_get_actions(hass: HomeAssistant, device_id: str) -> List[dict]:
         if entry.domain != DOMAIN:
             continue
 
-        state = hass.states.get(entry.entity_id)
-
-        # We need a state or else we can't populate the HVAC and preset modes.
-        if state is None:
-            continue
-
-        supported_features = state.attributes["supported_features"]
-
         # Add actions for each entity that belongs to this integration
-        if supported_features & SUPPORT_ALARM_ARM_AWAY:
-            actions.append(
-                {
-                    CONF_DEVICE_ID: device_id,
-                    CONF_DOMAIN: DOMAIN,
-                    CONF_ENTITY_ID: entry.entity_id,
-                    CONF_TYPE: "arm_away",
-                }
-            )
-        if supported_features & SUPPORT_ALARM_ARM_HOME:
-            actions.append(
-                {
-                    CONF_DEVICE_ID: device_id,
-                    CONF_DOMAIN: DOMAIN,
-                    CONF_ENTITY_ID: entry.entity_id,
-                    CONF_TYPE: "arm_home",
-                }
-            )
-        if supported_features & SUPPORT_ALARM_ARM_NIGHT:
-            actions.append(
-                {
-                    CONF_DEVICE_ID: device_id,
-                    CONF_DOMAIN: DOMAIN,
-                    CONF_ENTITY_ID: entry.entity_id,
-                    CONF_TYPE: "arm_night",
-                }
-            )
+        actions.append(
+            {
+                CONF_DEVICE_ID: device_id,
+                CONF_DOMAIN: DOMAIN,
+                CONF_ENTITY_ID: entry.entity_id,
+                CONF_TYPE: "arm_away",
+            }
+        )
+        actions.append(
+            {
+                CONF_DEVICE_ID: device_id,
+                CONF_DOMAIN: DOMAIN,
+                CONF_ENTITY_ID: entry.entity_id,
+                CONF_TYPE: "arm_home",
+            }
+        )
+        actions.append(
+            {
+                CONF_DEVICE_ID: device_id,
+                CONF_DOMAIN: DOMAIN,
+                CONF_ENTITY_ID: entry.entity_id,
+                CONF_TYPE: "arm_night",
+            }
+        )
         actions.append(
             {
                 CONF_DEVICE_ID: device_id,
@@ -94,15 +75,14 @@ async def async_get_actions(hass: HomeAssistant, device_id: str) -> List[dict]:
                 CONF_TYPE: "disarm",
             }
         )
-        if supported_features & SUPPORT_ALARM_TRIGGER:
-            actions.append(
-                {
-                    CONF_DEVICE_ID: device_id,
-                    CONF_DOMAIN: DOMAIN,
-                    CONF_ENTITY_ID: entry.entity_id,
-                    CONF_TYPE: "trigger",
-                }
-            )
+        actions.append(
+            {
+                CONF_DEVICE_ID: device_id,
+                CONF_DOMAIN: DOMAIN,
+                CONF_ENTITY_ID: entry.entity_id,
+                CONF_TYPE: "trigger",
+            }
+        )
 
     return actions
 

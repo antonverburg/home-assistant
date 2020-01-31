@@ -1,7 +1,6 @@
 """Support for EE Brightbox router."""
 import logging
 
-from eebrightbox import EEBrightBox, EEBrightBoxException
 import voluptuous as vol
 
 from homeassistant.components.device_tracker import (
@@ -47,6 +46,8 @@ class EEBrightBoxScanner(DeviceScanner):
 
     def check_config(self):
         """Check if provided configuration and credentials are correct."""
+        from eebrightbox import EEBrightBox, EEBrightBoxException
+
         try:
             with EEBrightBox(self.config) as ee_brightbox:
                 return bool(ee_brightbox.get_devices())
@@ -56,6 +57,8 @@ class EEBrightBoxScanner(DeviceScanner):
 
     def scan_devices(self):
         """Scan for devices."""
+        from eebrightbox import EEBrightBox
+
         with EEBrightBox(self.config) as ee_brightbox:
             self.devices = {d["mac"]: d for d in ee_brightbox.get_devices()}
 

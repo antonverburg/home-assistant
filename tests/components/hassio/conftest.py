@@ -1,16 +1,15 @@
 """Fixtures for Hass.io."""
 import os
-from unittest.mock import Mock, patch
+from unittest.mock import patch, Mock
 
 import pytest
 
-from homeassistant.components.hassio.handler import HassIO, HassioAPIError
 from homeassistant.core import CoreState
 from homeassistant.setup import async_setup_component
-
-from . import HASSIO_TOKEN
+from homeassistant.components.hassio.handler import HassIO, HassioAPIError
 
 from tests.common import mock_coro
+from . import HASSIO_TOKEN
 
 
 @pytest.fixture
@@ -20,7 +19,7 @@ def hassio_env():
         "homeassistant.components.hassio.HassIO.is_connected",
         Mock(return_value=mock_coro({"result": "ok", "data": {}})),
     ), patch.dict(os.environ, {"HASSIO_TOKEN": "123456"}), patch(
-        "homeassistant.components.hassio.HassIO.get_homeassistant_info",
+        "homeassistant.components.hassio.HassIO." "get_homeassistant_info",
         Mock(side_effect=HassioAPIError()),
     ):
         yield

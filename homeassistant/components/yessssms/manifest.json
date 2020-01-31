@@ -1,8 +1,12 @@
 {
   "domain": "yessssms",
-  "name": "yesss! SMS",
+  "name": "Yessssms",
   "documentation": "https://www.home-assistant.io/integrations/yessssms",
-  "requirements": ["YesssSMS==0.4.1"],
+  "requirements": [
+    "YesssSMS==0.4.1"
+  ],
   "dependencies": [],
-  "codeowners": ["@flowolf"]
+  "codeowners": [
+    "@flowolf"
+  ]
 }

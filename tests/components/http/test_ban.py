@@ -1,27 +1,28 @@
 """The tests for the Home Assistant HTTP component."""
 # pylint: disable=protected-access
 from ipaddress import ip_address
-from unittest.mock import Mock, mock_open, patch
+from unittest.mock import patch, mock_open, Mock
 
 from aiohttp import web
 from aiohttp.web_exceptions import HTTPUnauthorized
 from aiohttp.web_middlewares import middleware
 
-import homeassistant.components.http as http
 from homeassistant.components.http import KEY_AUTHENTICATED
-from homeassistant.components.http.ban import (
-    IP_BANS_FILE,
-    KEY_BANNED_IPS,
-    KEY_FAILED_LOGIN_ATTEMPTS,
-    IpBan,
-    setup_bans,
-)
 from homeassistant.components.http.view import request_handler_factory
 from homeassistant.setup import async_setup_component
+import homeassistant.components.http as http
+from homeassistant.components.http.ban import (
+    IpBan,
+    IP_BANS_FILE,
+    setup_bans,
+    KEY_BANNED_IPS,
+    KEY_FAILED_LOGIN_ATTEMPTS,
+)
 
 from . import mock_real_ip
 
 from tests.common import mock_coro
+
 
 BANNED_IPS = ["200.201.202.203", "100.64.0.2"]
 

@@ -1,11 +1,10 @@
 """The tests for the Islamic prayer times sensor platform."""
 from datetime import datetime, timedelta
 from unittest.mock import patch
-
-from homeassistant.components.islamic_prayer_times.sensor import IslamicPrayerTimesData
 from homeassistant.setup import async_setup_component
+from homeassistant.components.islamic_prayer_times.sensor import IslamicPrayerTimesData
+from tests.common import MockDependency
 import homeassistant.util.dt as dt_util
-
 from tests.common import async_fire_time_changed
 
 LATITUDE = 41
@@ -35,10 +34,8 @@ async def test_islamic_prayer_times_min_config(hass):
     """Test minimum Islamic prayer times configuration."""
     min_config_sensors = ["fajr", "dhuhr", "asr", "maghrib", "isha"]
 
-    with patch(
-        "homeassistant.components.islamic_prayer_times.sensor.PrayerTimesCalculator"
-    ) as PrayerTimesCalculator:
-        PrayerTimesCalculator.return_value.fetch_prayer_times.return_value = (
+    with MockDependency("prayer_times_calculator") as mock_pt_calc:
+        mock_pt_calc.PrayerTimesCalculator.return_value.fetch_prayer_times.return_value = (
             PRAYER_TIMES
         )
 
@@ -66,10 +63,8 @@ async def test_islamic_prayer_times_multiple_sensors(hass):
         "midnight",
     ]
 
-    with patch(
-        "homeassistant.components.islamic_prayer_times.sensor.PrayerTimesCalculator"
-    ) as PrayerTimesCalculator:
-        PrayerTimesCalculator.return_value.fetch_prayer_times.return_value = (
+    with MockDependency("prayer_times_calculator") as mock_pt_calc:
+        mock_pt_calc.PrayerTimesCalculator.return_value.fetch_prayer_times.return_value = (
             PRAYER_TIMES
         )
 
@@ -92,10 +87,8 @@ async def test_islamic_prayer_times_with_calculation_method(hass):
     """Test Islamic prayer times configuration with calculation method."""
     sensors = ["fajr", "maghrib"]
 
-    with patch(
-        "homeassistant.components.islamic_prayer_times.sensor.PrayerTimesCalculator"
-    ) as PrayerTimesCalculator:
-        PrayerTimesCalculator.return_value.fetch_prayer_times.return_value = (
+    with MockDependency("prayer_times_calculator") as mock_pt_calc:
+        mock_pt_calc.PrayerTimesCalculator.return_value.fetch_prayer_times.return_value = (
             PRAYER_TIMES
         )
 
@@ -120,10 +113,8 @@ async def test_islamic_prayer_times_with_calculation_method(hass):
 
 async def test_islamic_prayer_times_data_get_prayer_times(hass):
     """Test Islamic prayer times data fetcher."""
-    with patch(
-        "homeassistant.components.islamic_prayer_times.sensor.PrayerTimesCalculator"
-    ) as PrayerTimesCalculator:
-        PrayerTimesCalculator.return_value.fetch_prayer_times.return_value = (
+    with MockDependency("prayer_times_calculator") as mock_pt_calc:
+        mock_pt_calc.PrayerTimesCalculator.return_value.fetch_prayer_times.return_value = (
             PRAYER_TIMES
         )
 
@@ -147,10 +138,8 @@ async def test_islamic_prayer_times_sensor_update(hass):
         "Midnight": "00:45",
     }
 
-    with patch(
-        "homeassistant.components.islamic_prayer_times.sensor.PrayerTimesCalculator"
-    ) as PrayerTimesCalculator:
-        PrayerTimesCalculator.return_value.fetch_prayer_times.side_effect = [
+    with MockDependency("prayer_times_calculator") as mock_pt_calc:
+        mock_pt_calc.PrayerTimesCalculator.return_value.fetch_prayer_times.side_effect = [
             PRAYER_TIMES,
             new_prayer_times,
         ]
@@ -175,7 +164,7 @@ async def test_islamic_prayer_times_sensor_update(hass):
         future = midnight_dt + timedelta(days=1, minutes=1)
 
         with patch(
-            "homeassistant.components.islamic_prayer_times.sensor.dt_util.utcnow",
+            "homeassistant.components.islamic_prayer_times.sensor" ".dt_util.utcnow",
             return_value=future,
         ):
 

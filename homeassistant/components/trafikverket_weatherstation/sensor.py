@@ -5,7 +5,6 @@ from datetime import timedelta
 import logging
 
 import aiohttp
-from pytrafikverket.trafikverket_weather import TrafikverketWeather
 import voluptuous as vol
 
 from homeassistant.components.sensor import PLATFORM_SCHEMA
@@ -107,6 +106,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the Trafikverket sensor platform."""
+    from pytrafikverket.trafikverket_weather import TrafikverketWeather
 
     sensor_name = config[CONF_NAME]
     sensor_api = config[CONF_API_KEY]

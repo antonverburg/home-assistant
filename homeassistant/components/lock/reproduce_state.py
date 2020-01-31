@@ -5,10 +5,10 @@ from typing import Iterable, Optional
 
 from homeassistant.const import (
     ATTR_ENTITY_ID,
-    SERVICE_LOCK,
-    SERVICE_UNLOCK,
     STATE_LOCKED,
     STATE_UNLOCKED,
+    SERVICE_LOCK,
+    SERVICE_UNLOCK,
 )
 from homeassistant.core import Context, State
 from homeassistant.helpers.typing import HomeAssistantType

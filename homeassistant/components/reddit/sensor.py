@@ -6,7 +6,7 @@ import praw
 import voluptuous as vol
 
 from homeassistant.components.sensor import PLATFORM_SCHEMA
-from homeassistant.const import CONF_MAXIMUM, CONF_PASSWORD, CONF_USERNAME
+from homeassistant.const import CONF_USERNAME, CONF_PASSWORD, CONF_MAXIMUM
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity
 

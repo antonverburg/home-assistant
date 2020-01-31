@@ -1,8 +1,10 @@
 {
   "domain": "danfoss_air",
-  "name": "Danfoss Air",
+  "name": "Danfoss air",
   "documentation": "https://www.home-assistant.io/integrations/danfoss_air",
-  "requirements": ["pydanfossair==0.1.0"],
+  "requirements": [
+    "pydanfossair==0.1.0"
+  ],
   "dependencies": [],
   "codeowners": []
 }

@@ -1,6 +1,6 @@
 """Handle MySensors devices."""
-from functools import partial
 import logging
+from functools import partial
 
 from homeassistant.const import ATTR_BATTERY_LEVEL, STATE_OFF, STATE_ON
 from homeassistant.core import callback

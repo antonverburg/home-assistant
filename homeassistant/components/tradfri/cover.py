@@ -1,9 +1,8 @@
 """Support for IKEA Tradfri covers."""
 
-from homeassistant.components.cover import ATTR_POSITION, CoverDevice
-
+from homeassistant.components.cover import CoverDevice, ATTR_POSITION
 from .base_class import TradfriBaseDevice
-from .const import CONF_GATEWAY_ID, KEY_API, KEY_GATEWAY
+from .const import KEY_GATEWAY, KEY_API, CONF_GATEWAY_ID
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
