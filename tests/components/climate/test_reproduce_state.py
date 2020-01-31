@@ -2,6 +2,7 @@
 
 import pytest
 
+from homeassistant.components.climate.reproduce_state import async_reproduce_states
 from homeassistant.components.climate.const import (
     ATTR_AUX_HEAT,
     ATTR_HUMIDITY,
@@ -20,7 +21,6 @@ from homeassistant.components.climate.const import (
     SERVICE_SET_SWING_MODE,
     SERVICE_SET_TEMPERATURE,
 )
-from homeassistant.components.climate.reproduce_state import async_reproduce_states
 from homeassistant.const import ATTR_TEMPERATURE
 from homeassistant.core import Context, State
 

@@ -1,5 +1,5 @@
 """Test Home Assistant location util methods."""
-from unittest.mock import Mock, patch
+from unittest.mock import patch, Mock
 
 import aiohttp
 import pytest

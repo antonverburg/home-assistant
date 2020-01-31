@@ -1,35 +1,37 @@
 """The tests for Home Assistant frontend."""
+import asyncio
 import re
 from unittest.mock import patch
 
 import pytest
 
+from homeassistant.setup import async_setup_component
 from homeassistant.components.frontend import (
-    CONF_EXTRA_HTML_URL,
-    CONF_EXTRA_HTML_URL_ES5,
+    DOMAIN,
     CONF_JS_VERSION,
     CONF_THEMES,
-    DOMAIN,
+    CONF_EXTRA_HTML_URL,
+    CONF_EXTRA_HTML_URL_ES5,
     EVENT_PANELS_UPDATED,
 )
 from homeassistant.components.websocket_api.const import TYPE_RESULT
-from homeassistant.setup import async_setup_component
 
-from tests.common import async_capture_events, mock_coro
+from tests.common import mock_coro, async_capture_events
+
 
 CONFIG_THEMES = {DOMAIN: {CONF_THEMES: {"happy": {"primary-color": "red"}}}}
 
 
 @pytest.fixture
 def mock_http_client(hass, aiohttp_client):
-    """Start the Home Assistant HTTP component."""
+    """Start the Hass HTTP component."""
     hass.loop.run_until_complete(async_setup_component(hass, "frontend", {}))
     return hass.loop.run_until_complete(aiohttp_client(hass.http.app))
 
 
 @pytest.fixture
 def mock_http_client_with_themes(hass, aiohttp_client):
-    """Start the Home Assistant HTTP component."""
+    """Start the Hass HTTP component."""
     hass.loop.run_until_complete(
         async_setup_component(
             hass,
@@ -42,7 +44,7 @@ def mock_http_client_with_themes(hass, aiohttp_client):
 
 @pytest.fixture
 def mock_http_client_with_urls(hass, aiohttp_client):
-    """Start the Home Assistant HTTP component."""
+    """Start the Hass HTTP component."""
     hass.loop.run_until_complete(
         async_setup_component(
             hass,
@@ -70,48 +72,53 @@ def mock_onboarded():
         yield
 
 
-async def test_frontend_and_static(mock_http_client, mock_onboarded):
+@asyncio.coroutine
+def test_frontend_and_static(mock_http_client, mock_onboarded):
     """Test if we can get the frontend."""
-    resp = await mock_http_client.get("")
+    resp = yield from mock_http_client.get("")
     assert resp.status == 200
     assert "cache-control" not in resp.headers
 
-    text = await resp.text()
+    text = yield from resp.text()
 
     # Test we can retrieve frontend.js
     frontendjs = re.search(r"(?P<app>\/frontend_es5\/app.[A-Za-z0-9]{8}.js)", text)
 
     assert frontendjs is not None, text
-    resp = await mock_http_client.get(frontendjs.groups(0)[0])
+    resp = yield from mock_http_client.get(frontendjs.groups(0)[0])
     assert resp.status == 200
     assert "public" in resp.headers.get("cache-control")
 
 
-async def test_dont_cache_service_worker(mock_http_client):
+@asyncio.coroutine
+def test_dont_cache_service_worker(mock_http_client):
     """Test that we don't cache the service worker."""
-    resp = await mock_http_client.get("/service_worker.js")
+    resp = yield from mock_http_client.get("/service_worker.js")
     assert resp.status == 200
     assert "cache-control" not in resp.headers
 
 
-async def test_404(mock_http_client):
+@asyncio.coroutine
+def test_404(mock_http_client):
     """Test for HTTP 404 error."""
-    resp = await mock_http_client.get("/not-existing")
+    resp = yield from mock_http_client.get("/not-existing")
     assert resp.status == 404
 
 
-async def test_we_cannot_POST_to_root(mock_http_client):
+@asyncio.coroutine
+def test_we_cannot_POST_to_root(mock_http_client):
     """Test that POST is not allow to root."""
-    resp = await mock_http_client.post("/")
+    resp = yield from mock_http_client.post("/")
     assert resp.status == 405
 
 
-async def test_states_routes(mock_http_client):
+@asyncio.coroutine
+def test_states_routes(mock_http_client):
     """All served by index."""
-    resp = await mock_http_client.get("/states")
+    resp = yield from mock_http_client.get("/states")
     assert resp.status == 200
 
-    resp = await mock_http_client.get("/states/group.existing")
+    resp = yield from mock_http_client.get("/states/group.existing")
     assert resp.status == 200
 
 
@@ -205,11 +212,12 @@ async def test_missing_themes(hass, hass_ws_client):
     assert msg["result"]["themes"] == {}
 
 
-async def test_extra_urls(mock_http_client_with_urls, mock_onboarded):
+@asyncio.coroutine
+def test_extra_urls(mock_http_client_with_urls, mock_onboarded):
     """Test that extra urls are loaded."""
-    resp = await mock_http_client_with_urls.get("/states?latest")
+    resp = yield from mock_http_client_with_urls.get("/states?latest")
     assert resp.status == 200
-    text = await resp.text()
+    text = yield from resp.text()
     assert text.find('href="https://domain.com/my_extra_url.html"') >= 0
 
 

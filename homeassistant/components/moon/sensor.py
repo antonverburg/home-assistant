@@ -1,38 +1,19 @@
 """Support for tracking the moon phases."""
 import logging
 
-from astral import Astral
 import voluptuous as vol
 
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.const import CONF_NAME
-import homeassistant.helpers.config_validation as cv
-from homeassistant.helpers.entity import Entity
 import homeassistant.util.dt as dt_util
+from homeassistant.helpers.entity import Entity
+import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
 
 DEFAULT_NAME = "Moon"
 
-STATE_FIRST_QUARTER = "first_quarter"
-STATE_FULL_MOON = "full_moon"
-STATE_LAST_QUARTER = "last_quarter"
-STATE_NEW_MOON = "new_moon"
-STATE_WANING_CRESCENT = "waning_crescent"
-STATE_WANING_GIBBOUS = "waning_gibbous"
-STATE_WAXING_GIBBOUS = "waxing_gibbous"
-STATE_WAXING_CRESCENT = "waxing_crescent"
-
-MOON_ICONS = {
-    STATE_FIRST_QUARTER: "mdi:moon-first-quarter",
-    STATE_FULL_MOON: "mdi:moon-full",
-    STATE_LAST_QUARTER: "mdi:moon-last-quarter",
-    STATE_NEW_MOON: "mdi:moon-new",
-    STATE_WANING_CRESCENT: "mdi:moon-waning-crescent",
-    STATE_WANING_GIBBOUS: "mdi:moon-waning-gibbous",
-    STATE_WAXING_CRESCENT: "mdi:moon-waxing-crescent",
-    STATE_WAXING_GIBBOUS: "mdi:moon-waxing-gibbous",
-}
+ICON = "mdi:brightness-3"
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string}
@@ -50,7 +31,7 @@ class MoonSensor(Entity):
     """Representation of a Moon sensor."""
 
     def __init__(self, name):
-        """Initialize the moon sensor."""
+        """Initialize the sensor."""
         self._name = name
         self._state = None
 
@@ -63,27 +44,29 @@ class MoonSensor(Entity):
     def state(self):
         """Return the state of the device."""
         if self._state == 0:
-            return STATE_NEW_MOON
+            return "new_moon"
         if self._state < 7:
-            return STATE_WAXING_CRESCENT
+            return "waxing_crescent"
         if self._state == 7:
-            return STATE_FIRST_QUARTER
+            return "first_quarter"
         if self._state < 14:
-            return STATE_WAXING_GIBBOUS
+            return "waxing_gibbous"
         if self._state == 14:
-            return STATE_FULL_MOON
+            return "full_moon"
         if self._state < 21:
-            return STATE_WANING_GIBBOUS
+            return "waning_gibbous"
         if self._state == 21:
-            return STATE_LAST_QUARTER
-        return STATE_WANING_CRESCENT
+            return "last_quarter"
+        return "waning_crescent"
 
     @property
     def icon(self):
         """Icon to use in the frontend, if any."""
-        return MOON_ICONS.get(self.state)
+        return ICON
 
     async def async_update(self):
         """Get the time and updates the states."""
+        from astral import Astral
+
         today = dt_util.as_local(dt_util.utcnow()).date()
         self._state = Astral().moon_phase(today)

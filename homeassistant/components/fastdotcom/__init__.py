@@ -1,12 +1,11 @@
 """Support for testing internet speed via Fast.com."""
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
-from fastdotcom import fast_com
 import voluptuous as vol
 
-from homeassistant.const import CONF_SCAN_INTERVAL
 import homeassistant.helpers.config_validation as cv
+from homeassistant.const import CONF_SCAN_INTERVAL
 from homeassistant.helpers.discovery import async_load_platform
 from homeassistant.helpers.dispatcher import dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval
@@ -64,6 +63,7 @@ class SpeedtestData:
 
     def update(self, now=None):
         """Get the latest data from fast.com."""
+        from fastdotcom import fast_com
 
         _LOGGER.debug("Executing fast.com speedtest")
         self.data = {"download": fast_com()}

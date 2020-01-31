@@ -2,8 +2,8 @@
 
 import pywemo
 
-from homeassistant import config_entries
 from homeassistant.helpers import config_entry_flow
+from homeassistant import config_entries
 
 from . import DOMAIN
 

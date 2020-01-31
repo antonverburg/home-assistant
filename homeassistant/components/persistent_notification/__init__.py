@@ -14,6 +14,7 @@ from homeassistant.loader import bind_hass
 from homeassistant.util import slugify
 import homeassistant.util.dt as dt_util
 
+
 # mypy: allow-untyped-calls, allow-untyped-defs
 
 ATTR_CREATED_AT = "created_at"

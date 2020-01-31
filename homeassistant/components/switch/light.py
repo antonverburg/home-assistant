@@ -1,11 +1,10 @@
 """Light support for switch entities."""
 import logging
-from typing import Callable, Dict, Optional, Sequence, cast
+from typing import cast, Callable, Dict, Optional, Sequence
 
 import voluptuous as vol
 
 from homeassistant.components import switch
-from homeassistant.components.light import PLATFORM_SCHEMA, Light
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     CONF_ENTITY_ID,
@@ -18,6 +17,9 @@ import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import async_track_state_change
 from homeassistant.helpers.typing import ConfigType, HomeAssistantType
+
+from homeassistant.components.light import PLATFORM_SCHEMA, Light
+
 
 # mypy: allow-untyped-calls, allow-untyped-defs, no-check-untyped-defs
 

@@ -1,6 +1,5 @@
 """Support for the Elgato Avea lights."""
 import logging
-
 import avea
 
 from homeassistant.components.light import (
@@ -12,6 +11,7 @@ from homeassistant.components.light import (
 )
 from homeassistant.exceptions import PlatformNotReady
 import homeassistant.util.color as color_util
+
 
 _LOGGER = logging.getLogger(__name__)
 

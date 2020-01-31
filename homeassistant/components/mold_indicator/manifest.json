@@ -1,9 +1,8 @@
 {
   "domain": "mold_indicator",
-  "name": "Mold Indicator",
+  "name": "Mold indicator",
   "documentation": "https://www.home-assistant.io/integrations/mold_indicator",
   "requirements": [],
   "dependencies": [],
-  "codeowners": [],
-  "quality_scale": "internal"
+  "codeowners": []
 }

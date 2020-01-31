@@ -3,7 +3,6 @@ from datetime import timedelta
 import logging
 import urllib
 
-from pyW215.pyW215 import SmartPlug
 import voluptuous as vol
 
 from homeassistant.components.switch import PLATFORM_SCHEMA, SwitchDevice
@@ -43,6 +42,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up a D-Link Smart Plug."""
+    from pyW215.pyW215 import SmartPlug
 
     host = config.get(CONF_HOST)
     username = config.get(CONF_USERNAME)

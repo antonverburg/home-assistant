@@ -1,8 +1,12 @@
 {
   "domain": "waqi",
-  "name": "World Air Quality Index (WAQI)",
+  "name": "Waqi",
   "documentation": "https://www.home-assistant.io/integrations/waqi",
-  "requirements": ["waqiasync==1.0.0"],
+  "requirements": [
+    "waqiasync==1.0.0"
+  ],
   "dependencies": [],
-  "codeowners": ["@andrey-git"]
+  "codeowners": [
+    "@andrey-git"
+  ]
 }

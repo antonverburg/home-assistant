@@ -3,8 +3,7 @@
 import unittest
 
 from homeassistant.setup import setup_component
-
-from tests.common import get_test_home_assistant, init_recorder_component
+from tests.common import init_recorder_component, get_test_home_assistant
 
 
 class TestGraph(unittest.TestCase):

@@ -2,7 +2,6 @@
 from datetime import timedelta
 import logging
 
-from tapsaff import TapsAff
 import voluptuous as vol
 
 from homeassistant.components.binary_sensor import PLATFORM_SCHEMA, BinarySensorDevice
@@ -63,6 +62,7 @@ class TapsAffData:
 
     def __init__(self, location):
         """Initialize the data object."""
+        from tapsaff import TapsAff
 
         self._is_taps_aff = None
         self.taps_aff = TapsAff(location)

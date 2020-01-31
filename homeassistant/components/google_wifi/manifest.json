@@ -1,6 +1,6 @@
 {
   "domain": "google_wifi",
-  "name": "Google Wifi",
+  "name": "Google wifi",
   "documentation": "https://www.home-assistant.io/integrations/google_wifi",
   "requirements": [],
   "dependencies": [],

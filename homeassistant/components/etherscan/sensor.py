@@ -1,7 +1,6 @@
 """Support for Etherscan sensors."""
 from datetime import timedelta
 
-from pyetherscan import get_balance
 import voluptuous as vol
 
 from homeassistant.components.sensor import PLATFORM_SCHEMA
@@ -76,6 +75,7 @@ class EtherscanSensor(Entity):
 
     def update(self):
         """Get the latest state of the sensor."""
+        from pyetherscan import get_balance
 
         if self._token_address:
             self._state = get_balance(self._address, self._token_address)

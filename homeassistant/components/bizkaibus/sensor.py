@@ -2,13 +2,14 @@
 
 import logging
 
-from bizkaibus.bizkaibus import BizkaibusData
 import voluptuous as vol
-
-from homeassistant.components.sensor import PLATFORM_SCHEMA
-from homeassistant.const import CONF_NAME
+from bizkaibus.bizkaibus import BizkaibusData
 import homeassistant.helpers.config_validation as cv
+
+from homeassistant.const import CONF_NAME
+from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.helpers.entity import Entity
+
 
 _LOGGER = logging.getLogger(__name__)
 

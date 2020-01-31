@@ -1,6 +1,7 @@
 """Config flow to configure the Linky integration."""
 import logging
 
+import voluptuous as vol
 from pylinky.client import LinkyClient
 from pylinky.exceptions import (
     PyLinkyAccessException,
@@ -8,7 +9,6 @@ from pylinky.exceptions import (
     PyLinkyException,
     PyLinkyWrongLoginException,
 )
-import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_PASSWORD, CONF_TIMEOUT, CONF_USERNAME

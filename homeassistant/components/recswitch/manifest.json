@@ -1,8 +1,10 @@
 {
   "domain": "recswitch",
-  "name": "Ankuoo REC Switch",
+  "name": "Recswitch",
   "documentation": "https://www.home-assistant.io/integrations/recswitch",
-  "requirements": ["pyrecswitch==1.0.2"],
+  "requirements": [
+    "pyrecswitch==1.0.2"
+  ],
   "dependencies": [],
   "codeowners": []
 }

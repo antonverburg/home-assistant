@@ -1,8 +1,10 @@
 {
   "domain": "cisco_ios",
-  "name": "Cisco IOS",
+  "name": "Cisco ios",
   "documentation": "https://www.home-assistant.io/integrations/cisco_ios",
-  "requirements": ["pexpect==4.6.0"],
+  "requirements": [
+    "pexpect==4.6.0"
+  ],
   "dependencies": [],
   "codeowners": ["@fbradyirl"]
 }

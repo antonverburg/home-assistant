@@ -1,18 +1,19 @@
 """The tests for the Cast Media player platform."""
 # pylint: disable=protected-access
+import asyncio
 from typing import Optional
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import patch, MagicMock, Mock
 from uuid import UUID
 
 import attr
 import pytest
 
-from homeassistant.components.cast import media_player as cast
+from homeassistant.exceptions import PlatformNotReady
+from homeassistant.helpers.typing import HomeAssistantType
 from homeassistant.components.cast.media_player import ChromecastInfo
 from homeassistant.const import EVENT_HOMEASSISTANT_STOP
-from homeassistant.exceptions import PlatformNotReady
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
-from homeassistant.helpers.typing import HomeAssistantType
+from homeassistant.components.cast import media_player as cast
 from homeassistant.setup import async_setup_component
 
 from tests.common import MockConfigEntry, mock_coro
@@ -123,21 +124,23 @@ async def async_setup_media_player_cast(hass: HomeAssistantType, info: Chromecas
         return chromecast, entity
 
 
-async def test_start_discovery_called_once(hass):
+@asyncio.coroutine
+def test_start_discovery_called_once(hass):
     """Test pychromecast.start_discovery called exactly once."""
     with patch(
         "homeassistant.components.cast.discovery.pychromecast.start_discovery",
         return_value=(None, None),
     ) as start_discovery:
-        await async_setup_cast(hass)
+        yield from async_setup_cast(hass)
 
         assert start_discovery.call_count == 1
 
-        await async_setup_cast(hass)
+        yield from async_setup_cast(hass)
         assert start_discovery.call_count == 1
 
 
-async def test_stop_discovery_called_on_stop(hass):
+@asyncio.coroutine
+def test_stop_discovery_called_on_stop(hass):
     """Test pychromecast.stop_discovery called on shutdown."""
     browser = MagicMock(zc={})
 
@@ -146,7 +149,7 @@ async def test_stop_discovery_called_on_stop(hass):
         return_value=(None, browser),
     ) as start_discovery:
         # start_discovery should be called with empty config
-        await async_setup_cast(hass, {})
+        yield from async_setup_cast(hass, {})
 
         assert start_discovery.call_count == 1
 
@@ -155,7 +158,7 @@ async def test_stop_discovery_called_on_stop(hass):
     ) as stop_discovery:
         # stop discovery should be called on shutdown
         hass.bus.async_fire(EVENT_HOMEASSISTANT_STOP)
-        await hass.async_block_till_done()
+        yield from hass.async_block_till_done()
 
         stop_discovery.assert_called_once_with(browser)
 
@@ -164,7 +167,7 @@ async def test_stop_discovery_called_on_stop(hass):
         return_value=(None, browser),
     ) as start_discovery:
         # start_discovery should be called again on re-startup
-        await async_setup_cast(hass)
+        yield from async_setup_cast(hass)
 
         assert start_discovery.call_count == 1
 

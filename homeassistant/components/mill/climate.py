@@ -6,11 +6,12 @@ import voluptuous as vol
 
 from homeassistant.components.climate import PLATFORM_SCHEMA, ClimateDevice
 from homeassistant.components.climate.const import (
-    FAN_ON,
+    DOMAIN,
     HVAC_MODE_HEAT,
     HVAC_MODE_OFF,
     SUPPORT_FAN_MODE,
     SUPPORT_TARGET_TEMPERATURE,
+    FAN_ON,
 )
 from homeassistant.const import (
     ATTR_TEMPERATURE,
@@ -21,18 +22,15 @@ from homeassistant.const import (
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .const import (
-    ATTR_AWAY_TEMP,
-    ATTR_COMFORT_TEMP,
-    ATTR_ROOM_NAME,
-    ATTR_SLEEP_TEMP,
-    DOMAIN,
-    MAX_TEMP,
-    MIN_TEMP,
-    SERVICE_SET_ROOM_TEMP,
-)
-
 _LOGGER = logging.getLogger(__name__)
+
+ATTR_AWAY_TEMP = "away_temp"
+ATTR_COMFORT_TEMP = "comfort_temp"
+ATTR_ROOM_NAME = "room_name"
+ATTR_SLEEP_TEMP = "sleep_temp"
+MAX_TEMP = 35
+MIN_TEMP = 5
+SERVICE_SET_ROOM_TEMP = "mill_set_room_temperature"
 
 SUPPORT_FLAGS = SUPPORT_TARGET_TEMPERATURE | SUPPORT_FAN_MODE
 

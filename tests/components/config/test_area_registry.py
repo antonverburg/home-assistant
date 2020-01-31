@@ -2,7 +2,6 @@
 import pytest
 
 from homeassistant.components.config import area_registry
-
 from tests.common import mock_area_registry
 
 

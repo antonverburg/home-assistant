@@ -2,7 +2,6 @@
 from datetime import datetime, timedelta
 import logging
 
-from py_noaa import coops  # pylint: disable=import-error
 import voluptuous as vol
 
 from homeassistant.components.sensor import PLATFORM_SCHEMA
@@ -110,6 +109,7 @@ class NOAATidesAndCurrentsSensor(Entity):
 
     def update(self):
         """Get the latest data from NOAA Tides and Currents API."""
+        from py_noaa import coops  # pylint: disable=import-error
 
         begin = datetime.now()
         delta = timedelta(days=2)

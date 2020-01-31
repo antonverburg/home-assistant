@@ -3,7 +3,6 @@ import logging
 import random
 import string
 
-from sucks import EcoVacsAPI, VacBot
 import voluptuous as vol
 
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, EVENT_HOMEASSISTANT_STOP
@@ -44,6 +43,8 @@ def setup(hass, config):
     _LOGGER.debug("Creating new Ecovacs component")
 
     hass.data[ECOVACS_DEVICES] = []
+
+    from sucks import EcoVacsAPI, VacBot
 
     ecovacs_api = EcoVacsAPI(
         ECOVACS_API_DEVICEID,

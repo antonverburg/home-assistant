@@ -1,9 +1,12 @@
 """Pushover platform for notify component."""
 import logging
 
-from pushover import Client, InitError, RequestError
 import requests
 import voluptuous as vol
+from pushover import InitError, Client, RequestError
+
+from homeassistant.const import CONF_API_KEY
+import homeassistant.helpers.config_validation as cv
 
 from homeassistant.components.notify import (
     ATTR_DATA,
@@ -13,8 +16,6 @@ from homeassistant.components.notify import (
     PLATFORM_SCHEMA,
     BaseNotificationService,
 )
-from homeassistant.const import CONF_API_KEY
-import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -67,11 +68,7 @@ class PushoverNotificationService(BaseNotificationService):
                         # Replace the attachment identifier with file object.
                         data[ATTR_ATTACHMENT] = response.content
                     else:
-                        _LOGGER.error(
-                            "Failed to download image %s, response code: %d",
-                            data[ATTR_ATTACHMENT],
-                            response.status_code,
-                        )
+                        _LOGGER.error("Image not found")
                         # Remove attachment key to send without attachment.
                         del data[ATTR_ATTACHMENT]
                 except requests.exceptions.RequestException as ex_val:

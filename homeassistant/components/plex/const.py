@@ -9,8 +9,7 @@ DEFAULT_SSL = False
 DEFAULT_VERIFY_SSL = True
 
 DISPATCHERS = "dispatchers"
-PLATFORMS = frozenset(["media_player", "sensor"])
-PLATFORMS_COMPLETED = "platforms_completed"
+PLATFORMS = ["media_player", "sensor"]
 SERVERS = "servers"
 WEBSOCKETS = "websockets"
 

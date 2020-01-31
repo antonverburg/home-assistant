@@ -1,35 +1,34 @@
 """The tests for the GeoNet NZ Quakes Feed integration."""
 import datetime
 
-from asynctest import CoroutineMock, patch
+from asynctest import patch, CoroutineMock
 
 from homeassistant.components import geonetnz_quakes
 from homeassistant.components.geo_location import ATTR_SOURCE
 from homeassistant.components.geonetnz_quakes import DEFAULT_SCAN_INTERVAL
 from homeassistant.components.geonetnz_quakes.geo_location import (
-    ATTR_DEPTH,
     ATTR_EXTERNAL_ID,
-    ATTR_LOCALITY,
     ATTR_MAGNITUDE,
+    ATTR_LOCALITY,
     ATTR_MMI,
+    ATTR_DEPTH,
     ATTR_QUALITY,
 )
 from homeassistant.const import (
-    ATTR_ATTRIBUTION,
-    ATTR_FRIENDLY_NAME,
-    ATTR_ICON,
+    EVENT_HOMEASSISTANT_START,
+    CONF_RADIUS,
     ATTR_LATITUDE,
     ATTR_LONGITUDE,
-    ATTR_TIME,
+    ATTR_FRIENDLY_NAME,
     ATTR_UNIT_OF_MEASUREMENT,
-    CONF_RADIUS,
-    EVENT_HOMEASSISTANT_START,
+    ATTR_ATTRIBUTION,
+    ATTR_TIME,
+    ATTR_ICON,
 )
 from homeassistant.setup import async_setup_component
-import homeassistant.util.dt as dt_util
 from homeassistant.util.unit_system import IMPERIAL_SYSTEM
-
 from tests.common import async_fire_time_changed
+import homeassistant.util.dt as dt_util
 from tests.components.geonetnz_quakes import _generate_mock_feed_entry
 
 CONFIG = {geonetnz_quakes.DOMAIN: {CONF_RADIUS: 200}}

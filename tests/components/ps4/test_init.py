@@ -26,9 +26,8 @@ from homeassistant.const import (
     CONF_TOKEN,
 )
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.setup import async_setup_component
 from homeassistant.util import location
-
+from homeassistant.setup import async_setup_component
 from tests.common import MockConfigEntry, mock_coro, mock_registry
 
 MOCK_HOST = "192.168.0.1"

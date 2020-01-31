@@ -2,7 +2,6 @@
 from datetime import timedelta
 import logging
 
-from pystiebeleltron import pystiebeleltron
 import voluptuous as vol
 
 from homeassistant.components.modbus import (
@@ -56,6 +55,7 @@ class StiebelEltronData:
 
     def __init__(self, name, modbus_client):
         """Init the STIEBEL ELTRON data object."""
+        from pystiebeleltron import pystiebeleltron
 
         self.api = pystiebeleltron.StiebelEltronAPI(modbus_client, 1)
 

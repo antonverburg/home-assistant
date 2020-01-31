@@ -1,11 +1,11 @@
 """Device automation helpers for toggle entity."""
 from typing import Any, Dict, List
-
 import voluptuous as vol
 
+from homeassistant.core import Context, HomeAssistant, CALLBACK_TYPE
 from homeassistant.components.automation import (
-    AutomationActionType,
     state as state_automation,
+    AutomationActionType,
 )
 from homeassistant.components.device_automation.const import (
     CONF_IS_OFF,
@@ -24,12 +24,11 @@ from homeassistant.const import (
     CONF_PLATFORM,
     CONF_TYPE,
 )
-from homeassistant.core import CALLBACK_TYPE, Context, HomeAssistant
-from homeassistant.helpers import condition, config_validation as cv
 from homeassistant.helpers.entity_registry import async_entries_for_device
+from homeassistant.helpers import condition, config_validation as cv
 from homeassistant.helpers.typing import ConfigType, TemplateVarsType
-
 from . import TRIGGER_BASE_SCHEMA
+
 
 # mypy: allow-untyped-calls, allow-untyped-defs
 

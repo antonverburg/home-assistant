@@ -1,18 +1,19 @@
 """Config flow to configure ecobee."""
-from pyecobee import (
-    ECOBEE_API_KEY,
-    ECOBEE_CONFIG_FILENAME,
-    ECOBEE_REFRESH_TOKEN,
-    Ecobee,
-)
 import voluptuous as vol
+
+from pyecobee import (
+    Ecobee,
+    ECOBEE_CONFIG_FILENAME,
+    ECOBEE_API_KEY,
+    ECOBEE_REFRESH_TOKEN,
+)
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_API_KEY
 from homeassistant.core import HomeAssistantError
 from homeassistant.util.json import load_json
 
-from .const import _LOGGER, CONF_REFRESH_TOKEN, DATA_ECOBEE_CONFIG, DOMAIN
+from .const import CONF_REFRESH_TOKEN, DATA_ECOBEE_CONFIG, DOMAIN, _LOGGER
 
 
 class EcobeeFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):

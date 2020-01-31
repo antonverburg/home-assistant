@@ -5,8 +5,9 @@ import json
 import logging
 import os
 
-import aioautomatic
 from aiohttp import web
+import aioautomatic
+
 import voluptuous as vol
 
 from homeassistant.components.device_tracker import (
@@ -232,7 +233,7 @@ class AutomaticData:
         if event.created_at < self.vehicle_seen[event.vehicle.id]:
             # Skip events received out of order
             _LOGGER.debug(
-                "Skipping out of order event. Event Created %s. Last seen event: %s",
+                "Skipping out of order event. Event Created %s. " "Last seen event: %s",
                 event.created_at,
                 self.vehicle_seen[event.vehicle.id],
             )

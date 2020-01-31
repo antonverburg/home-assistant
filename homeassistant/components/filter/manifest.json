@@ -3,7 +3,8 @@
   "name": "Filter",
   "documentation": "https://www.home-assistant.io/integrations/filter",
   "requirements": [],
-  "dependencies": ["history"],
-  "codeowners": ["@dgomes"],
-  "quality_scale": "internal"
+  "dependencies": [],
+  "codeowners": [
+    "@dgomes"
+  ]
 }

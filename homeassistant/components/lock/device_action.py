@@ -1,23 +1,21 @@
 """Provides device automations for Lock."""
-from typing import List, Optional
-
+from typing import Optional, List
 import voluptuous as vol
 
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
-    CONF_DEVICE_ID,
     CONF_DOMAIN,
-    CONF_ENTITY_ID,
     CONF_TYPE,
+    CONF_DEVICE_ID,
+    CONF_ENTITY_ID,
     SERVICE_LOCK,
     SERVICE_OPEN,
     SERVICE_UNLOCK,
 )
-from homeassistant.core import Context, HomeAssistant
+from homeassistant.core import HomeAssistant, Context
 from homeassistant.helpers import entity_registry
 import homeassistant.helpers.config_validation as cv
-
 from . import DOMAIN, SUPPORT_OPEN
 
 ACTION_TYPES = {"lock", "unlock", "open"}

@@ -24,14 +24,14 @@ from homeassistant.core import Context, CoreState, HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import condition, extract_domain_configs, script
 import homeassistant.helpers.config_validation as cv
-from homeassistant.helpers.config_validation import make_entity_service_schema
+from homeassistant.helpers.config_validation import ENTITY_SERVICE_SCHEMA
 from homeassistant.helpers.entity import ToggleEntity
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.restore_state import RestoreEntity
-from homeassistant.helpers.service import async_register_admin_service
 from homeassistant.helpers.typing import TemplateVarsType
 from homeassistant.loader import bind_hass
 from homeassistant.util.dt import parse_datetime, utcnow
+
 
 # mypy: allow-untyped-calls, allow-untyped-defs
 # mypy: no-check-untyped-defs, no-warn-return-any
@@ -50,7 +50,6 @@ CONF_ACTION = "action"
 CONF_TRIGGER = "trigger"
 CONF_CONDITION_TYPE = "condition_type"
 CONF_INITIAL_STATE = "initial_state"
-CONF_SKIP_CONDITION = "skip_condition"
 
 CONDITION_USE_TRIGGER_VALUES = "use_trigger_values"
 CONDITION_TYPE_AND = "and"
@@ -107,11 +106,8 @@ PLATFORM_SCHEMA = vol.Schema(
     }
 )
 
-TRIGGER_SERVICE_SCHEMA = make_entity_service_schema(
-    {
-        vol.Optional(ATTR_VARIABLES, default={}): dict,
-        vol.Optional(CONF_SKIP_CONDITION, default=True): bool,
-    }
+TRIGGER_SERVICE_SCHEMA = ENTITY_SERVICE_SCHEMA.extend(
+    {vol.Optional(ATTR_VARIABLES, default={}): dict}
 )
 
 RELOAD_SERVICE_SCHEMA = vol.Schema({})
@@ -129,7 +125,9 @@ def is_on(hass, entity_id):
 
 async def async_setup(hass, config):
     """Set up the automation."""
-    component = EntityComponent(_LOGGER, DOMAIN, hass)
+    component = EntityComponent(
+        _LOGGER, DOMAIN, hass, group_name=GROUP_NAME_ALL_AUTOMATIONS
+    )
 
     await _async_process_config(hass, config, component)
 
@@ -139,8 +137,8 @@ async def async_setup(hass, config):
         for entity in await component.async_extract_from_service(service_call):
             tasks.append(
                 entity.async_trigger(
-                    service_call.data[ATTR_VARIABLES],
-                    skip_condition=service_call.data[CONF_SKIP_CONDITION],
+                    service_call.data.get(ATTR_VARIABLES),
+                    skip_condition=True,
                     context=service_call.context,
                 )
             )
@@ -181,27 +179,17 @@ async def async_setup(hass, config):
         DOMAIN, SERVICE_TRIGGER, trigger_service_handler, schema=TRIGGER_SERVICE_SCHEMA
     )
 
-    async_register_admin_service(
-        hass,
-        DOMAIN,
-        SERVICE_RELOAD,
-        reload_service_handler,
-        schema=RELOAD_SERVICE_SCHEMA,
+    hass.services.async_register(
+        DOMAIN, SERVICE_RELOAD, reload_service_handler, schema=RELOAD_SERVICE_SCHEMA
     )
 
     hass.services.async_register(
-        DOMAIN,
-        SERVICE_TOGGLE,
-        toggle_service_handler,
-        schema=make_entity_service_schema({}),
+        DOMAIN, SERVICE_TOGGLE, toggle_service_handler, schema=ENTITY_SERVICE_SCHEMA
     )
 
     for service in (SERVICE_TURN_ON, SERVICE_TURN_OFF):
         hass.services.async_register(
-            DOMAIN,
-            service,
-            turn_onoff_service_handler,
-            schema=make_entity_service_schema({}),
+            DOMAIN, service, turn_onoff_service_handler, schema=ENTITY_SERVICE_SCHEMA
         )
 
     return True
@@ -277,7 +265,7 @@ class AutomationEntity(ToggleEntity, RestoreEntity):
         else:
             enable_automation = DEFAULT_INITIAL_STATE
             _LOGGER.debug(
-                "Automation %s not in state storage, state %s from default is used.",
+                "Automation %s not in state storage, state %s from " "default is used.",
                 self.entity_id,
                 enable_automation,
             )
@@ -325,7 +313,7 @@ class AutomationEntity(ToggleEntity, RestoreEntity):
         await self.async_update_ha_state()
 
     async def async_will_remove_from_hass(self):
-        """Remove listeners when removing automation from Home Assistant."""
+        """Remove listeners when removing automation from HASS."""
         await super().async_will_remove_from_hass()
         await self.async_disable()
 

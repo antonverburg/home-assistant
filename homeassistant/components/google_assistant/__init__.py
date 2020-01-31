@@ -1,38 +1,44 @@
 """Support for Actions on Google Assistant Smart Home Control."""
+import asyncio
 import logging
-from typing import Any, Dict
+from typing import Dict, Any
+
+import aiohttp
+import async_timeout
 
 import voluptuous as vol
 
 # Typing imports
-from homeassistant.const import CONF_NAME
 from homeassistant.core import HomeAssistant, ServiceCall
+
+from homeassistant.const import CONF_NAME
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import (
-    CONF_ALIASES,
-    CONF_ALLOW_UNLOCK,
+    DOMAIN,
+    CONF_PROJECT_ID,
+    CONF_EXPOSE_BY_DEFAULT,
+    DEFAULT_EXPOSE_BY_DEFAULT,
+    CONF_EXPOSED_DOMAINS,
+    DEFAULT_EXPOSED_DOMAINS,
     CONF_API_KEY,
-    CONF_CLIENT_EMAIL,
+    SERVICE_REQUEST_SYNC,
+    REQUEST_SYNC_BASE_URL,
     CONF_ENTITY_CONFIG,
     CONF_EXPOSE,
-    CONF_EXPOSE_BY_DEFAULT,
-    CONF_EXPOSED_DOMAINS,
-    CONF_PRIVATE_KEY,
-    CONF_PROJECT_ID,
+    CONF_ALIASES,
     CONF_REPORT_STATE,
     CONF_ROOM_HINT,
+    CONF_ALLOW_UNLOCK,
     CONF_SECURE_DEVICES_PIN,
     CONF_SERVICE_ACCOUNT,
-    DEFAULT_EXPOSE_BY_DEFAULT,
-    DEFAULT_EXPOSED_DOMAINS,
-    DOMAIN,
-    SERVICE_REQUEST_SYNC,
+    CONF_CLIENT_EMAIL,
+    CONF_PRIVATE_KEY,
 )
+from .const import EVENT_COMMAND_RECEIVED, EVENT_SYNC_RECEIVED  # noqa: F401
 from .const import EVENT_QUERY_RECEIVED  # noqa: F401
-from .http import GoogleAssistantView, GoogleConfig
-
-from .const import EVENT_COMMAND_RECEIVED, EVENT_SYNC_RECEIVED  # noqa: F401, isort:skip
+from .http import async_register_http
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -65,7 +71,6 @@ def _check_report_state(data):
 
 GOOGLE_ASSISTANT_SCHEMA = vol.All(
     cv.deprecated(CONF_ALLOW_UNLOCK, invalidation_version="0.95"),
-    cv.deprecated(CONF_API_KEY, invalidation_version="0.105"),
     vol.Schema(
         {
             vol.Required(CONF_PROJECT_ID): cv.string,
@@ -94,29 +99,37 @@ CONFIG_SCHEMA = vol.Schema({DOMAIN: GOOGLE_ASSISTANT_SCHEMA}, extra=vol.ALLOW_EX
 async def async_setup(hass: HomeAssistant, yaml_config: Dict[str, Any]):
     """Activate Google Actions component."""
     config = yaml_config.get(DOMAIN, {})
-
-    google_config = GoogleConfig(hass, config)
-    await google_config.async_initialize()
-
-    hass.http.register_view(GoogleAssistantView(google_config))
-
-    if google_config.should_report_state:
-        google_config.async_enable_report_state()
+    api_key = config.get(CONF_API_KEY)
+    async_register_http(hass, config)
 
     async def request_sync_service_handler(call: ServiceCall):
         """Handle request sync service calls."""
-        agent_user_id = call.data.get("agent_user_id") or call.context.user_id
+        websession = async_get_clientsession(hass)
+        try:
+            with async_timeout.timeout(15):
+                agent_user_id = call.data.get("agent_user_id") or call.context.user_id
 
-        if agent_user_id is None:
-            _LOGGER.warning(
-                "No agent_user_id supplied for request_sync. Call as a user or pass in user id as agent_user_id."
-            )
-            return
+                if agent_user_id is None:
+                    _LOGGER.warning(
+                        "No agent_user_id supplied for request_sync. Call as a user or pass in user id as agent_user_id."
+                    )
+                    return
 
-        await google_config.async_sync_entities(agent_user_id)
+                res = await websession.post(
+                    REQUEST_SYNC_BASE_URL,
+                    params={"key": api_key},
+                    json={"agent_user_id": agent_user_id},
+                )
+                _LOGGER.info("Submitted request_sync request to Google")
+                res.raise_for_status()
+        except aiohttp.ClientResponseError:
+            body = await res.read()
+            _LOGGER.error("request_sync request failed: %d %s", res.status, body)
+        except (asyncio.TimeoutError, aiohttp.ClientError):
+            _LOGGER.error("Could not contact Google for request_sync")
 
-    # Register service only if key is provided
-    if CONF_API_KEY in config or CONF_SERVICE_ACCOUNT in config:
+    # Register service only if api key is provided
+    if api_key is not None:
         hass.services.async_register(
             DOMAIN, SERVICE_REQUEST_SYNC, request_sync_service_handler
         )

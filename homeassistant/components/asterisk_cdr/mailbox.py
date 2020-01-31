@@ -1,14 +1,12 @@
 """Support for the Asterisk CDR interface."""
-import datetime
-import hashlib
 import logging
+import hashlib
+import datetime
 
-from homeassistant.components.asterisk_mbox import (
-    DOMAIN as ASTERISK_DOMAIN,
-    SIGNAL_CDR_UPDATE,
-)
-from homeassistant.components.mailbox import Mailbox
 from homeassistant.core import callback
+from homeassistant.components.asterisk_mbox import SIGNAL_CDR_UPDATE
+from homeassistant.components.asterisk_mbox import DOMAIN as ASTERISK_DOMAIN
+from homeassistant.components.mailbox import Mailbox
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 _LOGGER = logging.getLogger(__name__)

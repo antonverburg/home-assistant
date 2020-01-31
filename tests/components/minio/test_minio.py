@@ -3,19 +3,19 @@ import asyncio
 import json
 from unittest.mock import MagicMock
 
-from asynctest import call, patch
 import pytest
+from asynctest import patch, call
 
 from homeassistant.components.minio import (
-    CONF_ACCESS_KEY,
+    QueueListener,
+    DOMAIN,
     CONF_HOST,
-    CONF_LISTEN,
-    CONF_LISTEN_BUCKET,
     CONF_PORT,
+    CONF_ACCESS_KEY,
     CONF_SECRET_KEY,
     CONF_SECURE,
-    DOMAIN,
-    QueueListener,
+    CONF_LISTEN,
+    CONF_LISTEN_BUCKET,
 )
 from homeassistant.core import callback
 from homeassistant.setup import async_setup_component
@@ -155,7 +155,7 @@ async def test_minio_listen(hass, caplog, minio_client_event):
 
 
 async def test_queue_listener():
-    """Tests QueueListener firing events on Home Assistant event bus."""
+    """Tests QueueListener firing events on Hass event bus."""
     hass = MagicMock()
 
     queue_listener = QueueListener(hass)

@@ -1,15 +1,10 @@
 """SendGrid notification service."""
 import logging
 
-from sendgrid import SendGridAPIClient
 import voluptuous as vol
 
-from homeassistant.components.notify import (
-    ATTR_TITLE,
-    ATTR_TITLE_DEFAULT,
-    PLATFORM_SCHEMA,
-    BaseNotificationService,
-)
+from sendgrid import SendGridAPIClient
+
 from homeassistant.const import (
     CONF_API_KEY,
     CONF_RECIPIENT,
@@ -17,6 +12,13 @@ from homeassistant.const import (
     CONTENT_TYPE_TEXT_PLAIN,
 )
 import homeassistant.helpers.config_validation as cv
+
+from homeassistant.components.notify import (
+    ATTR_TITLE,
+    ATTR_TITLE_DEFAULT,
+    PLATFORM_SCHEMA,
+    BaseNotificationService,
+)
 
 _LOGGER = logging.getLogger(__name__)
 

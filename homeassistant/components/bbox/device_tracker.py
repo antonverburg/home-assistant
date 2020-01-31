@@ -5,6 +5,7 @@ import logging
 from typing import List
 
 import pybbox
+
 import voluptuous as vol
 
 from homeassistant.components.device_tracker import (

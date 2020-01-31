@@ -4,6 +4,7 @@ from homeassistant.setup import async_setup_component
 
 from tests.common import ensure_auth_manager_loaded
 
+
 BASE_CONFIG = [
     {
         "name": "Example",

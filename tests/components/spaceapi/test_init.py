@@ -3,11 +3,10 @@
 from unittest.mock import patch
 
 import pytest
+from tests.common import mock_coro
 
 from homeassistant.components.spaceapi import DOMAIN, SPACEAPI_VERSION, URL_API_SPACEAPI
 from homeassistant.setup import async_setup_component
-
-from tests.common import mock_coro
 
 CONFIG = {
     DOMAIN: {

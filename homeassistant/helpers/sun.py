@@ -1,12 +1,11 @@
 """Helpers for sun events."""
 import datetime
-from typing import TYPE_CHECKING, Optional, Union
+from typing import Optional, Union, TYPE_CHECKING
 
 from homeassistant.const import SUN_EVENT_SUNRISE, SUN_EVENT_SUNSET
 from homeassistant.core import callback
-from homeassistant.loader import bind_hass
 from homeassistant.util import dt as dt_util
-
+from homeassistant.loader import bind_hass
 from .typing import HomeAssistantType
 
 if TYPE_CHECKING:

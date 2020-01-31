@@ -7,8 +7,8 @@ import voluptuous as vol
 from homeassistant import config_entries
 
 from .const import (
-    CONF_NETWORK_KEY,
     CONF_USB_STICK_PATH,
+    CONF_NETWORK_KEY,
     DEFAULT_CONF_USB_STICK_PATH,
     DOMAIN,
 )
@@ -48,7 +48,8 @@ class ZwaveFlowHandler(config_entries.ConfigFlow):
             try:
                 from functools import partial
 
-                option = await self.hass.async_add_executor_job(  # noqa: F841 pylint: disable=unused-variable
+                # pylint: disable=unused-variable
+                option = await self.hass.async_add_executor_job(  # noqa: F841
                     partial(
                         ZWaveOption,
                         user_input[CONF_USB_STICK_PATH],

@@ -1,8 +1,6 @@
 """Support for eQ-3 Bluetooth Smart thermostats."""
 import logging
 
-# pylint: disable=import-error
-from bluepy.btle import BTLEException
 import eq3bt as eq3  # pylint: disable=import-error
 import voluptuous as vol
 
@@ -13,9 +11,9 @@ from homeassistant.components.climate.const import (
     HVAC_MODE_OFF,
     PRESET_AWAY,
     PRESET_BOOST,
-    PRESET_NONE,
     SUPPORT_PRESET_MODE,
     SUPPORT_TARGET_TEMPERATURE,
+    PRESET_NONE,
 )
 from homeassistant.const import (
     ATTR_TEMPERATURE,
@@ -192,6 +190,8 @@ class EQ3BTSmartThermostat(ClimateDevice):
 
     def update(self):
         """Update the data from the thermostat."""
+        # pylint: disable=import-error,no-name-in-module
+        from bluepy.btle import BTLEException
 
         try:
             self._thermostat.update()

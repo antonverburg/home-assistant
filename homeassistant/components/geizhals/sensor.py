@@ -1,15 +1,14 @@
 """Parse prices of a device from geizhals."""
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
-from geizhals import Device, Geizhals
 import voluptuous as vol
 
 from homeassistant.components.sensor import PLATFORM_SCHEMA
-from homeassistant.const import CONF_NAME
 import homeassistant.helpers.config_validation as cv
-from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle
+from homeassistant.helpers.entity import Entity
+from homeassistant.const import CONF_NAME
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -46,6 +45,7 @@ class Geizwatch(Entity):
 
     def __init__(self, name, description, product_id, domain):
         """Initialize the sensor."""
+        from geizhals import Device, Geizhals
 
         # internal
         self._name = name

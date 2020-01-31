@@ -1,12 +1,12 @@
 """Test the SSDP integration."""
 import asyncio
-from unittest.mock import Mock, patch
+from unittest.mock import patch, Mock
 
 import aiohttp
 import pytest
 
-from homeassistant.components import ssdp
 from homeassistant.generated import ssdp as gn_ssdp
+from homeassistant.components import ssdp
 
 from tests.common import mock_coro
 
@@ -27,9 +27,7 @@ async def test_scan_match_st(hass):
     assert mock_init.mock_calls[0][2]["context"] == {"source": "ssdp"}
 
 
-@pytest.mark.parametrize(
-    "key", (ssdp.ATTR_UPNP_MANUFACTURER, ssdp.ATTR_UPNP_DEVICE_TYPE)
-)
+@pytest.mark.parametrize("key", ("manufacturer", "deviceType"))
 async def test_scan_match_upnp_devicedesc(hass, aioclient_mock, key):
     """Test matching based on UPnP device description data."""
     aioclient_mock.get(
@@ -76,14 +74,7 @@ async def test_scan_not_all_present(hass, aioclient_mock):
         return_value=[Mock(st="mock-st", location="http://1.1.1.1")],
     ), patch.dict(
         gn_ssdp.SSDP,
-        {
-            "mock-domain": [
-                {
-                    ssdp.ATTR_UPNP_DEVICE_TYPE: "Paulus",
-                    ssdp.ATTR_UPNP_MANUFACTURER: "Paulus",
-                }
-            ]
-        },
+        {"mock-domain": [{"deviceType": "Paulus", "manufacturer": "Paulus"}]},
     ), patch.object(
         hass.config_entries.flow, "async_init", return_value=mock_coro()
     ) as mock_init:
@@ -112,14 +103,7 @@ async def test_scan_not_all_match(hass, aioclient_mock):
         return_value=[Mock(st="mock-st", location="http://1.1.1.1")],
     ), patch.dict(
         gn_ssdp.SSDP,
-        {
-            "mock-domain": [
-                {
-                    ssdp.ATTR_UPNP_DEVICE_TYPE: "Paulus",
-                    ssdp.ATTR_UPNP_MANUFACTURER: "Not-Paulus",
-                }
-            ]
-        },
+        {"mock-domain": [{"deviceType": "Paulus", "manufacturer": "Not-Paulus"}]},
     ), patch.object(
         hass.config_entries.flow, "async_init", return_value=mock_coro()
     ) as mock_init:

@@ -1,8 +1,10 @@
 {
   "domain": "openhome",
-  "name": "Linn / OpenHome",
+  "name": "Openhome",
   "documentation": "https://www.home-assistant.io/integrations/openhome",
-  "requirements": ["openhomedevice==0.6.3"],
+  "requirements": [
+    "openhomedevice==0.4.2"
+  ],
   "dependencies": [],
   "codeowners": []
 }

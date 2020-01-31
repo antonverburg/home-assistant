@@ -1,10 +1,11 @@
 """Test the Google Domains component."""
+import asyncio
 from datetime import timedelta
 
 import pytest
 
-from homeassistant.components import google_domains
 from homeassistant.setup import async_setup_component
+from homeassistant.components import google_domains
 from homeassistant.util.dt import utcnow
 
 from tests.common import async_fire_time_changed
@@ -36,11 +37,12 @@ def setup_google_domains(hass, aioclient_mock):
     )
 
 
-async def test_setup(hass, aioclient_mock):
+@asyncio.coroutine
+def test_setup(hass, aioclient_mock):
     """Test setup works if update passes."""
     aioclient_mock.get(UPDATE_URL, params={"hostname": DOMAIN}, text="nochg 0.0.0.0")
 
-    result = await async_setup_component(
+    result = yield from async_setup_component(
         hass,
         google_domains.DOMAIN,
         {
@@ -55,15 +57,16 @@ async def test_setup(hass, aioclient_mock):
     assert aioclient_mock.call_count == 1
 
     async_fire_time_changed(hass, utcnow() + timedelta(minutes=5))
-    await hass.async_block_till_done()
+    yield from hass.async_block_till_done()
     assert aioclient_mock.call_count == 2
 
 
-async def test_setup_fails_if_update_fails(hass, aioclient_mock):
+@asyncio.coroutine
+def test_setup_fails_if_update_fails(hass, aioclient_mock):
     """Test setup fails if first update fails."""
     aioclient_mock.get(UPDATE_URL, params={"hostname": DOMAIN}, text="nohost")
 
-    result = await async_setup_component(
+    result = yield from async_setup_component(
         hass,
         google_domains.DOMAIN,
         {

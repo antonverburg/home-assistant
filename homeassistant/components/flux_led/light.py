@@ -1,28 +1,28 @@
 """Support for Flux lights."""
 import logging
-import random
 import socket
+import random
 
 from flux_led import BulbScanner, WifiLedBulb
 import voluptuous as vol
 
+from homeassistant.const import CONF_DEVICES, CONF_NAME, CONF_PROTOCOL, ATTR_MODE
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
-    ATTR_COLOR_TEMP,
-    ATTR_EFFECT,
     ATTR_HS_COLOR,
+    ATTR_EFFECT,
     ATTR_WHITE_VALUE,
+    ATTR_COLOR_TEMP,
     EFFECT_COLORLOOP,
     EFFECT_RANDOM,
-    PLATFORM_SCHEMA,
     SUPPORT_BRIGHTNESS,
-    SUPPORT_COLOR,
-    SUPPORT_COLOR_TEMP,
     SUPPORT_EFFECT,
+    SUPPORT_COLOR,
     SUPPORT_WHITE_VALUE,
+    SUPPORT_COLOR_TEMP,
     Light,
+    PLATFORM_SCHEMA,
 )
-from homeassistant.const import ATTR_MODE, CONF_DEVICES, CONF_NAME, CONF_PROTOCOL
 import homeassistant.helpers.config_validation as cv
 import homeassistant.util.color as color_util
 

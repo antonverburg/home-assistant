@@ -1,6 +1,7 @@
 """Print links to relevant docs."""
 from .model import Info
 
+
 DATA = {
     "config_flow": {
         "title": "Config Flow",

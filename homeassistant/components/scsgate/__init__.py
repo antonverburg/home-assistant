@@ -2,10 +2,6 @@
 import logging
 from threading import Lock
 
-from scsgate.connection import Connection
-from scsgate.messages import ScenarioTriggeredMessage, StateMessage
-from scsgate.reactor import Reactor
-from scsgate.tasks import GetStatusTask
 import voluptuous as vol
 
 from homeassistant.const import CONF_DEVICE, CONF_NAME
@@ -65,7 +61,11 @@ class SCSGate:
         self._device_being_registered = None
         self._device_being_registered_lock = Lock()
 
+        from scsgate.connection import Connection
+
         connection = Connection(device=device, logger=self._logger)
+
+        from scsgate.reactor import Reactor
 
         self._reactor = Reactor(
             connection=connection,
@@ -75,6 +75,7 @@ class SCSGate:
 
     def handle_message(self, message):
         """Handle a messages seen on the bus."""
+        from scsgate.messages import StateMessage, ScenarioTriggeredMessage
 
         self._logger.debug(f"Received message {message}")
         if not isinstance(message, StateMessage) and not isinstance(
@@ -131,6 +132,7 @@ class SCSGate:
 
     def _activate_next_device(self):
         """Start the activation of the first device."""
+        from scsgate.tasks import GetStatusTask
 
         with self._devices_to_register_lock:
             while self._devices_to_register:

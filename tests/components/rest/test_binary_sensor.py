@@ -1,21 +1,21 @@
 """The tests for the REST binary sensor platform."""
 import unittest
-from unittest.mock import Mock, patch
-
-import pytest
 from pytest import raises
+from unittest.mock import patch, Mock
+
 import requests
-from requests.exceptions import Timeout
+from requests.exceptions import Timeout, MissingSchema
 import requests_mock
 
+from homeassistant.exceptions import PlatformNotReady
+from homeassistant.setup import setup_component
 import homeassistant.components.binary_sensor as binary_sensor
 import homeassistant.components.rest.binary_sensor as rest
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.exceptions import PlatformNotReady
+from homeassistant.const import STATE_ON, STATE_OFF
 from homeassistant.helpers import template
-from homeassistant.setup import setup_component
 
-from tests.common import assert_setup_component, get_test_home_assistant
+from tests.common import get_test_home_assistant, assert_setup_component
+import pytest
 
 
 class TestRestBinarySensorSetup(unittest.TestCase):
@@ -47,7 +47,7 @@ class TestRestBinarySensorSetup(unittest.TestCase):
 
     def test_setup_missing_schema(self):
         """Test setup with resource missing schema."""
-        with pytest.raises(PlatformNotReady):
+        with pytest.raises(MissingSchema):
             rest.setup_platform(
                 self.hass,
                 {"platform": "rest", "resource": "localhost", "method": "GET"},
@@ -60,7 +60,7 @@ class TestRestBinarySensorSetup(unittest.TestCase):
         with raises(PlatformNotReady):
             rest.setup_platform(
                 self.hass,
-                {"platform": "rest", "resource": "http://localhost", "method": "GET"},
+                {"platform": "rest", "resource": "http://localhost"},
                 self.add_devices,
                 None,
             )
@@ -72,7 +72,7 @@ class TestRestBinarySensorSetup(unittest.TestCase):
         with raises(PlatformNotReady):
             rest.setup_platform(
                 self.hass,
-                {"platform": "rest", "resource": "http://localhost", "method": "GET"},
+                {"platform": "rest", "resource": "http://localhost"},
                 self.add_devices,
                 None,
             )

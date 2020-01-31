@@ -1,6 +1,6 @@
 {
   "domain": "vesync",
-  "name": "Etekcity VeSync",
+  "name": "VeSync",
   "documentation": "https://www.home-assistant.io/integrations/vesync",
   "dependencies": [],
   "codeowners": ["@markperdue", "@webdjoe"],

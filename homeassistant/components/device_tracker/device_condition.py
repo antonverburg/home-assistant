@@ -1,23 +1,21 @@
 """Provides device automations for Device tracker."""
 from typing import Dict, List
-
 import voluptuous as vol
 
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     CONF_CONDITION,
-    CONF_DEVICE_ID,
     CONF_DOMAIN,
-    CONF_ENTITY_ID,
     CONF_TYPE,
-    STATE_HOME,
+    CONF_DEVICE_ID,
+    CONF_ENTITY_ID,
     STATE_NOT_HOME,
+    STATE_HOME,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import condition, config_validation as cv, entity_registry
-from homeassistant.helpers.config_validation import DEVICE_CONDITION_BASE_SCHEMA
 from homeassistant.helpers.typing import ConfigType, TemplateVarsType
-
+from homeassistant.helpers.config_validation import DEVICE_CONDITION_BASE_SCHEMA
 from . import DOMAIN
 
 CONDITION_TYPES = {"is_home", "is_not_home"}

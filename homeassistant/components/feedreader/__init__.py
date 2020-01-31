@@ -2,15 +2,15 @@
 from datetime import datetime, timedelta
 from logging import getLogger
 from os.path import exists
-import pickle
 from threading import Lock
+import pickle
 
-import feedparser
 import voluptuous as vol
+import feedparser
 
-from homeassistant.const import CONF_SCAN_INTERVAL, EVENT_HOMEASSISTANT_START
-import homeassistant.helpers.config_validation as cv
+from homeassistant.const import EVENT_HOMEASSISTANT_START, CONF_SCAN_INTERVAL
 from homeassistant.helpers.event import track_time_interval
+import homeassistant.helpers.config_validation as cv
 
 _LOGGER = getLogger(__name__)
 
@@ -131,7 +131,7 @@ class FeedManager:
         """Filter the entries provided and return the ones to keep."""
         if len(self._feed.entries) > self._max_entries:
             _LOGGER.debug(
-                "Processing only the first %s entries in feed %s",
+                "Processing only the first %s entries " "in feed %s",
                 self._max_entries,
                 self._url,
             )

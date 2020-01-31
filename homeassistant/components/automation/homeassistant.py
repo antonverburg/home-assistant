@@ -3,8 +3,9 @@ import logging
 
 import voluptuous as vol
 
-from homeassistant.const import CONF_EVENT, CONF_PLATFORM, EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import CoreState, callback
+from homeassistant.core import callback, CoreState
+from homeassistant.const import CONF_PLATFORM, CONF_EVENT, EVENT_HOMEASSISTANT_STOP
+
 
 # mypy: allow-untyped-defs
 

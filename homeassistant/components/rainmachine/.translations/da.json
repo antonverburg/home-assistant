@@ -8,7 +8,7 @@
             "user": {
                 "data": {
                     "ip_address": "V\u00e6rtsnavn eller IP-adresse",
-                    "password": "Adgangskode",
+                    "password": "Password",
                     "port": "Port"
                 },
                 "title": "Udfyld dine oplysninger"

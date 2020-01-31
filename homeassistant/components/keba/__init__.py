@@ -66,7 +66,7 @@ async def async_setup(hass, config):
         _LOGGER.error("Could not find a charging station at %s", host)
         return False
 
-    # Set failsafe mode at start up of Home Assistant
+    # Set failsafe mode at start up of home assistant
     failsafe = config[DOMAIN][CONF_FS]
     timeout = config[DOMAIN][CONF_FS_TIMEOUT] if failsafe else 0
     fallback = config[DOMAIN][CONF_FS_FALLBACK] if failsafe else 0
@@ -106,14 +106,13 @@ class KebaHandler(KebaKeContact):
     """Representation of a KEBA charging station connection."""
 
     def __init__(self, hass, host, rfid, refresh_interval):
-        """Initialize charging station connection."""
+        """Constructor."""
         super().__init__(host, self.hass_callback)
 
         self._update_listeners = []
         self._hass = hass
         self.rfid = rfid
-        self.device_name = "keba"  # correct device name will be set in setup()
-        self.device_id = "keba_wallbox_"  # correct device id will be set in setup()
+        self.device_name = "keba_wallbox_"
 
         # Ensure at least MAX_POLLING_INTERVAL seconds delay
         self._refresh_interval = max(MAX_POLLING_INTERVAL, refresh_interval)
@@ -148,12 +147,8 @@ class KebaHandler(KebaKeContact):
 
         # Request initial values and extract serial number
         await self.request_data()
-        if (
-            self.get_value("Serial") is not None
-            and self.get_value("Product") is not None
-        ):
-            self.device_id = f"keba_wallbox_{self.get_value('Serial')}"
-            self.device_name = self.get_value("Product")
+        if self.get_value("Serial") is not None:
+            self.device_name = f"keba_wallbox_{self.get_value('Serial')}"
             return True
 
         return False
@@ -184,7 +179,7 @@ class KebaHandler(KebaKeContact):
         """Set energy target in async way."""
         try:
             energy = param["energy"]
-            await self.set_energy(float(energy))
+            await self.set_energy(energy)
             self._set_fast_polling()
         except (KeyError, ValueError) as ex:
             _LOGGER.warning("Energy value is not correct. %s", ex)
@@ -193,7 +188,7 @@ class KebaHandler(KebaKeContact):
         """Set current maximum in async way."""
         try:
             current = param["current"]
-            await self.set_current(float(current))
+            await self.set_current(current)
             # No fast polling as this function might be called regularly
         except (KeyError, ValueError) as ex:
             _LOGGER.warning("Current value is not correct. %s", ex)
@@ -221,10 +216,10 @@ class KebaHandler(KebaKeContact):
     async def async_set_failsafe(self, param=None):
         """Set failsafe mode in async way."""
         try:
-            timeout = param[CONF_FS_TIMEOUT]
+            timout = param[CONF_FS_TIMEOUT]
             fallback = param[CONF_FS_FALLBACK]
             persist = param[CONF_FS_PERSIST]
-            await self.set_failsafe(int(timeout), float(fallback), bool(persist))
+            await self.set_failsafe(timout, fallback, persist)
             self._set_fast_polling()
         except (KeyError, ValueError) as ex:
             _LOGGER.warning(

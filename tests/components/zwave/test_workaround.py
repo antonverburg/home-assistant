@@ -1,6 +1,5 @@
 """Test Z-Wave workarounds."""
 from homeassistant.components.zwave import const, workaround
-
 from tests.mock.zwave import MockNode, MockValue
 
 

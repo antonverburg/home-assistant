@@ -3,10 +3,11 @@ import logging
 
 import voluptuous as vol
 
-from homeassistant.const import CONF_PLATFORM
 from homeassistant.core import callback
+from homeassistant.const import CONF_PLATFORM
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.event import async_track_time_change
+
 
 # mypy: allow-untyped-defs, no-check-untyped-defs
 

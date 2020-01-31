@@ -3,7 +3,9 @@
   "name": "Logbook",
   "documentation": "https://www.home-assistant.io/integrations/logbook",
   "requirements": [],
-  "dependencies": ["frontend", "http", "recorder"],
-  "after_dependencies": ["homekit"],
+  "dependencies": [
+    "frontend",
+    "recorder"
+  ],
   "codeowners": []
 }

@@ -488,7 +488,7 @@ class KonnectedView(HomeAssistantView):
         device = data[CONF_DEVICES][device_id]
         if not device:
             return self.json_message(
-                f"Device {device_id} not configured", status_code=HTTP_NOT_FOUND
+                "Device " + device_id + " not configured", status_code=HTTP_NOT_FOUND
             )
 
         try:

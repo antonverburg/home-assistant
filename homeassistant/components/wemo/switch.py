@@ -1,19 +1,18 @@
 """Support for WeMo switches."""
 import asyncio
-from datetime import datetime, timedelta
 import logging
+from datetime import datetime, timedelta
 
 import async_timeout
 from pywemo import discovery
 import requests
 
 from homeassistant.components.switch import SwitchDevice
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_STANDBY, STATE_UNKNOWN
 from homeassistant.exceptions import PlatformNotReady
 from homeassistant.util import convert
+from homeassistant.const import STATE_OFF, STATE_ON, STATE_STANDBY, STATE_UNKNOWN
 
-from . import SUBSCRIPTION_REGISTRY
-from .const import DOMAIN
+from . import SUBSCRIPTION_REGISTRY, DOMAIN as WEMO_DOMAIN
 
 SCAN_INTERVAL = timedelta(seconds=10)
 
@@ -97,7 +96,7 @@ class WemoSwitch(SwitchDevice):
     @property
     def device_info(self):
         """Return the device info."""
-        return {"name": self._name, "identifiers": {(DOMAIN, self._serialnumber)}}
+        return {"name": self._name, "identifiers": {(WEMO_DOMAIN, self._serialnumber)}}
 
     @property
     def device_state_attributes(self):
@@ -196,7 +195,7 @@ class WemoSwitch(SwitchDevice):
         self.wemo.off()
 
     async def async_added_to_hass(self):
-        """Wemo switch added to Home Assistant."""
+        """Wemo switch added to HASS."""
         # Define inside async context so we know our event loop
         self._update_lock = asyncio.Lock()
 

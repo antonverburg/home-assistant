@@ -2,25 +2,26 @@
 from copy import deepcopy
 
 from asynctest import Mock, patch
-import pydeconz
+
 import pytest
 
 from homeassistant import config_entries
-from homeassistant.components import deconz, ssdp
+from homeassistant.components import deconz
+from homeassistant.components import ssdp
+from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
-from tests.common import MockConfigEntry
+import pydeconz
 
-API_KEY = "1234567890ABCDEF"
-BRIDGEID = "01234E56789A"
+BRIDGEID = "0123456789"
 
 ENTRY_CONFIG = {
-    deconz.config_flow.CONF_API_KEY: API_KEY,
+    deconz.config_flow.CONF_API_KEY: "ABCDEF",
+    deconz.config_flow.CONF_BRIDGEID: BRIDGEID,
     deconz.config_flow.CONF_HOST: "1.2.3.4",
     deconz.config_flow.CONF_PORT: 80,
+    deconz.config_flow.CONF_UUID: "456DEF",
 }
-
-ENTRY_OPTIONS = {}
 
 DECONZ_CONFIG = {
     "bridgeid": BRIDGEID,
@@ -33,50 +34,44 @@ DECONZ_CONFIG = {
     "websocketport": 1234,
 }
 
-DECONZ_WEB_REQUEST = {
-    "config": DECONZ_CONFIG,
-    "groups": {},
-    "lights": {},
-    "sensors": {},
-}
+DECONZ_WEB_REQUEST = {"config": DECONZ_CONFIG}
 
 
-async def setup_deconz_integration(
-    hass,
-    config=ENTRY_CONFIG,
-    options=ENTRY_OPTIONS,
-    get_state_response=DECONZ_WEB_REQUEST,
-    entry_id="1",
-    source="user",
-):
+async def setup_deconz_integration(hass, config, options, get_state_response):
     """Create the deCONZ gateway."""
-    config_entry = MockConfigEntry(
+    config_entry = config_entries.ConfigEntry(
+        version=1,
         domain=deconz.DOMAIN,
-        source=source,
-        data=deepcopy(config),
+        title="Mock Title",
+        data=config,
+        source="test",
         connection_class=config_entries.CONN_CLASS_LOCAL_PUSH,
-        options=deepcopy(options),
-        entry_id=entry_id,
+        system_options={},
+        options=options,
+        entry_id="1",
     )
-    config_entry.add_to_hass(hass)
 
     with patch(
-        "pydeconz.DeconzSession.request", return_value=deepcopy(get_state_response)
+        "pydeconz.DeconzSession.async_get_state", return_value=get_state_response
     ), patch("pydeconz.DeconzSession.start", return_value=True):
-        await hass.config_entries.async_setup(config_entry.entry_id)
+        await deconz.async_setup_entry(hass, config_entry)
     await hass.async_block_till_done()
 
-    bridgeid = get_state_response["config"]["bridgeid"]
-    return hass.data[deconz.DOMAIN].get(bridgeid)
+    hass.config_entries._entries.append(config_entry)
+
+    return hass.data[deconz.DOMAIN].get(config[deconz.CONF_BRIDGEID])
 
 
 async def test_gateway_setup(hass):
     """Successful setup."""
+    data = deepcopy(DECONZ_WEB_REQUEST)
     with patch(
         "homeassistant.config_entries.ConfigEntries.async_forward_entry_setup",
         return_value=True,
     ) as forward_entry_setup:
-        gateway = await setup_deconz_integration(hass)
+        gateway = await setup_deconz_integration(
+            hass, ENTRY_CONFIG, options={}, get_state_response=data
+        )
         assert gateway.bridgeid == BRIDGEID
         assert gateway.master is True
         assert gateway.option_allow_clip_sensor is False
@@ -97,26 +92,34 @@ async def test_gateway_setup(hass):
 
 async def test_gateway_retry(hass):
     """Retry setup."""
+    data = deepcopy(DECONZ_WEB_REQUEST)
     with patch(
         "homeassistant.components.deconz.gateway.get_gateway",
         side_effect=deconz.errors.CannotConnect,
-    ):
-        await setup_deconz_integration(hass)
-    assert not hass.data[deconz.DOMAIN]
+    ), pytest.raises(ConfigEntryNotReady):
+        await setup_deconz_integration(
+            hass, ENTRY_CONFIG, options={}, get_state_response=data
+        )
 
 
 async def test_gateway_setup_fails(hass):
     """Retry setup."""
+    data = deepcopy(DECONZ_WEB_REQUEST)
     with patch(
         "homeassistant.components.deconz.gateway.get_gateway", side_effect=Exception
     ):
-        gateway = await setup_deconz_integration(hass)
+        gateway = await setup_deconz_integration(
+            hass, ENTRY_CONFIG, options={}, get_state_response=data
+        )
         assert gateway is None
 
 
 async def test_connection_status_signalling(hass):
     """Make sure that connection status triggers a dispatcher send."""
-    gateway = await setup_deconz_integration(hass)
+    data = deepcopy(DECONZ_WEB_REQUEST)
+    gateway = await setup_deconz_integration(
+        hass, ENTRY_CONFIG, options={}, get_state_response=data
+    )
 
     event_call = Mock()
     unsub = async_dispatcher_connect(hass, gateway.signal_reachable, event_call)
@@ -132,16 +135,20 @@ async def test_connection_status_signalling(hass):
 
 async def test_update_address(hass):
     """Make sure that connection status triggers a dispatcher send."""
-    gateway = await setup_deconz_integration(hass)
+    data = deepcopy(DECONZ_WEB_REQUEST)
+    gateway = await setup_deconz_integration(
+        hass, ENTRY_CONFIG, options={}, get_state_response=data
+    )
     assert gateway.api.host == "1.2.3.4"
 
     await hass.config_entries.flow.async_init(
         deconz.config_flow.DOMAIN,
         data={
-            ssdp.ATTR_SSDP_LOCATION: "http://2.3.4.5:80/",
-            ssdp.ATTR_UPNP_MANUFACTURER_URL: deconz.config_flow.DECONZ_MANUFACTURERURL,
-            ssdp.ATTR_UPNP_SERIAL: BRIDGEID,
-            ssdp.ATTR_UPNP_UDN: "uuid:456DEF",
+            deconz.config_flow.CONF_HOST: "2.3.4.5",
+            deconz.config_flow.CONF_PORT: 80,
+            ssdp.ATTR_SERIAL: BRIDGEID,
+            ssdp.ATTR_MANUFACTURERURL: deconz.config_flow.DECONZ_MANUFACTURERURL,
+            deconz.config_flow.ATTR_UUID: "uuid:456DEF",
         },
         context={"source": "ssdp"},
     )
@@ -152,7 +159,10 @@ async def test_update_address(hass):
 
 async def test_reset_after_successful_setup(hass):
     """Make sure that connection status triggers a dispatcher send."""
-    gateway = await setup_deconz_integration(hass)
+    data = deepcopy(DECONZ_WEB_REQUEST)
+    gateway = await setup_deconz_integration(
+        hass, ENTRY_CONFIG, options={}, get_state_response=data
+    )
 
     result = await gateway.async_reset()
     await hass.async_block_till_done()
@@ -162,14 +172,15 @@ async def test_reset_after_successful_setup(hass):
 
 async def test_get_gateway(hass):
     """Successful call."""
-    with patch("pydeconz.DeconzSession.initialize", return_value=True):
+    with patch("pydeconz.DeconzSession.async_load_parameters", return_value=True):
         assert await deconz.gateway.get_gateway(hass, ENTRY_CONFIG, Mock(), Mock())
 
 
 async def test_get_gateway_fails_unauthorized(hass):
     """Failed call."""
     with patch(
-        "pydeconz.DeconzSession.initialize", side_effect=pydeconz.errors.Unauthorized,
+        "pydeconz.DeconzSession.async_load_parameters",
+        side_effect=pydeconz.errors.Unauthorized,
     ), pytest.raises(deconz.errors.AuthenticationRequired):
         assert (
             await deconz.gateway.get_gateway(hass, ENTRY_CONFIG, Mock(), Mock())
@@ -180,7 +191,8 @@ async def test_get_gateway_fails_unauthorized(hass):
 async def test_get_gateway_fails_cannot_connect(hass):
     """Failed call."""
     with patch(
-        "pydeconz.DeconzSession.initialize", side_effect=pydeconz.errors.RequestError,
+        "pydeconz.DeconzSession.async_load_parameters",
+        side_effect=pydeconz.errors.RequestError,
     ), pytest.raises(deconz.errors.CannotConnect):
         assert (
             await deconz.gateway.get_gateway(hass, ENTRY_CONFIG, Mock(), Mock())

@@ -1,65 +1,66 @@
 """Module to help with parsing and generating configuration files."""
-# pylint: disable=no-name-in-module
 from collections import OrderedDict
+
+# pylint: disable=no-name-in-module
 from distutils.version import LooseVersion  # pylint: disable=import-error
 import logging
 import os
 import re
 import shutil
+from typing import Any, Tuple, Optional, Dict, Union, Callable, Sequence, Set
 from types import ModuleType
-from typing import Any, Callable, Dict, Optional, Sequence, Set, Tuple, Union
-
 import voluptuous as vol
 from voluptuous.humanize import humanize_error
 
 from homeassistant import auth
 from homeassistant.auth import (
-    mfa_modules as auth_mfa_modules,
     providers as auth_providers,
+    mfa_modules as auth_mfa_modules,
 )
 from homeassistant.const import (
-    ATTR_ASSUMED_STATE,
     ATTR_FRIENDLY_NAME,
     ATTR_HIDDEN,
-    CONF_AUTH_MFA_MODULES,
-    CONF_AUTH_PROVIDERS,
-    CONF_CUSTOMIZE,
-    CONF_CUSTOMIZE_DOMAIN,
-    CONF_CUSTOMIZE_GLOB,
-    CONF_ELEVATION,
-    CONF_ID,
+    ATTR_ASSUMED_STATE,
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_NAME,
     CONF_PACKAGES,
-    CONF_TEMPERATURE_UNIT,
-    CONF_TIME_ZONE,
-    CONF_TYPE,
     CONF_UNIT_SYSTEM,
+    CONF_TIME_ZONE,
+    CONF_ELEVATION,
     CONF_UNIT_SYSTEM_IMPERIAL,
-    CONF_WHITELIST_EXTERNAL_DIRS,
+    CONF_TEMPERATURE_UNIT,
     TEMP_CELSIUS,
     __version__,
+    CONF_CUSTOMIZE,
+    CONF_CUSTOMIZE_DOMAIN,
+    CONF_CUSTOMIZE_GLOB,
+    CONF_WHITELIST_EXTERNAL_DIRS,
+    CONF_AUTH_PROVIDERS,
+    CONF_AUTH_MFA_MODULES,
+    CONF_TYPE,
+    CONF_ID,
 )
 from homeassistant.core import DOMAIN as CONF_CORE, SOURCE_YAML, HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import config_per_platform, extract_domain_configs
-import homeassistant.helpers.config_validation as cv
-from homeassistant.helpers.entity_values import EntityValues
 from homeassistant.loader import Integration, IntegrationNotFound
 from homeassistant.requirements import (
-    RequirementsNotFound,
     async_get_integration_with_requirements,
+    RequirementsNotFound,
 )
+from homeassistant.util.yaml import load_yaml, SECRET_YAML
 from homeassistant.util.package import is_docker_env
+import homeassistant.helpers.config_validation as cv
 from homeassistant.util.unit_system import IMPERIAL_SYSTEM, METRIC_SYSTEM
-from homeassistant.util.yaml import SECRET_YAML, load_yaml
+from homeassistant.helpers.entity_values import EntityValues
+from homeassistant.helpers import config_per_platform, extract_domain_configs
 
 _LOGGER = logging.getLogger(__name__)
 
 DATA_PERSISTENT_ERRORS = "bootstrap_persistent_errors"
 RE_YAML_ERROR = re.compile(r"homeassistant\.util\.yaml")
 RE_ASCII = re.compile(r"\033\[[^m]*m")
+HA_COMPONENT_URL = "[{}](https://home-assistant.io/integrations/{}/)"
 YAML_CONFIG_FILE = "configuration.yaml"
 VERSION_FILE = ".HA_VERSION"
 CONFIG_DIR_NAME = ".homeassistant"
@@ -209,7 +210,7 @@ CORE_CONFIG_SCHEMA = CUSTOMIZE_CONFIG_SCHEMA.extend(
                     {
                         CONF_TYPE: vol.NotIn(
                             ["insecure_example"],
-                            "The insecure_example mfa module is for testing only.",
+                            "The insecure_example mfa module" " is for testing only.",
                         )
                     }
                 )
@@ -411,25 +412,19 @@ def process_ha_config_upgrade(hass: HomeAssistant) -> None:
 
 @callback
 def async_log_exception(
-    ex: Exception,
-    domain: str,
-    config: Dict,
-    hass: HomeAssistant,
-    link: Optional[str] = None,
+    ex: Exception, domain: str, config: Dict, hass: HomeAssistant
 ) -> None:
     """Log an error for configuration validation.
 
     This method must be run in the event loop.
     """
     if hass is not None:
-        async_notify_setup_error(hass, domain, link)
-    _LOGGER.error(_format_config_error(ex, domain, config, link))
+        async_notify_setup_error(hass, domain, True)
+    _LOGGER.error(_format_config_error(ex, domain, config))
 
 
 @callback
-def _format_config_error(
-    ex: Exception, domain: str, config: Dict, link: Optional[str] = None
-) -> str:
+def _format_config_error(ex: Exception, domain: str, config: Dict) -> str:
     """Generate log exception for configuration validation.
 
     This method must be run in the event loop.
@@ -460,8 +455,11 @@ def _format_config_error(
         getattr(domain_config, "__line__", "?"),
     )
 
-    if domain != CONF_CORE and link:
-        message += f"Please check the docs at {link}"
+    if domain != CONF_CORE:
+        message += (
+            "Please check the docs at "
+            "https://home-assistant.io/integrations/{}/".format(domain)
+        )
 
     return message
 
@@ -572,7 +570,9 @@ async def async_process_ha_core_config(hass: HomeAssistant, config: Dict) -> Non
 
 def _log_pkg_error(package: str, component: str, config: Dict, message: str) -> None:
     """Log an error while merging packages."""
-    message = f"Package {package} setup failed. Integration {component} {message}"
+    message = "Package {} setup failed. Integration {} {}".format(
+        package, component, message
+    )
 
     pack_config = config[CONF_CORE][CONF_PACKAGES].get(package, config)
     message += " (See {}:{}). ".format(
@@ -626,6 +626,7 @@ async def merge_packages_config(
     _log_pkg_error: Callable = _log_pkg_error,
 ) -> Dict:
     """Merge packages into the top-level configuration. Mutate config."""
+    # pylint: disable=too-many-nested-blocks
     PACKAGES_CONFIG_SCHEMA(packages)
     for pack_name, pack_conf in packages.items():
         for comp_name, comp_conf in pack_conf.items():
@@ -716,7 +717,7 @@ async def async_process_component_config(
                 hass, config
             )
         except (vol.Invalid, HomeAssistantError) as ex:
-            async_log_exception(ex, domain, config, hass, integration.documentation)
+            async_log_exception(ex, domain, config, hass)
             return None
 
     # No custom config validator, proceed with schema validation
@@ -724,7 +725,7 @@ async def async_process_component_config(
         try:
             return component.CONFIG_SCHEMA(config)  # type: ignore
         except vol.Invalid as ex:
-            async_log_exception(ex, domain, config, hass, integration.documentation)
+            async_log_exception(ex, domain, config, hass)
             return None
 
     component_platform_schema = getattr(
@@ -740,7 +741,7 @@ async def async_process_component_config(
         try:
             p_validated = component_platform_schema(p_config)
         except vol.Invalid as ex:
-            async_log_exception(ex, domain, p_config, hass, integration.documentation)
+            async_log_exception(ex, domain, p_config, hass)
             continue
 
         # Not all platform components follow same pattern for platforms
@@ -764,18 +765,13 @@ async def async_process_component_config(
 
         # Validate platform specific schema
         if hasattr(platform, "PLATFORM_SCHEMA"):
+            # pylint: disable=no-member
             try:
                 p_validated = platform.PLATFORM_SCHEMA(  # type: ignore
                     p_config
                 )
             except vol.Invalid as ex:
-                async_log_exception(
-                    ex,
-                    f"{domain}.{p_name}",
-                    p_config,
-                    hass,
-                    p_integration.documentation,
-                )
+                async_log_exception(ex, f"{domain}.{p_name}", p_config, hass)
                 continue
 
         platforms.append(p_validated)
@@ -811,7 +807,7 @@ async def async_check_ha_config_file(hass: HomeAssistant) -> Optional[str]:
 
 @callback
 def async_notify_setup_error(
-    hass: HomeAssistant, component: str, display_link: Optional[str] = None
+    hass: HomeAssistant, component: str, display_link: bool = False
 ) -> None:
     """Print a persistent notification.
 
@@ -826,11 +822,11 @@ def async_notify_setup_error(
 
     errors[component] = errors.get(component) or display_link
 
-    message = "The following integrations and platforms could not be set up:\n\n"
+    message = "The following components and platforms could not be set up:\n\n"
 
     for name, link in errors.items():
         if link:
-            part = f"[{name}]({link})"
+            part = HA_COMPONENT_URL.format(name.replace("_", "-"), name)
         else:
             part = name
 

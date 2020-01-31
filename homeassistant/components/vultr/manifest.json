@@ -2,7 +2,9 @@
   "domain": "vultr",
   "name": "Vultr",
   "documentation": "https://www.home-assistant.io/integrations/vultr",
-  "requirements": ["vultr==0.1.2"],
+  "requirements": [
+    "vultr==0.1.2"
+  ],
   "dependencies": [],
   "codeowners": []
 }

@@ -1,8 +1,8 @@
 """The tests for the demo stt component."""
 import pytest
 
-from homeassistant.components import stt
 from homeassistant.setup import async_setup_component
+from homeassistant.components import stt
 
 
 @pytest.fixture(autouse=True)

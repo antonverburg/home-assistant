@@ -15,18 +15,17 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
     keba = hass.data[DOMAIN]
 
-    sensors = [KebaLock(keba, "Authentication", "authentication")]
+    sensors = [KebaLock(keba, "Authentication")]
     async_add_entities(sensors)
 
 
 class KebaLock(LockDevice):
     """The entity class for KEBA charging stations switch."""
 
-    def __init__(self, keba, name, entity_type):
+    def __init__(self, keba, name):
         """Initialize the KEBA switch."""
         self._keba = keba
         self._name = name
-        self._entity_type = entity_type
         self._state = True
 
     @property
@@ -36,13 +35,13 @@ class KebaLock(LockDevice):
 
     @property
     def unique_id(self):
-        """Return the unique ID of the lock."""
-        return f"{self._keba.device_id}_{self._entity_type}"
+        """Return the unique ID of the binary sensor."""
+        return f"{self._keba.device_name}_{self._name}"
 
     @property
     def name(self):
         """Return the name of the device."""
-        return f"{self._keba.device_name} {self._name}"
+        return self._name
 
     @property
     def is_locked(self):

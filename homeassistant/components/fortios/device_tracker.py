@@ -5,16 +5,17 @@ This component is part of the device_tracker platform.
 """
 import logging
 
-from fortiosapi import FortiOSAPI
 import voluptuous as vol
+from fortiosapi import FortiOSAPI
 
+import homeassistant.helpers.config_validation as cv
 from homeassistant.components.device_tracker import (
     DOMAIN,
     PLATFORM_SCHEMA,
     DeviceScanner,
 )
-from homeassistant.const import CONF_HOST, CONF_TOKEN, CONF_VERIFY_SSL
-import homeassistant.helpers.config_validation as cv
+from homeassistant.const import CONF_HOST, CONF_TOKEN
+from homeassistant.const import CONF_VERIFY_SSL
 
 _LOGGER = logging.getLogger(__name__)
 DEFAULT_VERIFY_SSL = False

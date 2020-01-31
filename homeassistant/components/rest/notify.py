@@ -4,14 +4,6 @@ import logging
 import requests
 import voluptuous as vol
 
-from homeassistant.components.notify import (
-    ATTR_MESSAGE,
-    ATTR_TARGET,
-    ATTR_TITLE,
-    ATTR_TITLE_DEFAULT,
-    PLATFORM_SCHEMA,
-    BaseNotificationService,
-)
 from homeassistant.const import (
     CONF_AUTHENTICATION,
     CONF_HEADERS,
@@ -25,6 +17,15 @@ from homeassistant.const import (
     HTTP_DIGEST_AUTHENTICATION,
 )
 import homeassistant.helpers.config_validation as cv
+
+from homeassistant.components.notify import (
+    ATTR_TARGET,
+    ATTR_TITLE,
+    ATTR_TITLE_DEFAULT,
+    ATTR_MESSAGE,
+    PLATFORM_SCHEMA,
+    BaseNotificationService,
+)
 
 CONF_DATA = "data"
 CONF_DATA_TEMPLATE = "data_template"

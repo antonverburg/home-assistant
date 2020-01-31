@@ -1,10 +1,12 @@
 """Tests for the TekSavvy sensor platform."""
+import asyncio
 from homeassistant.bootstrap import async_setup_component
 from homeassistant.components.teksavvy.sensor import TekSavvyData
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 
-async def test_capped_setup(hass, aioclient_mock):
+@asyncio.coroutine
+def test_capped_setup(hass, aioclient_mock):
     """Test the default setup."""
     config = {
         "platform": "teksavvy",
@@ -42,7 +44,7 @@ async def test_capped_setup(hass, aioclient_mock):
         text=result,
     )
 
-    await async_setup_component(hass, "sensor", {"sensor": config})
+    yield from async_setup_component(hass, "sensor", {"sensor": config})
 
     state = hass.states.get("sensor.teksavvy_data_limit")
     assert state.attributes.get("unit_of_measurement") == "GB"
@@ -85,7 +87,8 @@ async def test_capped_setup(hass, aioclient_mock):
     assert state.state == "173.25"
 
 
-async def test_unlimited_setup(hass, aioclient_mock):
+@asyncio.coroutine
+def test_unlimited_setup(hass, aioclient_mock):
     """Test the default setup."""
     config = {
         "platform": "teksavvy",
@@ -123,7 +126,7 @@ async def test_unlimited_setup(hass, aioclient_mock):
         text=result,
     )
 
-    await async_setup_component(hass, "sensor", {"sensor": config})
+    yield from async_setup_component(hass, "sensor", {"sensor": config})
 
     state = hass.states.get("sensor.teksavvy_data_limit")
     assert state.attributes.get("unit_of_measurement") == "GB"
@@ -166,7 +169,8 @@ async def test_unlimited_setup(hass, aioclient_mock):
     assert state.state == "inf"
 
 
-async def test_bad_return_code(hass, aioclient_mock):
+@asyncio.coroutine
+def test_bad_return_code(hass, aioclient_mock):
     """Test handling a return code that isn't HTTP OK."""
     aioclient_mock.get(
         "https://api.teksavvy.com/"
@@ -177,11 +181,12 @@ async def test_bad_return_code(hass, aioclient_mock):
 
     tsd = TekSavvyData(hass.loop, async_get_clientsession(hass), "notakey", 400)
 
-    result = await tsd.async_update()
+    result = yield from tsd.async_update()
     assert result is False
 
 
-async def test_bad_json_decode(hass, aioclient_mock):
+@asyncio.coroutine
+def test_bad_json_decode(hass, aioclient_mock):
     """Test decoding invalid json result."""
     aioclient_mock.get(
         "https://api.teksavvy.com/"
@@ -192,5 +197,5 @@ async def test_bad_json_decode(hass, aioclient_mock):
 
     tsd = TekSavvyData(hass.loop, async_get_clientsession(hass), "notakey", 400)
 
-    result = await tsd.async_update()
+    result = yield from tsd.async_update()
     assert result is False

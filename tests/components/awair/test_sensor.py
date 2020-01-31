@@ -6,6 +6,7 @@ import json
 import logging
 from unittest.mock import patch
 
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.awair.sensor import (
     ATTR_LAST_API_UPDATE,
     ATTR_TIMESTAMP,
@@ -14,7 +15,6 @@ from homeassistant.components.awair.sensor import (
     DEVICE_CLASS_SCORE,
     DEVICE_CLASS_VOLATILE_ORGANIC_COMPOUNDS,
 )
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.const import (
     DEVICE_CLASS_HUMIDITY,
     DEVICE_CLASS_TEMPERATURE,

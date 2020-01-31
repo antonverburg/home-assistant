@@ -2,7 +2,6 @@
 from datetime import timedelta
 import logging
 
-from spiderpy.spiderapi import SpiderApi, UnauthorizedException
 import voluptuous as vol
 
 from homeassistant.const import CONF_PASSWORD, CONF_SCAN_INTERVAL, CONF_USERNAME
@@ -33,6 +32,8 @@ CONFIG_SCHEMA = vol.Schema(
 
 def setup(hass, config):
     """Set up Spider Component."""
+    from spiderpy.spiderapi import SpiderApi
+    from spiderpy.spiderapi import UnauthorizedException
 
     username = config[DOMAIN][CONF_USERNAME]
     password = config[DOMAIN][CONF_PASSWORD]

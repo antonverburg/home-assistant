@@ -1,8 +1,12 @@
 {
   "domain": "ephember",
-  "name": "EPH Controls",
+  "name": "Ephember",
   "documentation": "https://www.home-assistant.io/integrations/ephember",
-  "requirements": ["pyephember==0.3.1"],
+  "requirements": [
+    "pyephember==0.3.1"
+  ],
   "dependencies": [],
-  "codeowners": ["@ttroy50"]
+  "codeowners": [
+    "@ttroy50"
+  ]
 }

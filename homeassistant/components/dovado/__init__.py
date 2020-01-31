@@ -1,18 +1,18 @@
 """Support for Dovado router."""
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
 import dovado
 import voluptuous as vol
 
+import homeassistant.helpers.config_validation as cv
 from homeassistant.const import (
-    CONF_HOST,
-    CONF_PASSWORD,
-    CONF_PORT,
     CONF_USERNAME,
+    CONF_PASSWORD,
+    CONF_HOST,
+    CONF_PORT,
     DEVICE_DEFAULT_NAME,
 )
-import homeassistant.helpers.config_validation as cv
 from homeassistant.util import Throttle
 
 _LOGGER = logging.getLogger(__name__)
@@ -21,16 +21,11 @@ DOMAIN = "dovado"
 
 CONFIG_SCHEMA = vol.Schema(
     {
-        DOMAIN: vol.Schema(
-            {
-                vol.Required(CONF_USERNAME): cv.string,
-                vol.Required(CONF_PASSWORD): cv.string,
-                vol.Optional(CONF_HOST): cv.string,
-                vol.Optional(CONF_PORT): cv.port,
-            }
-        )
-    },
-    extra=vol.ALLOW_EXTRA,
+        vol.Required(CONF_USERNAME): cv.string,
+        vol.Required(CONF_PASSWORD): cv.string,
+        vol.Optional(CONF_HOST): cv.string,
+        vol.Optional(CONF_PORT): cv.port,
+    }
 )
 
 MIN_TIME_BETWEEN_UPDATES = timedelta(seconds=30)
@@ -41,10 +36,10 @@ def setup(hass, config):
 
     hass.data[DOMAIN] = DovadoData(
         dovado.Dovado(
-            config[DOMAIN].get(CONF_USERNAME),
-            config[DOMAIN].get(CONF_PASSWORD),
-            config[DOMAIN].get(CONF_HOST),
-            config[DOMAIN].get(CONF_PORT),
+            config[CONF_USERNAME],
+            config[CONF_PASSWORD],
+            config.get(CONF_HOST),
+            config.get(CONF_PORT),
         )
     )
     return True

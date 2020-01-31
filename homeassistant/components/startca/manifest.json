@@ -1,8 +1,10 @@
 {
   "domain": "startca",
-  "name": "Start.ca",
+  "name": "Startca",
   "documentation": "https://www.home-assistant.io/integrations/startca",
-  "requirements": ["xmltodict==0.12.0"],
+  "requirements": [
+    "xmltodict==0.12.0"
+  ],
   "dependencies": [],
   "codeowners": []
 }

@@ -6,11 +6,12 @@ from typing import Any, List
 import attr
 from huawei_lte_api.exceptions import ResponseErrorException
 
-from homeassistant.components.notify import ATTR_TARGET, BaseNotificationService
+from homeassistant.components.notify import BaseNotificationService, ATTR_TARGET
 from homeassistant.const import CONF_RECIPIENT, CONF_URL
 
 from . import Router
 from .const import DOMAIN
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -42,12 +43,6 @@ class HuaweiLteSmsNotificationService(BaseNotificationService):
 
         targets = kwargs.get(ATTR_TARGET, self.default_targets)
         if not targets or not message:
-            return
-
-        if self.router.suspended:
-            _LOGGER.debug(
-                "Integration suspended, not sending notification to %s", targets
-            )
             return
 
         try:

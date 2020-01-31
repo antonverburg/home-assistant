@@ -1,7 +1,6 @@
 """Get ride details and liveboard details for NMBS (Belgian railway)."""
 import logging
 
-from pyrail import iRail
 import voluptuous as vol
 
 from homeassistant.components.sensor import PLATFORM_SCHEMA
@@ -65,6 +64,7 @@ def get_ride_duration(departure_time, arrival_time, delay=0):
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the NMBS sensor with iRail API."""
+    from pyrail import iRail
 
     api_client = iRail()
 
@@ -92,7 +92,7 @@ class NMBSLiveBoard(Entity):
         """Initialize the sensor for getting liveboard data."""
         self._station = live_station
         self._api_client = api_client
-        self._unique_id = f"nmbs_live_{self._station}"
+
         self._attrs = {}
         self._state = None
 
@@ -100,11 +100,6 @@ class NMBSLiveBoard(Entity):
     def name(self):
         """Return the sensor default name."""
         return "NMBS Live"
-
-    @property
-    def unique_id(self):
-        """Return a unique ID."""
-        return self._unique_id
 
     @property
     def icon(self):

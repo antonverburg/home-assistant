@@ -48,7 +48,8 @@ DOMAIN = "sensor"
 
 PLATFORM = "here_travel_time"
 
-API_KEY = "test"
+APP_ID = "test"
+APP_CODE = "test"
 
 TRUCK_ORIGIN_LATITUDE = "41.9798"
 TRUCK_ORIGIN_LONGITUDE = "-87.8801"
@@ -66,14 +67,15 @@ CAR_DESTINATION_LATITUDE = "39.0"
 CAR_DESTINATION_LONGITUDE = "-77.1"
 
 
-def _build_mock_url(origin, destination, modes, api_key, departure):
+def _build_mock_url(origin, destination, modes, app_id, app_code, departure):
     """Construct a url for HERE."""
-    base_url = "https://route.ls.hereapi.com/routing/7.2/calculateroute.json?"
+    base_url = "https://route.cit.api.here.com/routing/7.2/calculateroute.json?"
     parameters = {
-        "waypoint0": f"geo!{origin}",
-        "waypoint1": f"geo!{destination}",
+        "waypoint0": origin,
+        "waypoint1": destination,
         "mode": ";".join(str(herepy.RouteMode[mode]) for mode in modes),
-        "apikey": api_key,
+        "app_id": app_id,
+        "app_code": app_code,
         "departure": departure,
     }
     url = base_url + urllib.parse.urlencode(parameters)
@@ -116,7 +118,8 @@ def requests_mock_credentials_check(requests_mock):
         ",".join([CAR_ORIGIN_LATITUDE, CAR_ORIGIN_LONGITUDE]),
         ",".join([CAR_DESTINATION_LATITUDE, CAR_DESTINATION_LONGITUDE]),
         modes,
-        API_KEY,
+        APP_ID,
+        APP_CODE,
         "now",
     )
     requests_mock.get(
@@ -133,7 +136,8 @@ def requests_mock_truck_response(requests_mock_credentials_check):
         ",".join([TRUCK_ORIGIN_LATITUDE, TRUCK_ORIGIN_LONGITUDE]),
         ",".join([TRUCK_DESTINATION_LATITUDE, TRUCK_DESTINATION_LONGITUDE]),
         modes,
-        API_KEY,
+        APP_ID,
+        APP_CODE,
         "now",
     )
     requests_mock_credentials_check.get(
@@ -149,7 +153,8 @@ def requests_mock_car_disabled_response(requests_mock_credentials_check):
         ",".join([CAR_ORIGIN_LATITUDE, CAR_ORIGIN_LONGITUDE]),
         ",".join([CAR_DESTINATION_LATITUDE, CAR_DESTINATION_LONGITUDE]),
         modes,
-        API_KEY,
+        APP_ID,
+        APP_CODE,
         "now",
     )
     requests_mock_credentials_check.get(
@@ -167,7 +172,8 @@ async def test_car(hass, requests_mock_car_disabled_response):
             "origin_longitude": CAR_ORIGIN_LONGITUDE,
             "destination_latitude": CAR_DESTINATION_LATITUDE,
             "destination_longitude": CAR_DESTINATION_LONGITUDE,
-            "api_key": API_KEY,
+            "app_id": APP_ID,
+            "app_code": APP_CODE,
         }
     }
     assert await async_setup_component(hass, DOMAIN, config)
@@ -213,7 +219,8 @@ async def test_traffic_mode_enabled(hass, requests_mock_credentials_check):
         ",".join([CAR_ORIGIN_LATITUDE, CAR_ORIGIN_LONGITUDE]),
         ",".join([CAR_DESTINATION_LATITUDE, CAR_DESTINATION_LONGITUDE]),
         modes,
-        API_KEY,
+        APP_ID,
+        APP_CODE,
         "now",
     )
     requests_mock_credentials_check.get(
@@ -228,7 +235,8 @@ async def test_traffic_mode_enabled(hass, requests_mock_credentials_check):
             "origin_longitude": CAR_ORIGIN_LONGITUDE,
             "destination_latitude": CAR_DESTINATION_LATITUDE,
             "destination_longitude": CAR_DESTINATION_LONGITUDE,
-            "api_key": API_KEY,
+            "app_id": APP_ID,
+            "app_code": APP_CODE,
             "traffic_mode": True,
         }
     }
@@ -254,7 +262,8 @@ async def test_imperial(hass, requests_mock_car_disabled_response):
             "origin_longitude": CAR_ORIGIN_LONGITUDE,
             "destination_latitude": CAR_DESTINATION_LATITUDE,
             "destination_longitude": CAR_DESTINATION_LONGITUDE,
-            "api_key": API_KEY,
+            "app_id": APP_ID,
+            "app_code": APP_CODE,
             "unit_system": "imperial",
         }
     }
@@ -272,7 +281,7 @@ async def test_route_mode_shortest(hass, requests_mock_credentials_check):
     origin = "38.902981,-77.048338"
     destination = "39.042158,-77.119116"
     modes = [ROUTE_MODE_SHORTEST, TRAVEL_MODE_CAR, TRAFFIC_MODE_DISABLED]
-    response_url = _build_mock_url(origin, destination, modes, API_KEY, "now")
+    response_url = _build_mock_url(origin, destination, modes, APP_ID, APP_CODE, "now")
     requests_mock_credentials_check.get(
         response_url, text=load_fixture("here_travel_time/car_shortest_response.json")
     )
@@ -285,7 +294,8 @@ async def test_route_mode_shortest(hass, requests_mock_credentials_check):
             "origin_longitude": origin.split(",")[1],
             "destination_latitude": destination.split(",")[0],
             "destination_longitude": destination.split(",")[1],
-            "api_key": API_KEY,
+            "app_id": APP_ID,
+            "app_code": APP_CODE,
             "route_mode": ROUTE_MODE_SHORTEST,
         }
     }
@@ -303,7 +313,7 @@ async def test_route_mode_fastest(hass, requests_mock_credentials_check):
     origin = "38.902981,-77.048338"
     destination = "39.042158,-77.119116"
     modes = [ROUTE_MODE_FASTEST, TRAVEL_MODE_CAR, TRAFFIC_MODE_ENABLED]
-    response_url = _build_mock_url(origin, destination, modes, API_KEY, "now")
+    response_url = _build_mock_url(origin, destination, modes, APP_ID, APP_CODE, "now")
     requests_mock_credentials_check.get(
         response_url, text=load_fixture("here_travel_time/car_enabled_response.json")
     )
@@ -316,7 +326,8 @@ async def test_route_mode_fastest(hass, requests_mock_credentials_check):
             "origin_longitude": origin.split(",")[1],
             "destination_latitude": destination.split(",")[0],
             "destination_longitude": destination.split(",")[1],
-            "api_key": API_KEY,
+            "app_id": APP_ID,
+            "app_code": APP_CODE,
             "traffic_mode": True,
         }
     }
@@ -339,7 +350,8 @@ async def test_truck(hass, requests_mock_truck_response):
             "origin_longitude": TRUCK_ORIGIN_LONGITUDE,
             "destination_latitude": TRUCK_DESTINATION_LATITUDE,
             "destination_longitude": TRUCK_DESTINATION_LONGITUDE,
-            "api_key": API_KEY,
+            "app_id": APP_ID,
+            "app_code": APP_CODE,
             "mode": TRAVEL_MODE_TRUCK,
         }
     }
@@ -357,7 +369,7 @@ async def test_public_transport(hass, requests_mock_credentials_check):
     origin = "41.9798,-87.8801"
     destination = "41.9043,-87.9216"
     modes = [ROUTE_MODE_FASTEST, TRAVEL_MODE_PUBLIC, TRAFFIC_MODE_DISABLED]
-    response_url = _build_mock_url(origin, destination, modes, API_KEY, "now")
+    response_url = _build_mock_url(origin, destination, modes, APP_ID, APP_CODE, "now")
     requests_mock_credentials_check.get(
         response_url, text=load_fixture("here_travel_time/public_response.json")
     )
@@ -370,7 +382,8 @@ async def test_public_transport(hass, requests_mock_credentials_check):
             "origin_longitude": origin.split(",")[1],
             "destination_latitude": destination.split(",")[0],
             "destination_longitude": destination.split(",")[1],
-            "api_key": API_KEY,
+            "app_id": APP_ID,
+            "app_code": APP_CODE,
             "mode": TRAVEL_MODE_PUBLIC,
         }
     }
@@ -387,7 +400,7 @@ async def test_public_transport(hass, requests_mock_credentials_check):
     assert sensor.attributes.get(ATTR_DURATION) == 89.16666666666667
     assert sensor.attributes.get(ATTR_DISTANCE) == 22.325
     assert sensor.attributes.get(ATTR_ROUTE) == (
-        "332 - Palmer/Schiller; 332 - Cargo Rd./Delta Cargo; 332 - Palmer/Schiller"
+        "332 - Palmer/Schiller; 332 - Cargo Rd./Delta Cargo; " "332 - Palmer/Schiller"
     )
     assert sensor.attributes.get(CONF_UNIT_SYSTEM) == "metric"
     assert sensor.attributes.get(ATTR_DURATION_IN_TRAFFIC) == 89.16666666666667
@@ -406,7 +419,7 @@ async def test_public_transport_time_table(hass, requests_mock_credentials_check
     origin = "41.9798,-87.8801"
     destination = "41.9043,-87.9216"
     modes = [ROUTE_MODE_FASTEST, TRAVEL_MODE_PUBLIC_TIME_TABLE, TRAFFIC_MODE_DISABLED]
-    response_url = _build_mock_url(origin, destination, modes, API_KEY, "now")
+    response_url = _build_mock_url(origin, destination, modes, APP_ID, APP_CODE, "now")
     requests_mock_credentials_check.get(
         response_url,
         text=load_fixture("here_travel_time/public_time_table_response.json"),
@@ -420,7 +433,8 @@ async def test_public_transport_time_table(hass, requests_mock_credentials_check
             "origin_longitude": origin.split(",")[1],
             "destination_latitude": destination.split(",")[0],
             "destination_longitude": destination.split(",")[1],
-            "api_key": API_KEY,
+            "app_id": APP_ID,
+            "app_code": APP_CODE,
             "mode": TRAVEL_MODE_PUBLIC_TIME_TABLE,
         }
     }
@@ -456,7 +470,7 @@ async def test_pedestrian(hass, requests_mock_credentials_check):
     origin = "41.9798,-87.8801"
     destination = "41.9043,-87.9216"
     modes = [ROUTE_MODE_FASTEST, TRAVEL_MODE_PEDESTRIAN, TRAFFIC_MODE_DISABLED]
-    response_url = _build_mock_url(origin, destination, modes, API_KEY, "now")
+    response_url = _build_mock_url(origin, destination, modes, APP_ID, APP_CODE, "now")
     requests_mock_credentials_check.get(
         response_url, text=load_fixture("here_travel_time/pedestrian_response.json")
     )
@@ -469,7 +483,8 @@ async def test_pedestrian(hass, requests_mock_credentials_check):
             "origin_longitude": origin.split(",")[1],
             "destination_latitude": destination.split(",")[0],
             "destination_longitude": destination.split(",")[1],
-            "api_key": API_KEY,
+            "app_id": APP_ID,
+            "app_code": APP_CODE,
             "mode": TRAVEL_MODE_PEDESTRIAN,
         }
     }
@@ -508,7 +523,7 @@ async def test_bicycle(hass, requests_mock_credentials_check):
     origin = "41.9798,-87.8801"
     destination = "41.9043,-87.9216"
     modes = [ROUTE_MODE_FASTEST, TRAVEL_MODE_BICYCLE, TRAFFIC_MODE_DISABLED]
-    response_url = _build_mock_url(origin, destination, modes, API_KEY, "now")
+    response_url = _build_mock_url(origin, destination, modes, APP_ID, APP_CODE, "now")
     requests_mock_credentials_check.get(
         response_url, text=load_fixture("here_travel_time/bike_response.json")
     )
@@ -521,7 +536,8 @@ async def test_bicycle(hass, requests_mock_credentials_check):
             "origin_longitude": origin.split(",")[1],
             "destination_latitude": destination.split(",")[0],
             "destination_longitude": destination.split(",")[1],
-            "api_key": API_KEY,
+            "app_id": APP_ID,
+            "app_code": APP_CODE,
             "mode": TRAVEL_MODE_BICYCLE,
         }
     }
@@ -583,7 +599,8 @@ async def test_location_zone(hass, requests_mock_truck_response):
                 "name": "test",
                 "origin_entity_id": "zone.origin",
                 "destination_entity_id": "zone.destination",
-                "api_key": API_KEY,
+                "app_id": APP_ID,
+                "app_code": APP_CODE,
                 "mode": TRAVEL_MODE_TRUCK,
             }
         }
@@ -623,7 +640,8 @@ async def test_location_sensor(hass, requests_mock_truck_response):
                 "name": "test",
                 "origin_entity_id": "sensor.origin",
                 "destination_entity_id": "sensor.destination",
-                "api_key": API_KEY,
+                "app_id": APP_ID,
+                "app_code": APP_CODE,
                 "mode": TRAVEL_MODE_TRUCK,
             }
         }
@@ -671,7 +689,8 @@ async def test_location_person(hass, requests_mock_truck_response):
                 "name": "test",
                 "origin_entity_id": "person.origin",
                 "destination_entity_id": "person.destination",
-                "api_key": API_KEY,
+                "app_id": APP_ID,
+                "app_code": APP_CODE,
                 "mode": TRAVEL_MODE_TRUCK,
             }
         }
@@ -719,7 +738,8 @@ async def test_location_device_tracker(hass, requests_mock_truck_response):
                 "name": "test",
                 "origin_entity_id": "device_tracker.origin",
                 "destination_entity_id": "device_tracker.destination",
-                "api_key": API_KEY,
+                "app_id": APP_ID,
+                "app_code": APP_CODE,
                 "mode": TRAVEL_MODE_TRUCK,
             }
         }
@@ -753,7 +773,8 @@ async def test_location_device_tracker_added_after_update(
                 "name": "test",
                 "origin_entity_id": "device_tracker.origin",
                 "destination_entity_id": "device_tracker.destination",
-                "api_key": API_KEY,
+                "app_id": APP_ID,
+                "app_code": APP_CODE,
                 "mode": TRAVEL_MODE_TRUCK,
             }
         }
@@ -821,7 +842,8 @@ async def test_location_device_tracker_in_zone(
             "origin_entity_id": "device_tracker.origin",
             "destination_latitude": TRUCK_DESTINATION_LATITUDE,
             "destination_longitude": TRUCK_DESTINATION_LONGITUDE,
-            "api_key": API_KEY,
+            "app_id": APP_ID,
+            "app_code": APP_CODE,
             "mode": TRAVEL_MODE_TRUCK,
         }
     }
@@ -841,7 +863,7 @@ async def test_route_not_found(hass, requests_mock_credentials_check, caplog):
     origin = "52.516,13.3779"
     destination = "47.013399,-10.171986"
     modes = [ROUTE_MODE_FASTEST, TRAVEL_MODE_CAR, TRAFFIC_MODE_DISABLED]
-    response_url = _build_mock_url(origin, destination, modes, API_KEY, "now")
+    response_url = _build_mock_url(origin, destination, modes, APP_ID, APP_CODE, "now")
     requests_mock_credentials_check.get(
         response_url,
         text=load_fixture("here_travel_time/routing_error_no_route_found.json"),
@@ -855,7 +877,8 @@ async def test_route_not_found(hass, requests_mock_credentials_check, caplog):
             "origin_longitude": origin.split(",")[1],
             "destination_latitude": destination.split(",")[0],
             "destination_longitude": destination.split(",")[1],
-            "api_key": API_KEY,
+            "app_id": APP_ID,
+            "app_code": APP_CODE,
         }
     }
     assert await async_setup_component(hass, DOMAIN, config)
@@ -878,7 +901,8 @@ async def test_pattern_origin(hass, caplog):
             "origin_longitude": "-77.04833",
             "destination_latitude": CAR_DESTINATION_LATITUDE,
             "destination_longitude": CAR_DESTINATION_LONGITUDE,
-            "api_key": API_KEY,
+            "app_id": APP_ID,
+            "app_code": APP_CODE,
         }
     }
     assert await async_setup_component(hass, DOMAIN, config)
@@ -897,7 +921,8 @@ async def test_pattern_destination(hass, caplog):
             "origin_longitude": CAR_ORIGIN_LONGITUDE,
             "destination_latitude": "139.0",
             "destination_longitude": "-77.1",
-            "api_key": API_KEY,
+            "app_id": APP_ID,
+            "app_code": APP_CODE,
         }
     }
     assert await async_setup_component(hass, DOMAIN, config)
@@ -913,7 +938,8 @@ async def test_invalid_credentials(hass, requests_mock, caplog):
         ",".join([CAR_ORIGIN_LATITUDE, CAR_ORIGIN_LONGITUDE]),
         ",".join([CAR_DESTINATION_LATITUDE, CAR_DESTINATION_LONGITUDE]),
         modes,
-        API_KEY,
+        APP_ID,
+        APP_CODE,
         "now",
     )
     requests_mock.get(
@@ -929,7 +955,8 @@ async def test_invalid_credentials(hass, requests_mock, caplog):
             "origin_longitude": CAR_ORIGIN_LONGITUDE,
             "destination_latitude": CAR_DESTINATION_LATITUDE,
             "destination_longitude": CAR_DESTINATION_LONGITUDE,
-            "api_key": API_KEY,
+            "app_id": APP_ID,
+            "app_code": APP_CODE,
         }
     }
     assert await async_setup_component(hass, DOMAIN, config)
@@ -942,7 +969,7 @@ async def test_attribution(hass, requests_mock_credentials_check):
     origin = "50.037751372637686,14.39233448220898"
     destination = "50.07993838201255,14.42582157361062"
     modes = [ROUTE_MODE_SHORTEST, TRAVEL_MODE_PUBLIC_TIME_TABLE, TRAFFIC_MODE_ENABLED]
-    response_url = _build_mock_url(origin, destination, modes, API_KEY, "now")
+    response_url = _build_mock_url(origin, destination, modes, APP_ID, APP_CODE, "now")
     requests_mock_credentials_check.get(
         response_url, text=load_fixture("here_travel_time/attribution_response.json")
     )
@@ -955,7 +982,8 @@ async def test_attribution(hass, requests_mock_credentials_check):
             "origin_longitude": origin.split(",")[1],
             "destination_latitude": destination.split(",")[0],
             "destination_longitude": destination.split(",")[1],
-            "api_key": API_KEY,
+            "app_id": APP_ID,
+            "app_code": APP_CODE,
             "traffic_mode": True,
             "route_mode": ROUTE_MODE_SHORTEST,
             "mode": TRAVEL_MODE_PUBLIC_TIME_TABLE,
@@ -985,7 +1013,8 @@ async def test_pattern_entity_state(hass, requests_mock_truck_response, caplog):
             "origin_entity_id": "sensor.origin",
             "destination_latitude": TRUCK_DESTINATION_LATITUDE,
             "destination_longitude": TRUCK_DESTINATION_LONGITUDE,
-            "api_key": API_KEY,
+            "app_id": APP_ID,
+            "app_code": APP_CODE,
             "mode": TRAVEL_MODE_TRUCK,
         }
     }
@@ -1011,7 +1040,8 @@ async def test_pattern_entity_state_with_space(hass, requests_mock_truck_respons
             "origin_entity_id": "sensor.origin",
             "destination_latitude": TRUCK_DESTINATION_LATITUDE,
             "destination_longitude": TRUCK_DESTINATION_LONGITUDE,
-            "api_key": API_KEY,
+            "app_id": APP_ID,
+            "app_code": APP_CODE,
             "mode": TRAVEL_MODE_TRUCK,
         }
     }
@@ -1029,7 +1059,8 @@ async def test_delayed_update(hass, requests_mock_truck_response, caplog):
             "origin_entity_id": "sensor.origin",
             "destination_latitude": TRUCK_DESTINATION_LATITUDE,
             "destination_longitude": TRUCK_DESTINATION_LONGITUDE,
-            "api_key": API_KEY,
+            "app_id": APP_ID,
+            "app_code": APP_CODE,
             "mode": TRAVEL_MODE_TRUCK,
         }
     }

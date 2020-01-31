@@ -1,22 +1,22 @@
 """Unit tests for platform/plant.py."""
 import asyncio
-from datetime import datetime, timedelta
 import unittest
-
 import pytest
+from datetime import datetime, timedelta
 
-from homeassistant.components import recorder
-import homeassistant.components.plant as plant
 from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
-    STATE_OK,
-    STATE_PROBLEM,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
+    STATE_PROBLEM,
+    STATE_OK,
 )
+from homeassistant.components import recorder
+import homeassistant.components.plant as plant
 from homeassistant.setup import setup_component
 
 from tests.common import get_test_home_assistant, init_recorder_component
+
 
 GOOD_DATA = {
     "moisture": 50,
@@ -55,7 +55,7 @@ class TestPlant(unittest.TestCase):
     """Tests for component "plant"."""
 
     def setUp(self):
-        """Create test instance of Home Assistant."""
+        """Create test instance of home assistant."""
         self.hass = get_test_home_assistant()
         self.hass.start()
 

@@ -1,11 +1,12 @@
 """Support for Dark Sky weather service."""
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
 import forecastio
-from requests.exceptions import ConnectionError as ConnectError, HTTPError, Timeout
 import voluptuous as vol
+from requests.exceptions import ConnectionError as ConnectError, HTTPError, Timeout
 
+import homeassistant.helpers.config_validation as cv
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.const import (
     ATTR_ATTRIBUTION,
@@ -14,10 +15,9 @@ from homeassistant.const import (
     CONF_LONGITUDE,
     CONF_MONITORED_CONDITIONS,
     CONF_NAME,
-    CONF_SCAN_INTERVAL,
     UNIT_UV_INDEX,
+    CONF_SCAN_INTERVAL,
 )
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle
 
@@ -385,7 +385,7 @@ CONDITION_PICTURES = {
     ],
     "partly-cloudy-night": [
         "/static/images/darksky/weather-cloudy.svg",
-        "mdi:weather-night-partly-cloudy",
+        "mdi:weather-partly-cloudy",
     ],
 }
 
@@ -750,7 +750,7 @@ class DarkSkyAlertSensor(Entity):
         for i, alert in enumerate(data):
             for attr in ALERTS_ATTRS:
                 if multiple_alerts:
-                    dkey = f"{attr}_{i!s}"
+                    dkey = attr + "_" + str(i)
                 else:
                     dkey = attr
                 alerts[dkey] = getattr(alert, attr)

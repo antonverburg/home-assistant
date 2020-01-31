@@ -1,20 +1,20 @@
 """Test the unit system helper."""
 import pytest
 
+from homeassistant.util.unit_system import UnitSystem, METRIC_SYSTEM, IMPERIAL_SYSTEM
 from homeassistant.const import (
-    LENGTH,
-    LENGTH_KILOMETERS,
     LENGTH_METERS,
-    MASS,
+    LENGTH_KILOMETERS,
     MASS_GRAMS,
-    PRESSURE,
     PRESSURE_PA,
+    VOLUME_LITERS,
     TEMP_CELSIUS,
+    LENGTH,
+    MASS,
+    PRESSURE,
     TEMPERATURE,
     VOLUME,
-    VOLUME_LITERS,
 )
-from homeassistant.util.unit_system import IMPERIAL_SYSTEM, METRIC_SYSTEM, UnitSystem
 
 SYSTEM_NAME = "TEST"
 INVALID_UNIT = "INVALID"

@@ -4,26 +4,27 @@ from contextlib import suppress
 import logging
 from typing import Optional
 
-from aiohttp import WSMsgType, web
+from aiohttp import web, WSMsgType
 import async_timeout
 
-from homeassistant.components.http import HomeAssistantView
 from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import callback
+from homeassistant.components.http import HomeAssistantView
 
-from .auth import AuthPhase, auth_required_message
 from .const import (
-    CANCELLATION_ERRORS,
-    DATA_CONNECTIONS,
-    ERR_UNKNOWN_ERROR,
-    JSON_DUMP,
     MAX_PENDING_MSG,
+    CANCELLATION_ERRORS,
+    URL,
+    ERR_UNKNOWN_ERROR,
     SIGNAL_WEBSOCKET_CONNECTED,
     SIGNAL_WEBSOCKET_DISCONNECTED,
-    URL,
+    DATA_CONNECTIONS,
+    JSON_DUMP,
 )
+from .auth import AuthPhase, auth_required_message
 from .error import Disconnect
 from .messages import error_message
+
 
 # mypy: allow-untyped-calls, allow-untyped-defs, no-check-untyped-defs
 

@@ -4,21 +4,21 @@ import logging
 from pynetgear import Netgear
 import voluptuous as vol
 
+import homeassistant.helpers.config_validation as cv
 from homeassistant.components.device_tracker import (
     DOMAIN,
     PLATFORM_SCHEMA,
     DeviceScanner,
 )
 from homeassistant.const import (
-    CONF_DEVICES,
-    CONF_EXCLUDE,
     CONF_HOST,
     CONF_PASSWORD,
+    CONF_USERNAME,
     CONF_PORT,
     CONF_SSL,
-    CONF_USERNAME,
+    CONF_DEVICES,
+    CONF_EXCLUDE,
 )
-import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -110,16 +110,13 @@ class NetgearDeviceScanner(DeviceScanner):
                     or dev.name in self.excluded_devices
                 )
             )
-
-            # when link_rate is None this means the router still knows about
-            # the device, but it is not in range.
-            if tracked and dev.link_rate is not None:
+            if tracked:
                 devices.append(dev.mac)
                 if (
                     self.tracked_accesspoints
                     and dev.conn_ap_mac in self.tracked_accesspoints
                 ):
-                    devices.append(f"{dev.mac}_{dev.conn_ap_mac}")
+                    devices.append(dev.mac + "_" + dev.conn_ap_mac)
 
         return devices
 
@@ -147,7 +144,7 @@ class NetgearDeviceScanner(DeviceScanner):
                     ap_name = dev.name
                     break
 
-            return f"{name} on {ap_name}"
+            return name + " on " + ap_name
 
         return name
 

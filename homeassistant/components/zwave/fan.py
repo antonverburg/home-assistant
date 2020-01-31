@@ -2,18 +2,17 @@
 import logging
 import math
 
+from homeassistant.core import callback
 from homeassistant.components.fan import (
     DOMAIN,
-    SPEED_HIGH,
+    FanEntity,
+    SPEED_OFF,
     SPEED_LOW,
     SPEED_MEDIUM,
-    SPEED_OFF,
+    SPEED_HIGH,
     SUPPORT_SET_SPEED,
-    FanEntity,
 )
-from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
-
 from . import ZWaveDeviceEntity
 
 _LOGGER = logging.getLogger(__name__)

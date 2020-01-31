@@ -3,37 +3,36 @@ import logging
 
 import voluptuous as vol
 
+import homeassistant.helpers.config_validation as cv
 from homeassistant.components.fan import (
-    ATTR_DIRECTION,
-    ATTR_OSCILLATING,
-    ATTR_SPEED,
-    DIRECTION_FORWARD,
-    DIRECTION_REVERSE,
-    ENTITY_ID_FORMAT,
-    SPEED_HIGH,
     SPEED_LOW,
     SPEED_MEDIUM,
-    SUPPORT_DIRECTION,
-    SUPPORT_OSCILLATE,
+    SPEED_HIGH,
     SUPPORT_SET_SPEED,
+    SUPPORT_OSCILLATE,
     FanEntity,
+    ATTR_SPEED,
+    ATTR_OSCILLATING,
+    ENTITY_ID_FORMAT,
+    SUPPORT_DIRECTION,
+    DIRECTION_FORWARD,
+    DIRECTION_REVERSE,
+    ATTR_DIRECTION,
 )
 from homeassistant.const import (
-    CONF_ENTITY_ID,
     CONF_FRIENDLY_NAME,
     CONF_VALUE_TEMPLATE,
-    EVENT_HOMEASSISTANT_START,
-    STATE_OFF,
+    CONF_ENTITY_ID,
     STATE_ON,
+    STATE_OFF,
+    MATCH_ALL,
+    EVENT_HOMEASSISTANT_START,
     STATE_UNKNOWN,
 )
 from homeassistant.core import callback
 from homeassistant.exceptions import TemplateError
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.script import Script
-
-from . import extract_entities, initialise_templates
 from .const import CONF_AVAILABILITY_TEMPLATE
 
 _LOGGER = logging.getLogger(__name__)
@@ -99,16 +98,33 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
         speed_list = device_config[CONF_SPEED_LIST]
 
-        templates = {
-            CONF_VALUE_TEMPLATE: state_template,
-            CONF_SPEED_TEMPLATE: speed_template,
-            CONF_OSCILLATING_TEMPLATE: oscillating_template,
-            CONF_DIRECTION_TEMPLATE: direction_template,
-            CONF_AVAILABILITY_TEMPLATE: availability_template,
-        }
+        entity_ids = set()
+        manual_entity_ids = device_config.get(CONF_ENTITY_ID)
 
-        initialise_templates(hass, templates)
-        entity_ids = extract_entities(device, "fan", None, templates)
+        for template in (
+            state_template,
+            speed_template,
+            oscillating_template,
+            direction_template,
+            availability_template,
+        ):
+            if template is None:
+                continue
+            template.hass = hass
+
+            if entity_ids == MATCH_ALL or manual_entity_ids is not None:
+                continue
+
+            template_entity_ids = template.extract_entities()
+            if template_entity_ids == MATCH_ALL:
+                entity_ids = MATCH_ALL
+            else:
+                entity_ids |= set(template_entity_ids)
+
+        if manual_entity_ids is not None:
+            entity_ids = manual_entity_ids
+        elif entity_ids != MATCH_ALL:
+            entity_ids = list(entity_ids)
 
         fans.append(
             TemplateFan(

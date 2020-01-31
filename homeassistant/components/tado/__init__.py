@@ -1,29 +1,23 @@
 """Support for the (unofficial) Tado API."""
-from datetime import timedelta
 import logging
 import urllib
+from datetime import timedelta
 
-from PyTado.interface import Tado
 import voluptuous as vol
 
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.discovery import load_platform
-from homeassistant.helpers.dispatcher import dispatcher_send
+from homeassistant.helpers import config_validation as cv
+from homeassistant.const import CONF_USERNAME, CONF_PASSWORD
 from homeassistant.util import Throttle
-
-from .const import CONF_FALLBACK
 
 _LOGGER = logging.getLogger(__name__)
 
+DATA_TADO = "tado_data"
 DOMAIN = "tado"
 
-SIGNAL_TADO_UPDATE_RECEIVED = "tado_update_received_{}_{}"
+MIN_TIME_BETWEEN_UPDATES = timedelta(seconds=10)
 
 TADO_COMPONENTS = ["sensor", "climate"]
-
-MIN_TIME_BETWEEN_UPDATES = timedelta(seconds=10)
-SCAN_INTERVAL = timedelta(seconds=15)
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -31,7 +25,6 @@ CONFIG_SCHEMA = vol.Schema(
             {
                 vol.Required(CONF_USERNAME): cv.string,
                 vol.Required(CONF_PASSWORD): cv.string,
-                vol.Optional(CONF_FALLBACK, default=True): cv.boolean,
             }
         )
     },
@@ -44,106 +37,93 @@ def setup(hass, config):
     username = config[DOMAIN][CONF_USERNAME]
     password = config[DOMAIN][CONF_PASSWORD]
 
-    tadoconnector = TadoConnector(hass, username, password)
-    if not tadoconnector.setup():
+    from PyTado.interface import Tado
+
+    try:
+        tado = Tado(username, password)
+        tado.setDebugging(True)
+    except (RuntimeError, urllib.error.HTTPError):
+        _LOGGER.error("Unable to connect to mytado with username and password")
         return False
 
-    hass.data[DOMAIN] = tadoconnector
+    hass.data[DATA_TADO] = TadoDataStore(tado)
 
-    # Do first update
-    tadoconnector.update()
-
-    # Load components
     for component in TADO_COMPONENTS:
-        load_platform(
-            hass,
-            component,
-            DOMAIN,
-            {CONF_FALLBACK: config[DOMAIN][CONF_FALLBACK]},
-            config,
-        )
-
-    # Poll for updates in the background
-    hass.helpers.event.track_time_interval(
-        lambda now: tadoconnector.update(), SCAN_INTERVAL
-    )
+        load_platform(hass, component, DOMAIN, {}, config)
 
     return True
 
 
-class TadoConnector:
+class TadoDataStore:
     """An object to store the Tado data."""
 
-    def __init__(self, hass, username, password):
-        """Initialize Tado Connector."""
-        self.hass = hass
-        self._username = username
-        self._password = password
+    def __init__(self, tado):
+        """Initialize Tado data store."""
+        self.tado = tado
 
-        self.tado = None
-        self.zones = None
-        self.devices = None
-        self.data = {
-            "zone": {},
-            "device": {},
-        }
-
-    def setup(self):
-        """Connect to Tado and fetch the zones."""
-        try:
-            self.tado = Tado(self._username, self._password)
-        except (RuntimeError, urllib.error.HTTPError) as exc:
-            _LOGGER.error("Unable to connect: %s", exc)
-            return False
-
-        self.tado.setDebugging(True)
-
-        # Load zones and devices
-        self.zones = self.tado.getZones()
-        self.devices = self.tado.getMe()["homes"]
-
-        return True
+        self.sensors = {}
+        self.data = {}
 
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     def update(self):
-        """Update the registered zones."""
-        for zone in self.zones:
-            self.update_sensor("zone", zone["id"])
-        for device in self.devices:
-            self.update_sensor("device", device["id"])
+        """Update the internal data from mytado.com."""
+        for data_id, sensor in list(self.sensors.items()):
+            data = None
 
-    def update_sensor(self, sensor_type, sensor):
-        """Update the internal data from Tado."""
-        _LOGGER.debug("Updating %s %s", sensor_type, sensor)
-        try:
-            if sensor_type == "zone":
-                data = self.tado.getState(sensor)
-            elif sensor_type == "device":
-                data = self.tado.getDevices()[0]
-            else:
-                _LOGGER.debug("Unknown sensor: %s", sensor_type)
-                return
-        except RuntimeError:
-            _LOGGER.error(
-                "Unable to connect to Tado while updating %s %s", sensor_type, sensor,
-            )
-            return
+            try:
+                if "zone" in sensor:
+                    _LOGGER.debug(
+                        "Querying mytado.com for zone %s %s",
+                        sensor["id"],
+                        sensor["name"],
+                    )
+                    data = self.tado.getState(sensor["id"])
 
-        self.data[sensor_type][sensor] = data
+                if "device" in sensor:
+                    _LOGGER.debug(
+                        "Querying mytado.com for device %s %s",
+                        sensor["id"],
+                        sensor["name"],
+                    )
+                    data = self.tado.getDevices()[0]
 
-        _LOGGER.debug("Dispatching update to %s %s: %s", sensor_type, sensor, data)
-        dispatcher_send(
-            self.hass, SIGNAL_TADO_UPDATE_RECEIVED.format(sensor_type, sensor)
-        )
+            except RuntimeError:
+                _LOGGER.error(
+                    "Unable to connect to myTado. %s %s", sensor["id"], sensor["id"]
+                )
 
-    def get_capabilities(self, zone_id):
-        """Return the capabilities of the devices."""
-        return self.tado.getCapabilities(zone_id)
+            self.data[data_id] = data
+
+    def add_sensor(self, data_id, sensor):
+        """Add a sensor to update in _update()."""
+        self.sensors[data_id] = sensor
+        self.data[data_id] = None
+
+    def get_data(self, data_id):
+        """Get the cached data."""
+        data = {"error": "no data"}
+
+        if data_id in self.data:
+            data = self.data[data_id]
+
+        return data
+
+    def get_zones(self):
+        """Wrap for getZones()."""
+        return self.tado.getZones()
+
+    def get_capabilities(self, tado_id):
+        """Wrap for getCapabilities(..)."""
+        return self.tado.getCapabilities(tado_id)
+
+    def get_me(self):
+        """Wrap for getMet()."""
+        return self.tado.getMe()
 
     def reset_zone_overlay(self, zone_id):
-        """Reset the zone back to the default operation."""
+        """Wrap for resetZoneOverlay(..)."""
         self.tado.resetZoneOverlay(zone_id)
-        self.update_sensor("zone", zone_id)
+        self.update(no_throttle=True)  # pylint: disable=unexpected-keyword-arg
 
     def set_zone_overlay(
         self,
@@ -154,32 +134,13 @@ class TadoConnector:
         device_type="HEATING",
         mode=None,
     ):
-        """Set a zone overlay."""
-        _LOGGER.debug(
-            "Set overlay for zone %s: mode=%s, temp=%s, duration=%s, type=%s, mode=%s",
-            zone_id,
-            overlay_mode,
-            temperature,
-            duration,
-            device_type,
-            mode,
+        """Wrap for setZoneOverlay(..)."""
+        self.tado.setZoneOverlay(
+            zone_id, overlay_mode, temperature, duration, device_type, "ON", mode
         )
-        try:
-            self.tado.setZoneOverlay(
-                zone_id, overlay_mode, temperature, duration, device_type, "ON", mode
-            )
-        except urllib.error.HTTPError as exc:
-            _LOGGER.error("Could not set zone overlay: %s", exc.read())
-
-        self.update_sensor("zone", zone_id)
+        self.update(no_throttle=True)  # pylint: disable=unexpected-keyword-arg
 
     def set_zone_off(self, zone_id, overlay_mode, device_type="HEATING"):
         """Set a zone to off."""
-        try:
-            self.tado.setZoneOverlay(
-                zone_id, overlay_mode, None, None, device_type, "OFF"
-            )
-        except urllib.error.HTTPError as exc:
-            _LOGGER.error("Could not set zone overlay: %s", exc.read())
-
-        self.update_sensor("zone", zone_id)
+        self.tado.setZoneOverlay(zone_id, overlay_mode, None, None, device_type, "OFF")
+        self.update(no_throttle=True)  # pylint: disable=unexpected-keyword-arg

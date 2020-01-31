@@ -1,7 +1,6 @@
 """Test Alexa entity representation."""
 from homeassistant.components.alexa import smart_home
-
-from . import DEFAULT_CONFIG, get_new_request
+from . import get_new_request, DEFAULT_CONFIG
 
 
 async def test_unsupported_domain(hass):

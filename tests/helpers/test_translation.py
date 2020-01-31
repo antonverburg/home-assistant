@@ -5,10 +5,9 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.generated import config_flows
 import homeassistant.helpers.translation as translation
 from homeassistant.setup import async_setup_component
-
+from homeassistant.generated import config_flows
 from tests.common import mock_coro
 
 

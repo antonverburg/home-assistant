@@ -1,6 +1,6 @@
 """Support for settting the level of logging for components."""
-from collections import OrderedDict
 import logging
+from collections import OrderedDict
 
 import voluptuous as vol
 

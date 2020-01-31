@@ -3,11 +3,11 @@ import logging
 
 import voluptuous as vol
 
-from homeassistant.components import arduino
 from homeassistant.components.sensor import PLATFORM_SCHEMA
+from homeassistant.components import arduino
 from homeassistant.const import CONF_NAME
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity
+import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
 

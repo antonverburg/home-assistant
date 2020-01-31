@@ -2,7 +2,7 @@
 from datetime import timedelta
 import logging
 
-# pylint: disable=import-error, no-member
+# pylint: disable=import-error, no-member, no-value-for-parameter
 import switchmate
 import voluptuous as vol
 
@@ -46,7 +46,7 @@ class SwitchmateEntity(SwitchDevice):
 
     @property
     def unique_id(self) -> str:
-        """Return a unique, Home Assistant friendly identifier for this entity."""
+        """Return a unique, HASS-friendly identifier for this entity."""
         return self._mac.replace(":", "")
 
     @property

@@ -5,22 +5,23 @@ from unittest.mock import patch
 
 from homeassistant.components.reddit import sensor as reddit_sensor
 from homeassistant.components.reddit.sensor import (
-    ATTR_BODY,
+    DOMAIN,
+    ATTR_SUBREDDIT,
+    ATTR_POSTS,
+    CONF_SORT_BY,
+    ATTR_ID,
+    ATTR_URL,
+    ATTR_TITLE,
+    ATTR_SCORE,
     ATTR_COMMENTS_NUMBER,
     ATTR_CREATED,
-    ATTR_ID,
-    ATTR_POSTS,
-    ATTR_SCORE,
-    ATTR_SUBREDDIT,
-    ATTR_TITLE,
-    ATTR_URL,
-    CONF_SORT_BY,
-    DOMAIN,
+    ATTR_BODY,
 )
-from homeassistant.const import CONF_MAXIMUM, CONF_PASSWORD, CONF_USERNAME
+from homeassistant.const import CONF_USERNAME, CONF_PASSWORD, CONF_MAXIMUM
 from homeassistant.setup import setup_component
 
-from tests.common import MockDependency, get_test_home_assistant
+from tests.common import get_test_home_assistant, MockDependency
+
 
 VALID_CONFIG = {
     "sensor": {

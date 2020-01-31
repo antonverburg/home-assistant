@@ -8,6 +8,7 @@ import voluptuous as vol
 
 from homeassistant.components.media_player import PLATFORM_SCHEMA, MediaPlayerDevice
 from homeassistant.components.media_player.const import (
+    DOMAIN,
     SUPPORT_SELECT_SOURCE,
     SUPPORT_TURN_OFF,
     SUPPORT_TURN_ON,
@@ -22,8 +23,6 @@ from homeassistant.const import (
     STATE_ON,
 )
 import homeassistant.helpers.config_validation as cv
-
-from .const import DOMAIN, SERVICE_SETALLZONES
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -40,6 +39,7 @@ CONF_SOURCES = "sources"
 
 DATA_BLACKBIRD = "blackbird"
 
+SERVICE_SETALLZONES = "blackbird_set_all_zones"
 ATTR_SOURCE = "source"
 
 BLACKBIRD_SETALLZONES_SCHEMA = MEDIA_PLAYER_SCHEMA.extend(

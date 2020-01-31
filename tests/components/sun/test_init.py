@@ -5,10 +5,10 @@ from unittest.mock import patch
 from pytest import mark
 
 import homeassistant.components.sun as sun
-from homeassistant.const import EVENT_STATE_CHANGED
 import homeassistant.core as ha
-from homeassistant.setup import async_setup_component
 import homeassistant.util.dt as dt_util
+from homeassistant.const import EVENT_STATE_CHANGED
+from homeassistant.setup import async_setup_component
 
 
 async def test_setting_rising(hass):

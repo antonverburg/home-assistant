@@ -14,23 +14,17 @@
                     "name": "Name",
                     "password": "Passwort",
                     "port": "Port",
-                    "ssl": "Verwenden Sie SSL / TLS, um eine Verbindung zum Glances-System herzustellen",
-                    "username": "Benutzername",
-                    "verify_ssl": "\u00dcberpr\u00fcfen Sie die Zertifizierung des Systems",
-                    "version": "Glances API-Version (2 oder 3)"
-                },
-                "title": "Glances einrichten"
+                    "username": "Benutzername"
+                }
             }
-        },
-        "title": "Glances"
+        }
     },
     "options": {
         "step": {
             "init": {
                 "data": {
                     "scan_interval": "Aktualisierungsfrequenz"
-                },
-                "description": "Konfigurieren Sie die Optionen f\u00fcr Glances"
+                }
             }
         }
     }

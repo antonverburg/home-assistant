@@ -5,11 +5,10 @@ https://github.com/home-assistant/home-assistant/issues/20885
 """
 
 from homeassistant.components.climate.const import SUPPORT_TARGET_TEMPERATURE
-
 from tests.components.homekit_controller.common import (
-    Helper,
     setup_accessories_from_file,
     setup_test_accessories,
+    Helper,
 )
 
 

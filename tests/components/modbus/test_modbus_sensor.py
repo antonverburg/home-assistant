@@ -1,9 +1,14 @@
 """The tests for the Modbus sensor component."""
+import pytest
 from datetime import timedelta
 from unittest import mock
 
-import pytest
-
+from homeassistant.const import (
+    CONF_NAME,
+    CONF_OFFSET,
+    CONF_PLATFORM,
+    CONF_SCAN_INTERVAL,
+)
 from homeassistant.components.modbus import DEFAULT_HUB, DOMAIN as MODBUS_DOMAIN
 from homeassistant.components.modbus.sensor import (
     CONF_COUNT,
@@ -21,16 +26,9 @@ from homeassistant.components.modbus.sensor import (
     REGISTER_TYPE_INPUT,
 )
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.const import (
-    CONF_NAME,
-    CONF_OFFSET,
-    CONF_PLATFORM,
-    CONF_SCAN_INTERVAL,
-)
 from homeassistant.setup import async_setup_component
 import homeassistant.util.dt as dt_util
-
-from tests.common import MockModule, async_fire_time_changed, mock_integration
+from tests.common import MockModule, mock_integration, async_fire_time_changed
 
 
 @pytest.fixture()

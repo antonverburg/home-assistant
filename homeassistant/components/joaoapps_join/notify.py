@@ -1,9 +1,6 @@
 """Support for Join notifications."""
 import logging
-
-from pyjoin import get_devices, send_notification
 import voluptuous as vol
-
 from homeassistant.components.notify import (
     ATTR_DATA,
     ATTR_TITLE,
@@ -37,6 +34,8 @@ def get_service(hass, config, discovery_info=None):
     device_ids = config.get(CONF_DEVICE_IDS)
     device_names = config.get(CONF_DEVICE_NAMES)
     if api_key:
+        from pyjoin import get_devices
+
         if not get_devices(api_key):
             _LOGGER.error("Error connecting to Join. Check the API key")
             return False
@@ -61,6 +60,7 @@ class JoinNotificationService(BaseNotificationService):
 
     def send_message(self, message="", **kwargs):
         """Send a message to a user."""
+        from pyjoin import send_notification
 
         title = kwargs.get(ATTR_TITLE, ATTR_TITLE_DEFAULT)
         data = kwargs.get(ATTR_DATA) or {}

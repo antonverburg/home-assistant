@@ -1,6 +1,6 @@
 {
   "domain": "facebook",
-  "name": "Facebook Messenger",
+  "name": "Facebook",
   "documentation": "https://www.home-assistant.io/integrations/facebook",
   "requirements": [],
   "dependencies": [],

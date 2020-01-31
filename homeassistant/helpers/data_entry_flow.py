@@ -2,9 +2,10 @@
 
 import voluptuous as vol
 
-from homeassistant import config_entries, data_entry_flow
+from homeassistant import data_entry_flow, config_entries
 from homeassistant.components.http import HomeAssistantView
 from homeassistant.components.http.data_validator import RequestDataValidator
+
 
 # mypy: allow-untyped-calls, allow-untyped-defs
 

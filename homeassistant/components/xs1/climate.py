@@ -5,8 +5,8 @@ from xs1_api_client.api_constants import ActuatorType
 
 from homeassistant.components.climate import ClimateDevice
 from homeassistant.components.climate.const import (
-    HVAC_MODE_HEAT,
     SUPPORT_TARGET_TEMPERATURE,
+    HVAC_MODE_HEAT,
 )
 from homeassistant.const import ATTR_TEMPERATURE
 

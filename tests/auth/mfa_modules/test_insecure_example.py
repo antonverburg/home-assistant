@@ -2,7 +2,6 @@
 from homeassistant import auth, data_entry_flow
 from homeassistant.auth.mfa_modules import auth_mfa_module_from_config
 from homeassistant.auth.models import Credentials
-
 from tests.common import MockUser
 
 

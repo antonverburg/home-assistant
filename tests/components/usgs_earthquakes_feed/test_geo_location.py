@@ -1,37 +1,36 @@
 """The tests for the USGS Earthquake Hazards Program Feed platform."""
 import datetime
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import patch, MagicMock, call
 
 from homeassistant.components import geo_location
 from homeassistant.components.geo_location import ATTR_SOURCE
 from homeassistant.components.usgs_earthquakes_feed.geo_location import (
     ATTR_ALERT,
     ATTR_EXTERNAL_ID,
-    ATTR_MAGNITUDE,
+    SCAN_INTERVAL,
     ATTR_PLACE,
+    ATTR_MAGNITUDE,
     ATTR_STATUS,
-    ATTR_TIME,
     ATTR_TYPE,
+    ATTR_TIME,
     ATTR_UPDATED,
     CONF_FEED_TYPE,
-    SCAN_INTERVAL,
 )
 from homeassistant.const import (
-    ATTR_ATTRIBUTION,
-    ATTR_FRIENDLY_NAME,
-    ATTR_ICON,
+    EVENT_HOMEASSISTANT_START,
+    CONF_RADIUS,
     ATTR_LATITUDE,
     ATTR_LONGITUDE,
+    ATTR_FRIENDLY_NAME,
     ATTR_UNIT_OF_MEASUREMENT,
+    ATTR_ATTRIBUTION,
     CONF_LATITUDE,
     CONF_LONGITUDE,
-    CONF_RADIUS,
-    EVENT_HOMEASSISTANT_START,
+    ATTR_ICON,
 )
 from homeassistant.setup import async_setup_component
-import homeassistant.util.dt as dt_util
-
 from tests.common import assert_setup_component, async_fire_time_changed
+import homeassistant.util.dt as dt_util
 
 CONFIG = {
     geo_location.DOMAIN: [

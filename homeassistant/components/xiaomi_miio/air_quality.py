@@ -3,9 +3,9 @@ from miio import AirQualityMonitor, Device, DeviceException
 import voluptuous as vol
 
 from homeassistant.components.air_quality import (
-    _LOGGER,
-    PLATFORM_SCHEMA,
     AirQualityEntity,
+    PLATFORM_SCHEMA,
+    _LOGGER,
 )
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_TOKEN
 from homeassistant.exceptions import PlatformNotReady

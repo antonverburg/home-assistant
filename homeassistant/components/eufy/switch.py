@@ -1,6 +1,5 @@
 """Support for Eufy switches."""
 import logging
-
 import lakeside
 
 from homeassistant.components.switch import SwitchDevice

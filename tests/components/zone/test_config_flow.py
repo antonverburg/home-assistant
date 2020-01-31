@@ -3,10 +3,10 @@
 from homeassistant.components.zone import config_flow
 from homeassistant.components.zone.const import CONF_PASSIVE, DOMAIN, HOME_ZONE
 from homeassistant.const import (
-    CONF_ICON,
+    CONF_NAME,
     CONF_LATITUDE,
     CONF_LONGITUDE,
-    CONF_NAME,
+    CONF_ICON,
     CONF_RADIUS,
 )
 

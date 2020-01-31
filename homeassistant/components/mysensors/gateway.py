@@ -6,7 +6,6 @@ import socket
 import sys
 
 import async_timeout
-from mysensors import mysensors
 import voluptuous as vol
 
 from homeassistant.const import CONF_OPTIMISTIC, EVENT_HOMEASSISTANT_STOP
@@ -85,6 +84,7 @@ async def setup_gateways(hass, config):
 
 async def _get_gateway(hass, config, gateway_conf, persistence_file):
     """Return gateway after setup of the gateway."""
+    from mysensors import mysensors
 
     conf = config[DOMAIN]
     persistence = conf[CONF_PERSISTENCE]

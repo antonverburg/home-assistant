@@ -1,7 +1,6 @@
 """Support for Ripple sensors."""
 from datetime import timedelta
 
-from pyripple import get_balance
 import voluptuous as vol
 
 from homeassistant.components.sensor import PLATFORM_SCHEMA
@@ -63,6 +62,7 @@ class RippleSensor(Entity):
 
     def update(self):
         """Get the latest state of the sensor."""
+        from pyripple import get_balance
 
         balance = get_balance(self.address)
         if balance is not None:

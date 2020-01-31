@@ -1,13 +1,12 @@
 """Tests for the SolarEdge config flow."""
-from unittest.mock import Mock, patch
-
 import pytest
-from requests.exceptions import ConnectTimeout, HTTPError
+from requests.exceptions import HTTPError, ConnectTimeout
+from unittest.mock import patch, Mock
 
 from homeassistant import data_entry_flow
 from homeassistant.components.solaredge import config_flow
 from homeassistant.components.solaredge.const import CONF_SITE_ID, DEFAULT_NAME
-from homeassistant.const import CONF_API_KEY, CONF_NAME
+from homeassistant.const import CONF_NAME, CONF_API_KEY
 
 from tests.common import MockConfigEntry
 

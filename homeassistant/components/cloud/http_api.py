@@ -174,8 +174,7 @@ class GoogleActionsSyncView(HomeAssistantView):
         """Trigger a Google Actions sync."""
         hass = request.app["hass"]
         cloud: Cloud = hass.data[DOMAIN]
-        gconf = await cloud.client.get_google_config()
-        status = await gconf.async_sync_entities(gconf.agent_user_id)
+        status = await cloud.client.google_config.async_sync_entities()
         return self.json({}, status_code=status)
 
 
@@ -193,7 +192,11 @@ class CloudLoginView(HomeAssistantView):
         """Handle login request."""
         hass = request.app["hass"]
         cloud = hass.data[DOMAIN]
-        await cloud.login(data["email"], data["password"])
+
+        with async_timeout.timeout(REQUEST_TIMEOUT):
+            await hass.async_add_job(cloud.auth.login, data["email"], data["password"])
+
+        hass.async_add_job(cloud.iot.connect)
         return self.json({"success": True})
 
 
@@ -474,8 +477,7 @@ async def websocket_remote_disconnect(hass, connection, msg):
 async def google_assistant_list(hass, connection, msg):
     """List all google assistant entities."""
     cloud = hass.data[DOMAIN]
-    gconf = await cloud.client.get_google_config()
-    entities = google_helpers.async_get_entities(hass, gconf)
+    entities = google_helpers.async_get_entities(hass, cloud.client.google_config)
 
     result = []
 
@@ -583,7 +585,7 @@ async def alexa_sync(hass, connection, msg):
             connection.send_error(
                 msg["id"],
                 "alexa_relink",
-                "Please go to the Alexa app and re-link the Home Assistant skill.",
+                "Please go to the Alexa app and re-link the Home Assistant " "skill.",
             )
             return
 

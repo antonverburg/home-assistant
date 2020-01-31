@@ -3,18 +3,18 @@ import asyncio
 import datetime
 import logging
 
-from homekit.controller.ip_implementation import IpPairing
 from homekit.exceptions import (
     AccessoryDisconnectedError,
     AccessoryNotFoundError,
     EncryptionError,
 )
-from homekit.model.characteristics import CharacteristicsTypes
 from homekit.model.services import ServicesTypes
+from homekit.model.characteristics import CharacteristicsTypes
 
 from homeassistant.helpers.event import async_track_time_interval
 
-from .const import DOMAIN, ENTITY_MAP, HOMEKIT_ACCESSORY_DISPATCH
+from .const import DOMAIN, HOMEKIT_ACCESSORY_DISPATCH, ENTITY_MAP
+
 
 DEFAULT_SCAN_INTERVAL = datetime.timedelta(seconds=60)
 RETRY_INTERVAL = 60  # seconds
@@ -57,6 +57,7 @@ class HKDevice:
 
     def __init__(self, hass, config_entry, pairing_data):
         """Initialise a generic HomeKit device."""
+        from homekit.controller.ip_implementation import IpPairing
 
         self.hass = hass
         self.config_entry = config_entry
@@ -122,7 +123,7 @@ class HKDevice:
         self.hass.helpers.dispatcher.async_dispatcher_send(self.signal_state_updated)
 
     async def async_setup(self):
-        """Prepare to use a paired HomeKit device in Home Assistant."""
+        """Prepare to use a paired HomeKit device in homeassistant."""
         cache = self.hass.data[ENTITY_MAP].get_map(self.unique_id)
         if not cache:
             if await self.async_refresh_entity_map(self.config_num):
@@ -135,32 +136,19 @@ class HKDevice:
         self.accessories = cache["accessories"]
         self.config_num = cache["config_num"]
 
-        self._polling_interval_remover = async_track_time_interval(
-            self.hass, self.async_update, DEFAULT_SCAN_INTERVAL
-        )
-
-        self.hass.async_create_task(self.async_process_entity_map())
-
-        return True
-
-    async def async_process_entity_map(self):
-        """
-        Process the entity map and load any platforms or entities that need adding.
-
-        This is idempotent and will be called at startup and when we detect metadata changes
-        via the c# counter on the zeroconf record.
-        """
-        # Ensure the Pairing object has access to the latest version of the entity map. This
-        # is especially important for BLE, as the Pairing instance relies on the entity map
-        # to map aid/iid to GATT characteristics. So push it to there as well.
-
+        # Ensure the Pairing object has access to the latest version of the
+        # entity map.
         self.pairing.pairing_data["accessories"] = self.accessories
 
-        await self.async_load_platforms()
+        self.async_load_platforms()
 
         self.add_entities()
 
         await self.async_update()
+
+        self._polling_interval_remover = async_track_time_interval(
+            self.hass, self.async_update, DEFAULT_SCAN_INTERVAL
+        )
 
         return True
 
@@ -191,14 +179,24 @@ class HKDevice:
         except AccessoryDisconnectedError:
             # If we fail to refresh this data then we will naturally retry
             # later when Bonjour spots c# is still not up to date.
-            return False
+            return
 
         self.hass.data[ENTITY_MAP].async_create_or_update_map(
             self.unique_id, config_num, self.accessories
         )
 
         self.config_num = config_num
-        self.hass.async_create_task(self.async_process_entity_map())
+
+        # For BLE, the Pairing instance relies on the entity map to map
+        # aid/iid to GATT characteristics. So push it to there as well.
+        self.pairing.pairing_data["accessories"] = self.accessories
+
+        self.async_load_platforms()
+
+        # Register and add new entities that are available
+        self.add_entities()
+
+        await self.async_update()
 
         return True
 
@@ -228,7 +226,7 @@ class HKDevice:
                         self.entities.append((aid, iid))
                         break
 
-    async def async_load_platforms(self):
+    def async_load_platforms(self):
         """Load any platforms needed by this HomeKit device."""
         for accessory in self.accessories:
             for service in accessory["services"]:
@@ -240,14 +238,12 @@ class HKDevice:
                 if platform in self.platforms:
                     continue
 
-                self.platforms.add(platform)
-                try:
-                    await self.hass.config_entries.async_forward_entry_setup(
+                self.hass.async_create_task(
+                    self.hass.config_entries.async_forward_entry_setup(
                         self.config_entry, platform
                     )
-                except Exception:
-                    self.platforms.remove(platform)
-                    raise
+                )
+                self.platforms.add(platform)
 
     async def async_update(self, now=None):
         """Poll state of all entities attached to this bridge/accessory."""

@@ -18,14 +18,14 @@
                     "flow_impl": "Udbyder"
                 },
                 "description": "V\u00e6lg hvilken godkendelsesudbyder du vil godkende med Nest.",
-                "title": "Godkendelsesudbyder"
+                "title": "Godkendelses udbyder"
             },
             "link": {
                 "data": {
                     "code": "PIN-kode"
                 },
                 "description": "For at forbinde din Nest-konto, [godkend din konto]({url}). \n\nEfter godkendelse skal du kopiere pin koden nedenfor.",
-                "title": "Forbind Nest-konto"
+                "title": "Link Nest-konto"
             }
         },
         "title": "Nest"

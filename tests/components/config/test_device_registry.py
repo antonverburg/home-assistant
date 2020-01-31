@@ -2,7 +2,6 @@
 import pytest
 
 from homeassistant.components.config import device_registry
-
 from tests.common import mock_device_registry
 
 

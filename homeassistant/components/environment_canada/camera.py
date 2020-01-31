@@ -7,18 +7,17 @@ https://home-assistant.io/components/camera.environment_canada/
 import datetime
 import logging
 
-from env_canada import ECRadar
 import voluptuous as vol
 
 from homeassistant.components.camera import PLATFORM_SCHEMA, Camera
 from homeassistant.const import (
-    ATTR_ATTRIBUTION,
+    CONF_NAME,
     CONF_LATITUDE,
     CONF_LONGITUDE,
-    CONF_NAME,
+    ATTR_ATTRIBUTION,
 )
-import homeassistant.helpers.config_validation as cv
 from homeassistant.util import Throttle
+import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -47,6 +46,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 
 def setup_platform(hass, config, add_devices, discovery_info=None):
     """Set up the Environment Canada camera."""
+    from env_canada import ECRadar
 
     if config.get(CONF_STATION):
         radar_object = ECRadar(

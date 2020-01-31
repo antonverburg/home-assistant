@@ -2,7 +2,9 @@
   "domain": "pencom",
   "name": "Pencom",
   "documentation": "https://www.home-assistant.io/integrations/pencom",
-  "requirements": ["pencompy==0.0.3"],
+  "requirements": [
+    "pencompy==0.0.3"
+  ],
   "dependencies": [],
   "codeowners": []
 }

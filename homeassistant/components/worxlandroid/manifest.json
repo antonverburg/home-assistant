@@ -1,6 +1,6 @@
 {
   "domain": "worxlandroid",
-  "name": "Worx Landroid",
+  "name": "Worxlandroid",
   "documentation": "https://www.home-assistant.io/integrations/worxlandroid",
   "requirements": [],
   "dependencies": [],

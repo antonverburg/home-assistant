@@ -1,11 +1,10 @@
 """Support for a switch using a 433MHz module via GPIO on a Raspberry Pi."""
 import importlib
 import logging
-from threading import RLock
 
 import voluptuous as vol
 
-from homeassistant.components.switch import PLATFORM_SCHEMA, SwitchDevice
+from homeassistant.components.switch import SwitchDevice, PLATFORM_SCHEMA
 from homeassistant.const import CONF_NAME, CONF_SWITCHES, EVENT_HOMEASSISTANT_STOP
 import homeassistant.helpers.config_validation as cv
 
@@ -45,6 +44,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Find and return switches controlled by a generic RF device via GPIO."""
     rpi_rf = importlib.import_module("rpi_rf")
+    from threading import RLock
 
     gpio = config.get(CONF_GPIO)
     rfdevice = rpi_rf.RFDevice(gpio)

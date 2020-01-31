@@ -1,13 +1,14 @@
 """The tests for the Alexa component."""
 # pylint: disable=protected-access
+import asyncio
 import datetime
 
 import pytest
 
-from homeassistant.components import alexa
-from homeassistant.components.alexa import const
 from homeassistant.core import callback
 from homeassistant.setup import async_setup_component
+from homeassistant.components import alexa
+from homeassistant.components.alexa import const
 
 SESSION_ID = "amzn1.echo-api.session.0000000-0000-0000-0000-00000000000"
 APPLICATION_ID = "amzn1.echo-sdk-ams.app.000000-d0ed-0000-ad00-000000d00ebe"
@@ -66,19 +67,21 @@ def _flash_briefing_req(client, briefing_id):
     return client.get("/api/alexa/flash_briefings/{}".format(briefing_id))
 
 
-async def test_flash_briefing_invalid_id(alexa_client):
+@asyncio.coroutine
+def test_flash_briefing_invalid_id(alexa_client):
     """Test an invalid Flash Briefing ID."""
-    req = await _flash_briefing_req(alexa_client, 10000)
+    req = yield from _flash_briefing_req(alexa_client, 10000)
     assert req.status == 404
-    text = await req.text()
+    text = yield from req.text()
     assert text == ""
 
 
-async def test_flash_briefing_date_from_str(alexa_client):
+@asyncio.coroutine
+def test_flash_briefing_date_from_str(alexa_client):
     """Test the response has a valid date parsed from string."""
-    req = await _flash_briefing_req(alexa_client, "weather")
+    req = yield from _flash_briefing_req(alexa_client, "weather")
     assert req.status == 200
-    data = await req.json()
+    data = yield from req.json()
     assert isinstance(
         datetime.datetime.strptime(
             data[0].get(const.ATTR_UPDATE_DATE), const.DATE_FORMAT
@@ -87,7 +90,8 @@ async def test_flash_briefing_date_from_str(alexa_client):
     )
 
 
-async def test_flash_briefing_valid(alexa_client):
+@asyncio.coroutine
+def test_flash_briefing_valid(alexa_client):
     """Test the response is valid."""
     data = [
         {
@@ -100,9 +104,9 @@ async def test_flash_briefing_valid(alexa_client):
         }
     ]
 
-    req = await _flash_briefing_req(alexa_client, "news_audio")
+    req = yield from _flash_briefing_req(alexa_client, "news_audio")
     assert req.status == 200
-    json = await req.json()
+    json = yield from req.json()
     assert isinstance(
         datetime.datetime.strptime(
             json[0].get(const.ATTR_UPDATE_DATE), const.DATE_FORMAT

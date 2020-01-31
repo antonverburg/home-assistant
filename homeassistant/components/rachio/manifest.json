@@ -2,7 +2,9 @@
   "domain": "rachio",
   "name": "Rachio",
   "documentation": "https://www.home-assistant.io/integrations/rachio",
-  "requirements": ["rachiopy==0.1.3"],
-  "dependencies": ["http"],
+  "requirements": [
+    "rachiopy==0.1.3"
+  ],
+  "dependencies": [],
   "codeowners": []
 }

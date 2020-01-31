@@ -2,9 +2,8 @@
 
 import unittest
 
-import pytest
-
 from homeassistant.components.fan import FanEntity
+import pytest
 
 
 class BaseFan(FanEntity):
@@ -31,7 +30,7 @@ class TestFanEntity(unittest.TestCase):
         assert "off" == self.fan.state
         assert 0 == len(self.fan.speed_list)
         assert 0 == self.fan.supported_features
-        assert {"speed_list": []} == self.fan.capability_attributes
+        assert {"speed_list": []} == self.fan.state_attributes
         # Test set_speed not required
         self.fan.oscillate(True)
         with pytest.raises(NotImplementedError):

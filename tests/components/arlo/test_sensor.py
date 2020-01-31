@@ -1,15 +1,14 @@
 """The tests for the Netgear Arlo sensors."""
 from collections import namedtuple
-from unittest.mock import MagicMock, patch
-
+from unittest.mock import patch, MagicMock
 import pytest
-
-from homeassistant.components.arlo import DATA_ARLO, sensor as arlo
 from homeassistant.const import (
-    ATTR_ATTRIBUTION,
-    DEVICE_CLASS_HUMIDITY,
     DEVICE_CLASS_TEMPERATURE,
+    DEVICE_CLASS_HUMIDITY,
+    ATTR_ATTRIBUTION,
 )
+from homeassistant.components.arlo import sensor as arlo
+from homeassistant.components.arlo import DATA_ARLO
 
 
 def _get_named_tuple(input_dict):

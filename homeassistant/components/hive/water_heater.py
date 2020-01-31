@@ -7,8 +7,7 @@ from homeassistant.components.water_heater import (
     WaterHeaterDevice,
 )
 from homeassistant.const import TEMP_CELSIUS
-
-from . import DATA_HIVE, DOMAIN, HiveEntity, refresh_system
+from . import DOMAIN, DATA_HIVE, HiveEntity, refresh_system
 
 SUPPORT_FLAGS_HEATER = SUPPORT_OPERATION_MODE
 

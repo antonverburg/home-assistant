@@ -5,22 +5,20 @@ from aiohttp import web
 import voluptuous as vol
 
 from homeassistant import util
-from homeassistant.components.http import real_ip
 from homeassistant.const import EVENT_HOMEASSISTANT_START, EVENT_HOMEASSISTANT_STOP
 from homeassistant.exceptions import HomeAssistantError
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.deprecation import get_deprecated
+import homeassistant.helpers.config_validation as cv
 from homeassistant.util.json import load_json, save_json
+from homeassistant.components.http import real_ip
 
 from .hue_api import (
-    HueAllGroupsStateView,
-    HueAllLightsStateView,
-    HueFullStateView,
-    HueGroupView,
-    HueOneLightChangeView,
-    HueOneLightStateView,
-    HueUnauthorizedUser,
     HueUsernameView,
+    HueAllLightsStateView,
+    HueOneLightStateView,
+    HueOneLightChangeView,
+    HueGroupView,
+    HueAllGroupsStateView,
 )
 from .upnp import DescriptionXmlView, UPNPResponderThread
 
@@ -115,13 +113,11 @@ async def async_setup(hass, yaml_config):
 
     DescriptionXmlView(config).register(app, app.router)
     HueUsernameView().register(app, app.router)
-    HueUnauthorizedUser().register(app, app.router)
     HueAllLightsStateView(config).register(app, app.router)
     HueOneLightStateView(config).register(app, app.router)
     HueOneLightChangeView(config).register(app, app.router)
     HueAllGroupsStateView(config).register(app, app.router)
     HueGroupView(config).register(app, app.router)
-    HueFullStateView(config).register(app, app.router)
 
     upnp_listener = UPNPResponderThread(
         config.host_ip_addr,
@@ -312,7 +308,7 @@ class Config:
 
 
 def _load_json(filename):
-    """Load JSON, handling invalid syntax."""
+    """Wrapper, because we actually want to handle invalid json."""
     try:
         return load_json(filename)
     except HomeAssistantError:

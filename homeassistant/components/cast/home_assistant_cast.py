@@ -1,8 +1,9 @@
 """Home Assistant Cast integration for Cast."""
 from typing import Optional
 
-from pychromecast.controllers.homeassistant import HomeAssistantController
 import voluptuous as vol
+
+from pychromecast.controllers.homeassistant import HomeAssistantController
 
 from homeassistant import auth, config_entries, core
 from homeassistant.const import ATTR_ENTITY_ID

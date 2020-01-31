@@ -1,15 +1,14 @@
 """Support for Traccar."""
 import logging
 
-from aiohttp import web
 import voluptuous as vol
+from aiohttp import web
 
-from homeassistant.components.device_tracker import DOMAIN as DEVICE_TRACKER
-from homeassistant.const import CONF_WEBHOOK_ID, HTTP_OK, HTTP_UNPROCESSABLE_ENTITY
-from homeassistant.helpers import config_entry_flow
 import homeassistant.helpers.config_validation as cv
+from homeassistant.const import HTTP_UNPROCESSABLE_ENTITY, HTTP_OK, CONF_WEBHOOK_ID
+from homeassistant.helpers import config_entry_flow
 from homeassistant.helpers.dispatcher import async_dispatcher_send
-
+from homeassistant.components.device_tracker import DOMAIN as DEVICE_TRACKER
 from .const import (
     ATTR_ACCURACY,
     ATTR_ALTITUDE,

@@ -1,20 +1,20 @@
 """Component that will help set the Dlib face detect processing."""
-import io
 import logging
+import io
 
 # pylint: disable=import-error
 import face_recognition
 import voluptuous as vol
 
+from homeassistant.core import split_entity_id
 from homeassistant.components.image_processing import (
-    CONF_CONFIDENCE,
+    ImageProcessingFaceEntity,
+    PLATFORM_SCHEMA,
+    CONF_SOURCE,
     CONF_ENTITY_ID,
     CONF_NAME,
-    CONF_SOURCE,
-    PLATFORM_SCHEMA,
-    ImageProcessingFaceEntity,
+    CONF_CONFIDENCE,
 )
-from homeassistant.core import split_entity_id
 import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)

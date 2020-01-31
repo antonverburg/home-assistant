@@ -79,6 +79,7 @@ class AdGuardHomeFlowHandler(ConfigFlow):
             password=user_input.get(CONF_PASSWORD),
             tls=user_input[CONF_SSL],
             verify_ssl=user_input[CONF_VERIFY_SSL],
+            loop=self.hass.loop,
             session=session,
         )
 
@@ -160,6 +161,7 @@ class AdGuardHomeFlowHandler(ConfigFlow):
             self._hassio_discovery[CONF_HOST],
             port=self._hassio_discovery[CONF_PORT],
             tls=False,
+            loop=self.hass.loop,
             session=session,
         )
 

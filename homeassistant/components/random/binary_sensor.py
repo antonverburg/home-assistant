@@ -1,16 +1,15 @@
 """Support for showing random states."""
 import logging
-from random import getrandbits
 
 import voluptuous as vol
 
-from homeassistant.components.binary_sensor import (
-    DEVICE_CLASSES_SCHEMA,
-    PLATFORM_SCHEMA,
-    BinarySensorDevice,
-)
-from homeassistant.const import CONF_DEVICE_CLASS, CONF_NAME
 import homeassistant.helpers.config_validation as cv
+from homeassistant.components.binary_sensor import (
+    BinarySensorDevice,
+    PLATFORM_SCHEMA,
+    DEVICE_CLASSES_SCHEMA,
+)
+from homeassistant.const import CONF_NAME, CONF_DEVICE_CLASS
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -58,5 +57,6 @@ class RandomSensor(BinarySensorDevice):
 
     async def async_update(self):
         """Get new state and update the sensor's state."""
+        from random import getrandbits
 
         self._state = bool(getrandbits(1))

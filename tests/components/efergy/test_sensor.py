@@ -5,7 +5,7 @@ import requests_mock
 
 from homeassistant.setup import setup_component
 
-from tests.common import get_test_home_assistant, load_fixture
+from tests.common import load_fixture, get_test_home_assistant
 
 token = "9p6QGJ7dpZfO3fqPTBk1fyEmjV1cGoLT"
 multi_sensor_token = "9r6QGF7dpZfO3fqPTBl1fyRmjV1cGoLT"

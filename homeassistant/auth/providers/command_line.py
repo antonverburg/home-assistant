@@ -1,17 +1,19 @@
 """Auth provider that validates credentials via an external command."""
 
+from typing import Any, Dict, Optional, cast
+
 import asyncio.subprocess
 import collections
 import logging
 import os
-from typing import Any, Dict, Optional, cast
 
 import voluptuous as vol
 
 from homeassistant.exceptions import HomeAssistantError
 
-from . import AUTH_PROVIDER_SCHEMA, AUTH_PROVIDERS, AuthProvider, LoginFlow
+from . import AuthProvider, AUTH_PROVIDER_SCHEMA, AUTH_PROVIDERS, LoginFlow
 from ..models import Credentials, UserMeta
+
 
 CONF_COMMAND = "command"
 CONF_ARGS = "args"
@@ -76,7 +78,7 @@ class CommandLineAuthProvider(AuthProvider):
 
         if process.returncode != 0:
             _LOGGER.error(
-                "User %r failed to authenticate, command exited with code %d.",
+                "User %r failed to authenticate, command exited " "with code %d.",
                 username,
                 process.returncode,
             )

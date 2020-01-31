@@ -4,12 +4,12 @@ Lazy 'tox' to quickly check if branch is up to PR standards.
 
 This is NOT a tox replacement, only a quick check during development.
 """
-import asyncio
-from collections import namedtuple
 import os
+import asyncio
+import sys
 import re
 import shlex
-import sys
+from collections import namedtuple
 
 try:
     from colorlog.escape_codes import escape_codes
@@ -76,7 +76,8 @@ async def async_exec(*args, display=False):
         proc = await asyncio.create_subprocess_exec(*args, **kwargs)
     except FileNotFoundError as err:
         printc(
-            FAIL, f"Could not execute {args[0]}. Did you install test requirements?",
+            FAIL,
+            "Could not execute {}. Did you install test requirements?".format(args[0]),
         )
         raise err
 
@@ -201,7 +202,7 @@ async def main():
             elif parts[-1] == "__main__.py":
                 parts[-1] = "test_main.py"
             else:
-                parts[-1] = f"test_{parts[-1]}"
+                parts[-1] = "test_" + parts[-1]
             fname = "/".join(parts)
             if os.path.isfile(fname):
                 test_files.add(fname)

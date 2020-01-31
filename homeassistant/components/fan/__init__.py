@@ -6,20 +6,25 @@ from typing import Optional
 
 import voluptuous as vol
 
-from homeassistant.const import SERVICE_TOGGLE, SERVICE_TURN_OFF, SERVICE_TURN_ON
-import homeassistant.helpers.config_validation as cv
+from homeassistant.components import group
+from homeassistant.const import SERVICE_TURN_ON, SERVICE_TOGGLE, SERVICE_TURN_OFF
+from homeassistant.loader import bind_hass
+from homeassistant.helpers.entity import ToggleEntity
+from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.config_validation import (  # noqa: F401
+    ENTITY_SERVICE_SCHEMA,
     PLATFORM_SCHEMA,
     PLATFORM_SCHEMA_BASE,
 )
-from homeassistant.helpers.entity import ToggleEntity
-from homeassistant.helpers.entity_component import EntityComponent
-from homeassistant.loader import bind_hass
+import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
 
 DOMAIN = "fan"
 SCAN_INTERVAL = timedelta(seconds=30)
+
+GROUP_NAME_ALL_FANS = "all fans"
+ENTITY_ID_ALL_FANS = group.ENTITY_ID_FORMAT.format(GROUP_NAME_ALL_FANS)
 
 ENTITY_ID_FORMAT = DOMAIN + ".{}"
 
@@ -47,14 +52,30 @@ ATTR_DIRECTION = "direction"
 
 PROP_TO_ATTR = {
     "speed": ATTR_SPEED,
+    "speed_list": ATTR_SPEED_LIST,
     "oscillating": ATTR_OSCILLATING,
     "current_direction": ATTR_DIRECTION,
 }
 
+FAN_SET_SPEED_SCHEMA = ENTITY_SERVICE_SCHEMA.extend(
+    {vol.Required(ATTR_SPEED): cv.string}
+)
+
+FAN_TURN_ON_SCHEMA = ENTITY_SERVICE_SCHEMA.extend({vol.Optional(ATTR_SPEED): cv.string})
+
+FAN_OSCILLATE_SCHEMA = ENTITY_SERVICE_SCHEMA.extend(
+    {vol.Required(ATTR_OSCILLATING): cv.boolean}
+)
+
+FAN_SET_DIRECTION_SCHEMA = ENTITY_SERVICE_SCHEMA.extend(
+    {vol.Optional(ATTR_DIRECTION): cv.string}
+)
+
 
 @bind_hass
-def is_on(hass, entity_id: str) -> bool:
+def is_on(hass, entity_id: Optional[str] = None) -> bool:
     """Return if the fans are on based on the statemachine."""
+    entity_id = entity_id or ENTITY_ID_ALL_FANS
     state = hass.states.get(entity_id)
     return state.attributes[ATTR_SPEED] not in [SPEED_OFF, None]
 
@@ -62,33 +83,28 @@ def is_on(hass, entity_id: str) -> bool:
 async def async_setup(hass, config: dict):
     """Expose fan control via statemachine and services."""
     component = hass.data[DOMAIN] = EntityComponent(
-        _LOGGER, DOMAIN, hass, SCAN_INTERVAL
+        _LOGGER, DOMAIN, hass, SCAN_INTERVAL, GROUP_NAME_ALL_FANS
     )
 
     await component.async_setup(config)
 
     component.async_register_entity_service(
-        SERVICE_TURN_ON, {vol.Optional(ATTR_SPEED): cv.string}, "async_turn_on"
-    )
-    component.async_register_entity_service(SERVICE_TURN_OFF, {}, "async_turn_off")
-    component.async_register_entity_service(SERVICE_TOGGLE, {}, "async_toggle")
-    component.async_register_entity_service(
-        SERVICE_SET_SPEED,
-        {vol.Required(ATTR_SPEED): cv.string},
-        "async_set_speed",
-        [SUPPORT_SET_SPEED],
+        SERVICE_TURN_ON, FAN_TURN_ON_SCHEMA, "async_turn_on"
     )
     component.async_register_entity_service(
-        SERVICE_OSCILLATE,
-        {vol.Required(ATTR_OSCILLATING): cv.boolean},
-        "async_oscillate",
-        [SUPPORT_OSCILLATE],
+        SERVICE_TURN_OFF, ENTITY_SERVICE_SCHEMA, "async_turn_off"
     )
     component.async_register_entity_service(
-        SERVICE_SET_DIRECTION,
-        {vol.Optional(ATTR_DIRECTION): cv.string},
-        "async_set_direction",
-        [SUPPORT_DIRECTION],
+        SERVICE_TOGGLE, ENTITY_SERVICE_SCHEMA, "async_toggle"
+    )
+    component.async_register_entity_service(
+        SERVICE_SET_SPEED, FAN_SET_SPEED_SCHEMA, "async_set_speed"
+    )
+    component.async_register_entity_service(
+        SERVICE_OSCILLATE, FAN_OSCILLATE_SCHEMA, "async_oscillate"
+    )
+    component.async_register_entity_service(
+        SERVICE_SET_DIRECTION, FAN_SET_DIRECTION_SCHEMA, "async_set_direction"
     )
 
     return True
@@ -176,11 +192,6 @@ class FanEntity(ToggleEntity):
     def current_direction(self) -> Optional[str]:
         """Return the current direction of the fan."""
         return None
-
-    @property
-    def capability_attributes(self):
-        """Return capabilitiy attributes."""
-        return {ATTR_SPEED_LIST: self.speed_list}
 
     @property
     def state_attributes(self) -> dict:

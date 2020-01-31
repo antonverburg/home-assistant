@@ -3,14 +3,13 @@ import logging
 import threading
 import time
 
-from nx584 import client as nx584_client
 import requests
 import voluptuous as vol
 
 from homeassistant.components.binary_sensor import (
     DEVICE_CLASSES,
-    PLATFORM_SCHEMA,
     BinarySensorDevice,
+    PLATFORM_SCHEMA,
 )
 from homeassistant.const import CONF_HOST, CONF_PORT
 import homeassistant.helpers.config_validation as cv
@@ -40,6 +39,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the NX584 binary sensor platform."""
+    from nx584 import client as nx584_client
 
     host = config.get(CONF_HOST)
     port = config.get(CONF_PORT)

@@ -56,6 +56,7 @@ PRESET_SLEEP = "sleep"
 # Device is reacting to activity (e.g. movement sensors)
 PRESET_ACTIVITY = "activity"
 
+
 # Possible fan state
 FAN_ON = "on"
 FAN_OFF = "off"

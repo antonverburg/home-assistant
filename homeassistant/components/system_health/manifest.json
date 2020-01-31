@@ -1,9 +1,10 @@
 {
   "domain": "system_health",
-  "name": "System Health",
+  "name": "System health",
   "documentation": "https://www.home-assistant.io/integrations/system_health",
   "requirements": [],
-  "dependencies": ["http"],
-  "codeowners": [],
-  "quality_scale": "internal"
+  "dependencies": [
+    "http"
+  ],
+  "codeowners": []
 }

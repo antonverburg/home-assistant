@@ -1,8 +1,11 @@
 """Apprise platform for notify component."""
 import logging
 
-import apprise
 import voluptuous as vol
+
+import apprise
+
+import homeassistant.helpers.config_validation as cv
 
 from homeassistant.components.notify import (
     ATTR_TARGET,
@@ -11,7 +14,6 @@ from homeassistant.components.notify import (
     PLATFORM_SCHEMA,
     BaseNotificationService,
 )
-import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
 

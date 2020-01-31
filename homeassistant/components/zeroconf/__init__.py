@@ -1,25 +1,22 @@
 """Support for exposing Home Assistant via Zeroconf."""
-import ipaddress
+# PyLint bug confuses absolute/relative imports
+# https://github.com/PyCQA/pylint/issues/1931
+# pylint: disable=no-name-in-module
 import logging
 import socket
 
+import ipaddress
 import voluptuous as vol
-from zeroconf import (
-    NonUniqueNameException,
-    ServiceBrowser,
-    ServiceInfo,
-    ServiceStateChange,
-    Zeroconf,
-)
+
+from zeroconf import ServiceBrowser, ServiceInfo, ServiceStateChange, Zeroconf
 
 from homeassistant import util
 from homeassistant.const import (
-    ATTR_NAME,
-    EVENT_HOMEASSISTANT_START,
     EVENT_HOMEASSISTANT_STOP,
+    EVENT_HOMEASSISTANT_START,
     __version__,
 )
-from homeassistant.generated.zeroconf import HOMEKIT, ZEROCONF
+from homeassistant.generated.zeroconf import ZEROCONF, HOMEKIT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -29,6 +26,7 @@ ATTR_HOST = "host"
 ATTR_PORT = "port"
 ATTR_HOSTNAME = "hostname"
 ATTR_TYPE = "type"
+ATTR_NAME = "name"
 ATTR_PROPERTIES = "properties"
 
 ZEROCONF_TYPE = "_home-assistant._tcp.local."
@@ -45,7 +43,7 @@ def setup(hass, config):
     params = {
         "version": __version__,
         "base_url": hass.config.api.base_url,
-        # Always needs authentication
+        # always needs authentication
         "requires_api_password": True,
     }
 
@@ -71,12 +69,7 @@ def setup(hass, config):
         Wait till started or otherwise HTTP is not up and running.
         """
         _LOGGER.info("Starting Zeroconf broadcast")
-        try:
-            zeroconf.register_service(info)
-        except NonUniqueNameException:
-            _LOGGER.error(
-                "Home Assistant instance with identical name present in the local network"
-            )
+        zeroconf.register_service(info)
 
     hass.bus.listen_once(EVENT_HOMEASSISTANT_START, zeroconf_hass_start)
 

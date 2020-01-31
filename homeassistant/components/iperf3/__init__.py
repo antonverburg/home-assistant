@@ -85,7 +85,17 @@ async def async_setup(hass, config):
 
     conf = config[DOMAIN]
     for host in conf[CONF_HOSTS]:
-        data = hass.data[DOMAIN][host[CONF_HOST]] = Iperf3Data(hass, host)
+        host_name = host[CONF_HOST]
+
+        client = iperf3.Client()
+        client.duration = host[CONF_DURATION]
+        client.server_hostname = host_name
+        client.port = host[CONF_PORT]
+        client.num_streams = host[CONF_PARALLEL]
+        client.protocol = host[CONF_PROTOCOL]
+        client.verbose = False
+
+        data = hass.data[DOMAIN][host_name] = Iperf3Data(hass, client)
 
         if not conf[CONF_MANUAL]:
             async_track_time_interval(hass, data.update, conf[CONF_SCAN_INTERVAL])
@@ -113,37 +123,26 @@ async def async_setup(hass, config):
 class Iperf3Data:
     """Get the latest data from iperf3."""
 
-    def __init__(self, hass, host):
+    def __init__(self, hass, client):
         """Initialize the data object."""
         self._hass = hass
-        self._host = host
+        self._client = client
         self.data = {ATTR_DOWNLOAD: None, ATTR_UPLOAD: None, ATTR_VERSION: None}
-
-    def create_client(self):
-        """Create a new iperf3 client to use for measurement."""
-        client = iperf3.Client()
-        client.duration = self._host[CONF_DURATION]
-        client.server_hostname = self._host[CONF_HOST]
-        client.port = self._host[CONF_PORT]
-        client.num_streams = self._host[CONF_PARALLEL]
-        client.protocol = self._host[CONF_PROTOCOL]
-        client.verbose = False
-        return client
 
     @property
     def protocol(self):
         """Return the protocol used for this connection."""
-        return self._host[CONF_PROTOCOL]
+        return self._client.protocol
 
     @property
     def host(self):
         """Return the host connected to."""
-        return self._host[CONF_HOST]
+        return self._client.server_hostname
 
     @property
     def port(self):
         """Return the port on the host connected to."""
-        return self._host[CONF_PORT]
+        return self._client.port
 
     def update(self, now=None):
         """Get the latest data from iperf3."""
@@ -166,10 +165,9 @@ class Iperf3Data:
 
     def _run_test(self, test_type):
         """Run and return the iperf3 data."""
-        client = self.create_client()
-        client.reverse = test_type == ATTR_DOWNLOAD
+        self._client.reverse = test_type == ATTR_DOWNLOAD
         try:
-            result = client.run()
+            result = self._client.run()
         except (AttributeError, OSError, ValueError) as error:
             _LOGGER.error("Iperf3 error: %s", error)
             return None

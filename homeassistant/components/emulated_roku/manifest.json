@@ -1,9 +1,11 @@
 {
   "domain": "emulated_roku",
-  "name": "Emulated Roku",
+  "name": "Emulated roku",
   "config_flow": true,
   "documentation": "https://www.home-assistant.io/integrations/emulated_roku",
-  "requirements": ["emulated_roku==0.1.8"],
+  "requirements": [
+    "emulated_roku==0.1.8"
+  ],
   "dependencies": [],
   "codeowners": []
 }

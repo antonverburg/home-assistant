@@ -3,9 +3,11 @@
 import logging
 import threading
 
-import aprslib
-from aprslib import ConnectionError as AprsConnectionError, LoginError
 import geopy.distance
+import aprslib
+from aprslib import ConnectionError as AprsConnectionError
+from aprslib import LoginError
+
 import voluptuous as vol
 
 from homeassistant.components.device_tracker import PLATFORM_SCHEMA

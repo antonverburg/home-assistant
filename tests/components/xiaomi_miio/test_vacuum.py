@@ -1,5 +1,6 @@
 """The tests for the Xiaomi vacuum platform."""
-from datetime import time, timedelta
+import asyncio
+from datetime import timedelta, time
 from unittest import mock
 
 import pytest
@@ -21,26 +22,25 @@ from homeassistant.components.vacuum import (
 )
 from homeassistant.components.xiaomi_miio.vacuum import (
     ATTR_CLEANED_AREA,
-    ATTR_CLEANED_TOTAL_AREA,
-    ATTR_CLEANING_COUNT,
     ATTR_CLEANING_TIME,
-    ATTR_CLEANING_TOTAL_TIME,
     ATTR_DO_NOT_DISTURB,
-    ATTR_DO_NOT_DISTURB_END,
     ATTR_DO_NOT_DISTURB_START,
+    ATTR_DO_NOT_DISTURB_END,
     ATTR_ERROR,
-    ATTR_FILTER_LEFT,
     ATTR_MAIN_BRUSH_LEFT,
     ATTR_SIDE_BRUSH_LEFT,
+    ATTR_FILTER_LEFT,
+    ATTR_CLEANING_COUNT,
+    ATTR_CLEANED_TOTAL_AREA,
+    ATTR_CLEANING_TOTAL_TIME,
     CONF_HOST,
     CONF_NAME,
     CONF_TOKEN,
-    DOMAIN as XIAOMI_DOMAIN,
-    SERVICE_CLEAN_ZONE,
     SERVICE_MOVE_REMOTE_CONTROL,
     SERVICE_MOVE_REMOTE_CONTROL_STEP,
     SERVICE_START_REMOTE_CONTROL,
     SERVICE_STOP_REMOTE_CONTROL,
+    SERVICE_CLEAN_ZONE,
 )
 from homeassistant.const import (
     ATTR_ENTITY_ID,
@@ -148,10 +148,11 @@ def mirobo_errors_fixture():
         yield mock_vacuum
 
 
-async def test_xiaomi_exceptions(hass, caplog, mock_mirobo_errors):
+@asyncio.coroutine
+def test_xiaomi_exceptions(hass, caplog, mock_mirobo_errors):
     """Test vacuum supported features."""
     entity_name = "test_vacuum_cleaner_error"
-    await async_setup_component(
+    yield from async_setup_component(
         hass,
         DOMAIN,
         {
@@ -163,7 +164,7 @@ async def test_xiaomi_exceptions(hass, caplog, mock_mirobo_errors):
             }
         },
     )
-    await hass.async_block_till_done()
+    yield from hass.async_block_till_done()
 
     assert "Initializing with host 127.0.0.1 (token 12345...)" in caplog.text
     assert mock_mirobo_errors.status.call_count == 1
@@ -171,12 +172,13 @@ async def test_xiaomi_exceptions(hass, caplog, mock_mirobo_errors):
     assert "Got OSError while fetching the state" in caplog.text
 
 
-async def test_xiaomi_vacuum_services(hass, caplog, mock_mirobo_is_got_error):
+@asyncio.coroutine
+def test_xiaomi_vacuum_services(hass, caplog, mock_mirobo_is_got_error):
     """Test vacuum supported features."""
     entity_name = "test_vacuum_cleaner_1"
-    entity_id = f"{DOMAIN}.{entity_name}"
+    entity_id = "{}.{}".format(DOMAIN, entity_name)
 
-    await async_setup_component(
+    yield from async_setup_component(
         hass,
         DOMAIN,
         {
@@ -188,7 +190,7 @@ async def test_xiaomi_vacuum_services(hass, caplog, mock_mirobo_is_got_error):
             }
         },
     )
-    await hass.async_block_till_done()
+    yield from hass.async_block_till_done()
 
     assert "Initializing with host 127.0.0.1 (token 12345...)" in caplog.text
 
@@ -204,13 +206,12 @@ async def test_xiaomi_vacuum_services(hass, caplog, mock_mirobo_is_got_error):
     assert state.attributes.get(ATTR_BATTERY_ICON) == "mdi:battery-80"
     assert state.attributes.get(ATTR_CLEANING_TIME) == 155
     assert state.attributes.get(ATTR_CLEANED_AREA) == 123
-    assert state.attributes.get(ATTR_FAN_SPEED) == "Silent"
+    assert state.attributes.get(ATTR_FAN_SPEED) == "Quiet"
     assert state.attributes.get(ATTR_FAN_SPEED_LIST) == [
-        "Silent",
-        "Standard",
-        "Medium",
+        "Quiet",
+        "Balanced",
         "Turbo",
-        "Gentle",
+        "Max",
     ]
     assert state.attributes.get(ATTR_MAIN_BRUSH_LEFT) == 12
     assert state.attributes.get(ATTR_SIDE_BRUSH_LEFT) == 12
@@ -220,7 +221,7 @@ async def test_xiaomi_vacuum_services(hass, caplog, mock_mirobo_is_got_error):
     assert state.attributes.get(ATTR_CLEANING_TOTAL_TIME) == 695
 
     # Call services
-    await hass.services.async_call(
+    yield from hass.services.async_call(
         DOMAIN, SERVICE_START, {"entity_id": entity_id}, blocking=True
     )
     mock_mirobo_is_got_error.assert_has_calls(
@@ -229,28 +230,28 @@ async def test_xiaomi_vacuum_services(hass, caplog, mock_mirobo_is_got_error):
     mock_mirobo_is_got_error.assert_has_calls(STATUS_CALLS, any_order=True)
     mock_mirobo_is_got_error.reset_mock()
 
-    await hass.services.async_call(
+    yield from hass.services.async_call(
         DOMAIN, SERVICE_STOP, {"entity_id": entity_id}, blocking=True
     )
     mock_mirobo_is_got_error.assert_has_calls([mock.call.stop()], any_order=True)
     mock_mirobo_is_got_error.assert_has_calls(STATUS_CALLS, any_order=True)
     mock_mirobo_is_got_error.reset_mock()
 
-    await hass.services.async_call(
+    yield from hass.services.async_call(
         DOMAIN, SERVICE_RETURN_TO_BASE, {"entity_id": entity_id}, blocking=True
     )
     mock_mirobo_is_got_error.assert_has_calls([mock.call.home()], any_order=True)
     mock_mirobo_is_got_error.assert_has_calls(STATUS_CALLS, any_order=True)
     mock_mirobo_is_got_error.reset_mock()
 
-    await hass.services.async_call(
+    yield from hass.services.async_call(
         DOMAIN, SERVICE_LOCATE, {"entity_id": entity_id}, blocking=True
     )
     mock_mirobo_is_got_error.assert_has_calls([mock.call.find()], any_order=True)
     mock_mirobo_is_got_error.assert_has_calls(STATUS_CALLS, any_order=True)
     mock_mirobo_is_got_error.reset_mock()
 
-    await hass.services.async_call(
+    yield from hass.services.async_call(
         DOMAIN, SERVICE_CLEAN_SPOT, {"entity_id": entity_id}, blocking=True
     )
     mock_mirobo_is_got_error.assert_has_calls([mock.call.spot()], any_order=True)
@@ -258,7 +259,7 @@ async def test_xiaomi_vacuum_services(hass, caplog, mock_mirobo_is_got_error):
     mock_mirobo_is_got_error.reset_mock()
 
     # Set speed service:
-    await hass.services.async_call(
+    yield from hass.services.async_call(
         DOMAIN,
         SERVICE_SET_FAN_SPEED,
         {"entity_id": entity_id, "fan_speed": 60},
@@ -270,10 +271,10 @@ async def test_xiaomi_vacuum_services(hass, caplog, mock_mirobo_is_got_error):
     mock_mirobo_is_got_error.assert_has_calls(STATUS_CALLS, any_order=True)
     mock_mirobo_is_got_error.reset_mock()
 
-    await hass.services.async_call(
+    yield from hass.services.async_call(
         DOMAIN,
         SERVICE_SET_FAN_SPEED,
-        {"entity_id": entity_id, "fan_speed": "Medium"},
+        {"entity_id": entity_id, "fan_speed": "turbo"},
         blocking=True,
     )
     mock_mirobo_is_got_error.assert_has_calls(
@@ -283,7 +284,7 @@ async def test_xiaomi_vacuum_services(hass, caplog, mock_mirobo_is_got_error):
     mock_mirobo_is_got_error.reset_mock()
 
     assert "ERROR" not in caplog.text
-    await hass.services.async_call(
+    yield from hass.services.async_call(
         DOMAIN,
         SERVICE_SET_FAN_SPEED,
         {"entity_id": entity_id, "fan_speed": "invent"},
@@ -291,7 +292,7 @@ async def test_xiaomi_vacuum_services(hass, caplog, mock_mirobo_is_got_error):
     )
     assert "ERROR" in caplog.text
 
-    await hass.services.async_call(
+    yield from hass.services.async_call(
         DOMAIN,
         SERVICE_SEND_COMMAND,
         {"entity_id": entity_id, "command": "raw"},
@@ -303,7 +304,7 @@ async def test_xiaomi_vacuum_services(hass, caplog, mock_mirobo_is_got_error):
     mock_mirobo_is_got_error.assert_has_calls(STATUS_CALLS, any_order=True)
     mock_mirobo_is_got_error.reset_mock()
 
-    await hass.services.async_call(
+    yield from hass.services.async_call(
         DOMAIN,
         SERVICE_SEND_COMMAND,
         {"entity_id": entity_id, "command": "raw", "params": {"k1": 2}},
@@ -316,12 +317,13 @@ async def test_xiaomi_vacuum_services(hass, caplog, mock_mirobo_is_got_error):
     mock_mirobo_is_got_error.reset_mock()
 
 
-async def test_xiaomi_specific_services(hass, caplog, mock_mirobo_is_on):
+@asyncio.coroutine
+def test_xiaomi_specific_services(hass, caplog, mock_mirobo_is_on):
     """Test vacuum supported features."""
     entity_name = "test_vacuum_cleaner_2"
-    entity_id = f"{DOMAIN}.{entity_name}"
+    entity_id = "{}.{}".format(DOMAIN, entity_name)
 
-    await async_setup_component(
+    yield from async_setup_component(
         hass,
         DOMAIN,
         {
@@ -333,7 +335,7 @@ async def test_xiaomi_specific_services(hass, caplog, mock_mirobo_is_on):
             }
         },
     )
-    await hass.async_block_till_done()
+    yield from hass.async_block_till_done()
 
     assert "Initializing with host 192.168.1.100 (token 12345" in caplog.text
 
@@ -348,11 +350,10 @@ async def test_xiaomi_specific_services(hass, caplog, mock_mirobo_is_on):
     assert state.attributes.get(ATTR_CLEANED_AREA) == 133
     assert state.attributes.get(ATTR_FAN_SPEED) == 99
     assert state.attributes.get(ATTR_FAN_SPEED_LIST) == [
-        "Silent",
-        "Standard",
-        "Medium",
+        "Quiet",
+        "Balanced",
         "Turbo",
-        "Gentle",
+        "Max",
     ]
     assert state.attributes.get(ATTR_MAIN_BRUSH_LEFT) == 11
     assert state.attributes.get(ATTR_SIDE_BRUSH_LEFT) == 11
@@ -362,11 +363,8 @@ async def test_xiaomi_specific_services(hass, caplog, mock_mirobo_is_on):
     assert state.attributes.get(ATTR_CLEANING_TOTAL_TIME) == 675
 
     # Xiaomi vacuum specific services:
-    await hass.services.async_call(
-        XIAOMI_DOMAIN,
-        SERVICE_START_REMOTE_CONTROL,
-        {ATTR_ENTITY_ID: entity_id},
-        blocking=True,
+    yield from hass.services.async_call(
+        DOMAIN, SERVICE_START_REMOTE_CONTROL, {ATTR_ENTITY_ID: entity_id}, blocking=True
     )
 
     mock_mirobo_is_on.assert_has_calls([mock.call.manual_start()], any_order=True)
@@ -374,8 +372,8 @@ async def test_xiaomi_specific_services(hass, caplog, mock_mirobo_is_on):
     mock_mirobo_is_on.reset_mock()
 
     control = {"duration": 1000, "rotation": -40, "velocity": -0.1}
-    await hass.services.async_call(
-        XIAOMI_DOMAIN, SERVICE_MOVE_REMOTE_CONTROL, control, blocking=True
+    yield from hass.services.async_call(
+        DOMAIN, SERVICE_MOVE_REMOTE_CONTROL, control, blocking=True
     )
     mock_mirobo_is_on.manual_control.assert_has_calls(
         [mock.call(**control)], any_order=True
@@ -383,16 +381,16 @@ async def test_xiaomi_specific_services(hass, caplog, mock_mirobo_is_on):
     mock_mirobo_is_on.assert_has_calls(STATUS_CALLS, any_order=True)
     mock_mirobo_is_on.reset_mock()
 
-    await hass.services.async_call(
-        XIAOMI_DOMAIN, SERVICE_STOP_REMOTE_CONTROL, {}, blocking=True
+    yield from hass.services.async_call(
+        DOMAIN, SERVICE_STOP_REMOTE_CONTROL, {}, blocking=True
     )
     mock_mirobo_is_on.assert_has_calls([mock.call.manual_stop()], any_order=True)
     mock_mirobo_is_on.assert_has_calls(STATUS_CALLS, any_order=True)
     mock_mirobo_is_on.reset_mock()
 
     control_once = {"duration": 2000, "rotation": 120, "velocity": 0.1}
-    await hass.services.async_call(
-        XIAOMI_DOMAIN, SERVICE_MOVE_REMOTE_CONTROL_STEP, control_once, blocking=True
+    yield from hass.services.async_call(
+        DOMAIN, SERVICE_MOVE_REMOTE_CONTROL_STEP, control_once, blocking=True
     )
     mock_mirobo_is_on.manual_control_once.assert_has_calls(
         [mock.call(**control_once)], any_order=True
@@ -401,8 +399,8 @@ async def test_xiaomi_specific_services(hass, caplog, mock_mirobo_is_on):
     mock_mirobo_is_on.reset_mock()
 
     control = {"zone": [[123, 123, 123, 123]], "repeats": 2}
-    await hass.services.async_call(
-        XIAOMI_DOMAIN, SERVICE_CLEAN_ZONE, control, blocking=True
+    yield from hass.services.async_call(
+        DOMAIN, SERVICE_CLEAN_ZONE, control, blocking=True
     )
     mock_mirobo_is_on.zoned_clean.assert_has_calls(
         [mock.call([[123, 123, 123, 123, 2]])], any_order=True

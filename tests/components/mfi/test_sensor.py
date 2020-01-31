@@ -2,13 +2,12 @@
 import unittest
 import unittest.mock as mock
 
-from mficlient.client import FailedToLogin
 import requests
 
-import homeassistant.components.mfi.sensor as mfi
-import homeassistant.components.sensor as sensor
-from homeassistant.const import TEMP_CELSIUS
 from homeassistant.setup import setup_component
+import homeassistant.components.sensor as sensor
+import homeassistant.components.mfi.sensor as mfi
+from homeassistant.const import TEMP_CELSIUS
 
 from tests.common import get_test_home_assistant
 
@@ -39,26 +38,28 @@ class TestMfiSensorSetup(unittest.TestCase):
         """Stop everything that was started."""
         self.hass.stop()
 
-    @mock.patch("homeassistant.components.mfi.sensor.MFiClient")
+    @mock.patch("mficlient.client.MFiClient")
     def test_setup_missing_config(self, mock_client):
         """Test setup with missing configuration."""
         config = {"sensor": {"platform": "mfi"}}
         assert setup_component(self.hass, "sensor", config)
         assert not mock_client.called
 
-    @mock.patch("homeassistant.components.mfi.sensor.MFiClient")
+    @mock.patch("mficlient.client.MFiClient")
     def test_setup_failed_login(self, mock_client):
         """Test setup with login failure."""
+        from mficlient.client import FailedToLogin
+
         mock_client.side_effect = FailedToLogin
         assert not self.PLATFORM.setup_platform(self.hass, dict(self.GOOD_CONFIG), None)
 
-    @mock.patch("homeassistant.components.mfi.sensor.MFiClient")
+    @mock.patch("mficlient.client.MFiClient")
     def test_setup_failed_connect(self, mock_client):
         """Test setup with connection failure."""
         mock_client.side_effect = requests.exceptions.ConnectionError
         assert not self.PLATFORM.setup_platform(self.hass, dict(self.GOOD_CONFIG), None)
 
-    @mock.patch("homeassistant.components.mfi.sensor.MFiClient")
+    @mock.patch("mficlient.client.MFiClient")
     def test_setup_minimum(self, mock_client):
         """Test setup with minimum configuration."""
         config = dict(self.GOOD_CONFIG)
@@ -69,7 +70,7 @@ class TestMfiSensorSetup(unittest.TestCase):
             "foo", "user", "pass", port=6443, use_tls=True, verify=True
         )
 
-    @mock.patch("homeassistant.components.mfi.sensor.MFiClient")
+    @mock.patch("mficlient.client.MFiClient")
     def test_setup_with_port(self, mock_client):
         """Test setup with port."""
         config = dict(self.GOOD_CONFIG)
@@ -80,7 +81,7 @@ class TestMfiSensorSetup(unittest.TestCase):
             "foo", "user", "pass", port=6123, use_tls=True, verify=True
         )
 
-    @mock.patch("homeassistant.components.mfi.sensor.MFiClient")
+    @mock.patch("mficlient.client.MFiClient")
     def test_setup_with_tls_disabled(self, mock_client):
         """Test setup without TLS."""
         config = dict(self.GOOD_CONFIG)
@@ -93,7 +94,7 @@ class TestMfiSensorSetup(unittest.TestCase):
             "foo", "user", "pass", port=6080, use_tls=False, verify=False
         )
 
-    @mock.patch("homeassistant.components.mfi.sensor.MFiClient")
+    @mock.patch("mficlient.client.MFiClient")
     @mock.patch("homeassistant.components.mfi.sensor.MfiSensor")
     def test_setup_adds_proper_devices(self, mock_sensor, mock_client):
         """Test if setup adds devices."""

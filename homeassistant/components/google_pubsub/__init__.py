@@ -5,7 +5,6 @@ import logging
 import os
 from typing import Any, Dict
 
-from google.cloud import pubsub_v1
 import voluptuous as vol
 
 from homeassistant.const import EVENT_STATE_CHANGED, STATE_UNAVAILABLE, STATE_UNKNOWN
@@ -39,6 +38,7 @@ CONFIG_SCHEMA = vol.Schema(
 
 def setup(hass: HomeAssistant, yaml_config: Dict[str, Any]):
     """Activate Google Pub/Sub component."""
+    from google.cloud import pubsub_v1
 
     config = yaml_config[DOMAIN]
     project_id = config[CONF_PROJECT_ID]
@@ -57,9 +57,7 @@ def setup(hass: HomeAssistant, yaml_config: Dict[str, Any]):
         service_principal_path
     )
 
-    topic_path = publisher.topic_path(  # pylint: disable=no-member
-        project_id, topic_name
-    )
+    topic_path = publisher.topic_path(project_id, topic_name)  # pylint: disable=E1101
 
     encoder = DateTimeJSONEncoder()
 
@@ -89,7 +87,7 @@ class DateTimeJSONEncoder(json.JSONEncoder):
     Additionally add encoding for datetime objects as isoformat.
     """
 
-    def default(self, o):  # pylint: disable=method-hidden
+    def default(self, o):  # pylint: disable=E0202
         """Implement encoding logic."""
         if isinstance(o, datetime.datetime):
             return o.isoformat()

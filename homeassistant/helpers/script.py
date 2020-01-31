@@ -1,16 +1,16 @@
 """Helpers to execute scripts."""
 import asyncio
+import logging
 from contextlib import suppress
 from datetime import datetime
 from itertools import islice
-import logging
-from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Tuple
+from typing import Optional, Sequence, Callable, Dict, List, Set, Tuple, Any
 
 import voluptuous as vol
 
-from homeassistant import exceptions
 import homeassistant.components.device_automation as device_automation
 import homeassistant.components.scene as scene
+from homeassistant.core import HomeAssistant, Context, callback, CALLBACK_TYPE
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     CONF_CONDITION,
@@ -19,20 +19,21 @@ from homeassistant.const import (
     CONF_TIMEOUT,
     SERVICE_TURN_ON,
 )
-from homeassistant.core import CALLBACK_TYPE, Context, HomeAssistant, callback
+from homeassistant import exceptions
 from homeassistant.helpers import (
-    condition,
-    config_validation as cv,
     service,
+    condition,
     template as template,
+    config_validation as cv,
 )
 from homeassistant.helpers.event import (
     async_track_point_in_utc_time,
     async_track_template,
 )
 from homeassistant.helpers.typing import ConfigType
-from homeassistant.util.async_ import run_callback_threadsafe
 import homeassistant.util.dt as date_util
+from homeassistant.util.async_ import run_callback_threadsafe
+
 
 # mypy: allow-untyped-calls, allow-untyped-defs, no-check-untyped-defs
 
@@ -230,6 +231,7 @@ class Script:
 
         Should only be called on exceptions raised by this scripts async_run.
         """
+        # pylint: disable=protected-access
         step = self._exception_step
         action = self.sequence[step]
         action_type = _determine_action(action)
@@ -279,6 +281,7 @@ class Script:
         @callback
         def async_script_delay(now):
             """Handle delay."""
+            # pylint: disable=cell-var-from-loop
             with suppress(ValueError):
                 self._async_listener.remove(unsub)
 
@@ -299,7 +302,7 @@ class Script:
             _LOGGER.error("Error rendering '%s' delay template: %s", self.name, ex)
             raise _StopScript
 
-        self.last_action = action.get(CONF_ALIAS, f"delay {delay}")
+        self.last_action = action.get(CONF_ALIAS, "delay {}".format(delay))
         self._log("Executing step %s" % self.last_action)
 
         unsub = async_track_point_in_utc_time(
@@ -408,7 +411,7 @@ class Script:
 
         self.last_action = action.get(CONF_ALIAS, action[CONF_CONDITION])
         check = config(self.hass, variables)
-        self._log(f"Test condition {self.last_action}: {check}")
+        self._log("Test condition {}: {}".format(self.last_action, check))
 
         if not check:
             raise _StopScript
@@ -446,6 +449,6 @@ class Script:
     def _log(self, msg):
         """Logger helper."""
         if self.name is not None:
-            msg = f"Script {self.name}: {msg}"
+            msg = "Script {}: {}".format(self.name, msg)
 
         _LOGGER.info(msg)

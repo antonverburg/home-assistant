@@ -1,23 +1,23 @@
 """Support for TCP socket based sensors."""
 import logging
-import select
 import socket
+import select
 
 import voluptuous as vol
 
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.const import (
-    CONF_HOST,
     CONF_NAME,
-    CONF_PAYLOAD,
+    CONF_HOST,
     CONF_PORT,
+    CONF_PAYLOAD,
     CONF_TIMEOUT,
     CONF_UNIT_OF_MEASUREMENT,
     CONF_VALUE_TEMPLATE,
 )
 from homeassistant.exceptions import TemplateError
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity
+import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
 

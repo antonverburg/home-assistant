@@ -1,6 +1,5 @@
 """Demo platform that has two fake binary sensors."""
 from homeassistant.components.binary_sensor import BinarySensorDevice
-
 from . import DOMAIN
 
 

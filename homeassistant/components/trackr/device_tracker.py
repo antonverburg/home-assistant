@@ -1,11 +1,10 @@
 """Support for the TrackR platform."""
 import logging
 
-from pytrackr.api import trackrApiInterface
 import voluptuous as vol
 
 from homeassistant.components.device_tracker import PLATFORM_SCHEMA
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
+from homeassistant.const import CONF_USERNAME, CONF_PASSWORD
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.event import track_utc_time_change
 from homeassistant.util import slugify
@@ -28,6 +27,7 @@ class TrackRDeviceScanner:
 
     def __init__(self, hass, config: dict, see) -> None:
         """Initialize the TrackR device scanner."""
+        from pytrackr.api import trackrApiInterface
 
         self.hass = hass
         self.api = trackrApiInterface(

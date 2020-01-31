@@ -3,15 +3,7 @@ import logging
 
 import voluptuous as vol
 
-from homeassistant.components.alarm_control_panel import (
-    FORMAT_NUMBER,
-    AlarmControlPanel,
-)
-from homeassistant.components.alarm_control_panel.const import (
-    SUPPORT_ALARM_ARM_AWAY,
-    SUPPORT_ALARM_ARM_HOME,
-    SUPPORT_ALARM_ARM_NIGHT,
-)
+import homeassistant.components.alarm_control_panel as alarm
 from homeassistant.const import (
     ATTR_CODE,
     STATE_ALARM_ARMED_AWAY,
@@ -21,11 +13,11 @@ from homeassistant.const import (
 )
 import homeassistant.helpers.config_validation as cv
 
-from . import DATA_AD, DOMAIN, SIGNAL_PANEL_MESSAGE
+from . import DATA_AD, DOMAIN as DOMAIN_ALARMDECODER, SIGNAL_PANEL_MESSAGE
 
 _LOGGER = logging.getLogger(__name__)
 
-SERVICE_ALARM_TOGGLE_CHIME = "alarm_toggle_chime"
+SERVICE_ALARM_TOGGLE_CHIME = "alarmdecoder_alarm_toggle_chime"
 ALARM_TOGGLE_CHIME_SCHEMA = vol.Schema({vol.Required(ATTR_CODE): cv.string})
 
 SERVICE_ALARM_KEYPRESS = "alarm_keypress"
@@ -35,7 +27,7 @@ ALARM_KEYPRESS_SCHEMA = vol.Schema({vol.Required(ATTR_KEYPRESS): cv.string})
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up for AlarmDecoder alarm panels."""
-    device = AlarmDecoderAlarmPanel(discovery_info["autobypass"])
+    device = AlarmDecoderAlarmPanel()
     add_entities([device])
 
     def alarm_toggle_chime_handler(service):
@@ -44,7 +36,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
         device.alarm_toggle_chime(code)
 
     hass.services.register(
-        DOMAIN,
+        alarm.DOMAIN,
         SERVICE_ALARM_TOGGLE_CHIME,
         alarm_toggle_chime_handler,
         schema=ALARM_TOGGLE_CHIME_SCHEMA,
@@ -56,17 +48,17 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
         device.alarm_keypress(keypress)
 
     hass.services.register(
-        DOMAIN,
+        DOMAIN_ALARMDECODER,
         SERVICE_ALARM_KEYPRESS,
         alarm_keypress_handler,
         schema=ALARM_KEYPRESS_SCHEMA,
     )
 
 
-class AlarmDecoderAlarmPanel(AlarmControlPanel):
+class AlarmDecoderAlarmPanel(alarm.AlarmControlPanel):
     """Representation of an AlarmDecoder-based alarm panel."""
 
-    def __init__(self, auto_bypass):
+    def __init__(self):
         """Initialize the alarm panel."""
         self._display = ""
         self._name = "Alarm Panel"
@@ -80,7 +72,6 @@ class AlarmDecoderAlarmPanel(AlarmControlPanel):
         self._programming_mode = None
         self._ready = None
         self._zone_bypassed = None
-        self._auto_bypass = auto_bypass
 
     async def async_added_to_hass(self):
         """Register callbacks."""
@@ -124,17 +115,12 @@ class AlarmDecoderAlarmPanel(AlarmControlPanel):
     @property
     def code_format(self):
         """Return one or more digits/characters."""
-        return FORMAT_NUMBER
+        return alarm.FORMAT_NUMBER
 
     @property
     def state(self):
         """Return the state of the device."""
         return self._state
-
-    @property
-    def supported_features(self) -> int:
-        """Return the list of supported features."""
-        return SUPPORT_ALARM_ARM_HOME | SUPPORT_ALARM_ARM_AWAY | SUPPORT_ALARM_ARM_NIGHT
 
     @property
     def device_state_attributes(self):
@@ -159,15 +145,11 @@ class AlarmDecoderAlarmPanel(AlarmControlPanel):
     def alarm_arm_away(self, code=None):
         """Send arm away command."""
         if code:
-            if self._auto_bypass:
-                self.hass.data[DATA_AD].send(f"{code!s}6#")
             self.hass.data[DATA_AD].send(f"{code!s}2")
 
     def alarm_arm_home(self, code=None):
         """Send arm home command."""
         if code:
-            if self._auto_bypass:
-                self.hass.data[DATA_AD].send(f"{code!s}6#")
             self.hass.data[DATA_AD].send(f"{code!s}3")
 
     def alarm_arm_night(self, code=None):

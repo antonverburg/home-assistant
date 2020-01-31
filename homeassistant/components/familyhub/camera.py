@@ -1,10 +1,9 @@
 """Family Hub camera for Samsung Refrigerators."""
 import logging
 
-from pyfamilyhublocal import FamilyHubCam
 import voluptuous as vol
 
-from homeassistant.components.camera import PLATFORM_SCHEMA, Camera
+from homeassistant.components.camera import Camera, PLATFORM_SCHEMA
 from homeassistant.const import CONF_IP_ADDRESS, CONF_NAME
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
@@ -23,6 +22,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the Family Hub Camera."""
+    from pyfamilyhublocal import FamilyHubCam
 
     address = config.get(CONF_IP_ADDRESS)
     name = config.get(CONF_NAME)

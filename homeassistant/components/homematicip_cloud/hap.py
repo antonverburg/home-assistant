@@ -22,13 +22,13 @@ _LOGGER = logging.getLogger(__name__)
 class HomematicipAuth:
     """Manages HomematicIP client registration."""
 
-    def __init__(self, hass, config) -> None:
+    def __init__(self, hass, config):
         """Initialize HomematicIP Cloud client registration."""
         self.hass = hass
         self.config = config
         self.auth = None
 
-    async def async_setup(self) -> bool:
+    async def async_setup(self):
         """Connect to HomematicIP for registration."""
         try:
             self.auth = await self.get_auth(
@@ -38,7 +38,7 @@ class HomematicipAuth:
         except HmipcConnectionError:
             return False
 
-    async def async_checkbutton(self) -> bool:
+    async def async_checkbutton(self):
         """Check blue butten has been pressed."""
         try:
             return await self.auth.isRequestAcknowledged()
@@ -82,7 +82,7 @@ class HomematicipHAP:
         self._accesspoint_connected = True
         self.hmip_device_by_entity_id = {}
 
-    async def async_setup(self, tries: int = 0) -> bool:
+    async def async_setup(self, tries: int = 0):
         """Initialize connection."""
         try:
             self.home = await self.get_hap(
@@ -108,7 +108,7 @@ class HomematicipHAP:
         return True
 
     @callback
-    def async_update(self, *args, **kwargs) -> None:
+    def async_update(self, *args, **kwargs):
         """Async update the home device.
 
         Triggered when the HMIP HOME_CHANGED event has fired.
@@ -141,23 +141,23 @@ class HomematicipHAP:
             self.home.update_home_only(args[0])
 
     @callback
-    def async_create_entity(self, *args, **kwargs) -> None:
+    def async_create_entity(self, *args, **kwargs):
         """Create a device or a group."""
         is_device = EventType(kwargs["event_type"]) == EventType.DEVICE_ADDED
         self.hass.async_create_task(self.async_create_entity_lazy(is_device))
 
-    async def async_create_entity_lazy(self, is_device=True) -> None:
+    async def async_create_entity_lazy(self, is_device=True):
         """Delay entity creation to allow the user to enter a device name."""
         if is_device:
             await asyncio.sleep(30)
         await self.hass.config_entries.async_reload(self.config_entry.entry_id)
 
-    async def get_state(self) -> None:
+    async def get_state(self):
         """Update HMIP state and tell Home Assistant."""
         await self.home.get_current_state()
         self.update_all()
 
-    def get_state_finished(self, future) -> None:
+    def get_state_finished(self, future):
         """Execute when get_state coroutine has finished."""
         try:
             future.result()
@@ -167,18 +167,18 @@ class HomematicipHAP:
             _LOGGER.error("Updating state after HMIP access point reconnect failed")
             self.hass.async_create_task(self.home.disable_events())
 
-    def set_all_to_unavailable(self) -> None:
+    def set_all_to_unavailable(self):
         """Set all devices to unavailable and tell Home Assistant."""
         for device in self.home.devices:
             device.unreach = True
         self.update_all()
 
-    def update_all(self) -> None:
+    def update_all(self):
         """Signal all devices to update their state."""
         for device in self.home.devices:
             device.fire_update_event()
 
-    async def async_connect(self) -> None:
+    async def async_connect(self):
         """Start WebSocket connection."""
         tries = 0
         while True:
@@ -210,7 +210,7 @@ class HomematicipHAP:
             except asyncio.CancelledError:
                 break
 
-    async def async_reset(self) -> bool:
+    async def async_reset(self):
         """Close the websocket connection."""
         self._ws_close_requested = True
         if self._retry_task is not None:

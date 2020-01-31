@@ -1,5 +1,6 @@
 """The tests for the Home Assistant API component."""
 # pylint: disable=protected-access
+import asyncio
 import json
 from unittest.mock import patch
 
@@ -17,28 +18,32 @@ from tests.common import async_mock_service
 
 @pytest.fixture
 def mock_api_client(hass, hass_client):
-    """Start the Home Assistant HTTP component and return admin API client."""
+    """Start the Hass HTTP component and return admin API client."""
     hass.loop.run_until_complete(async_setup_component(hass, "api", {}))
     return hass.loop.run_until_complete(hass_client())
 
 
-async def test_api_list_state_entities(hass, mock_api_client):
+@asyncio.coroutine
+def test_api_list_state_entities(hass, mock_api_client):
     """Test if the debug interface allows us to list state entities."""
     hass.states.async_set("test.entity", "hello")
-    resp = await mock_api_client.get(const.URL_API_STATES)
+    resp = yield from mock_api_client.get(const.URL_API_STATES)
     assert resp.status == 200
-    json = await resp.json()
+    json = yield from resp.json()
 
     remote_data = [ha.State.from_dict(item) for item in json]
     assert remote_data == hass.states.async_all()
 
 
-async def test_api_get_state(hass, mock_api_client):
+@asyncio.coroutine
+def test_api_get_state(hass, mock_api_client):
     """Test if the debug interface allows us to get a state."""
     hass.states.async_set("hello.world", "nice", {"attr": 1})
-    resp = await mock_api_client.get(const.URL_API_STATES_ENTITY.format("hello.world"))
+    resp = yield from mock_api_client.get(
+        const.URL_API_STATES_ENTITY.format("hello.world")
+    )
     assert resp.status == 200
-    json = await resp.json()
+    json = yield from resp.json()
 
     data = ha.State.from_dict(json)
 
@@ -49,19 +54,21 @@ async def test_api_get_state(hass, mock_api_client):
     assert data.attributes == state.attributes
 
 
-async def test_api_get_non_existing_state(hass, mock_api_client):
+@asyncio.coroutine
+def test_api_get_non_existing_state(hass, mock_api_client):
     """Test if the debug interface allows us to get a state."""
-    resp = await mock_api_client.get(
+    resp = yield from mock_api_client.get(
         const.URL_API_STATES_ENTITY.format("does_not_exist")
     )
     assert resp.status == 404
 
 
-async def test_api_state_change(hass, mock_api_client):
+@asyncio.coroutine
+def test_api_state_change(hass, mock_api_client):
     """Test if we can change the state of an entity that exists."""
     hass.states.async_set("test.test", "not_to_be_set")
 
-    await mock_api_client.post(
+    yield from mock_api_client.post(
         const.URL_API_STATES_ENTITY.format("test.test"),
         json={"state": "debug_state_change2"},
     )
@@ -70,11 +77,12 @@ async def test_api_state_change(hass, mock_api_client):
 
 
 # pylint: disable=invalid-name
-async def test_api_state_change_of_non_existing_entity(hass, mock_api_client):
+@asyncio.coroutine
+def test_api_state_change_of_non_existing_entity(hass, mock_api_client):
     """Test if changing a state of a non existing entity is possible."""
     new_state = "debug_state_change"
 
-    resp = await mock_api_client.post(
+    resp = yield from mock_api_client.post(
         const.URL_API_STATES_ENTITY.format("test_entity.that_does_not_exist"),
         json={"state": new_state},
     )
@@ -85,9 +93,10 @@ async def test_api_state_change_of_non_existing_entity(hass, mock_api_client):
 
 
 # pylint: disable=invalid-name
-async def test_api_state_change_with_bad_data(hass, mock_api_client):
+@asyncio.coroutine
+def test_api_state_change_with_bad_data(hass, mock_api_client):
     """Test if API sends appropriate error if we omit state."""
-    resp = await mock_api_client.post(
+    resp = yield from mock_api_client.post(
         const.URL_API_STATES_ENTITY.format("test_entity.that_does_not_exist"), json={}
     )
 
@@ -95,16 +104,17 @@ async def test_api_state_change_with_bad_data(hass, mock_api_client):
 
 
 # pylint: disable=invalid-name
-async def test_api_state_change_to_zero_value(hass, mock_api_client):
+@asyncio.coroutine
+def test_api_state_change_to_zero_value(hass, mock_api_client):
     """Test if changing a state to a zero value is possible."""
-    resp = await mock_api_client.post(
+    resp = yield from mock_api_client.post(
         const.URL_API_STATES_ENTITY.format("test_entity.with_zero_state"),
         json={"state": 0},
     )
 
     assert resp.status == 201
 
-    resp = await mock_api_client.post(
+    resp = yield from mock_api_client.post(
         const.URL_API_STATES_ENTITY.format("test_entity.with_zero_state"),
         json={"state": 0.0},
     )
@@ -113,7 +123,8 @@ async def test_api_state_change_to_zero_value(hass, mock_api_client):
 
 
 # pylint: disable=invalid-name
-async def test_api_state_change_push(hass, mock_api_client):
+@asyncio.coroutine
+def test_api_state_change_push(hass, mock_api_client):
     """Test if we can push a change the state of an entity."""
     hass.states.async_set("test.test", "not_to_be_set")
 
@@ -126,22 +137,23 @@ async def test_api_state_change_push(hass, mock_api_client):
 
     hass.bus.async_listen(const.EVENT_STATE_CHANGED, event_listener)
 
-    await mock_api_client.post(
+    yield from mock_api_client.post(
         const.URL_API_STATES_ENTITY.format("test.test"), json={"state": "not_to_be_set"}
     )
-    await hass.async_block_till_done()
+    yield from hass.async_block_till_done()
     assert len(events) == 0
 
-    await mock_api_client.post(
+    yield from mock_api_client.post(
         const.URL_API_STATES_ENTITY.format("test.test"),
         json={"state": "not_to_be_set", "force_update": True},
     )
-    await hass.async_block_till_done()
+    yield from hass.async_block_till_done()
     assert len(events) == 1
 
 
 # pylint: disable=invalid-name
-async def test_api_fire_event_with_no_data(hass, mock_api_client):
+@asyncio.coroutine
+def test_api_fire_event_with_no_data(hass, mock_api_client):
     """Test if the API allows us to fire an event."""
     test_value = []
 
@@ -152,14 +164,17 @@ async def test_api_fire_event_with_no_data(hass, mock_api_client):
 
     hass.bus.async_listen_once("test.event_no_data", listener)
 
-    await mock_api_client.post(const.URL_API_EVENTS_EVENT.format("test.event_no_data"))
-    await hass.async_block_till_done()
+    yield from mock_api_client.post(
+        const.URL_API_EVENTS_EVENT.format("test.event_no_data")
+    )
+    yield from hass.async_block_till_done()
 
     assert len(test_value) == 1
 
 
 # pylint: disable=invalid-name
-async def test_api_fire_event_with_data(hass, mock_api_client):
+@asyncio.coroutine
+def test_api_fire_event_with_data(hass, mock_api_client):
     """Test if the API allows us to fire an event."""
     test_value = []
 
@@ -174,17 +189,18 @@ async def test_api_fire_event_with_data(hass, mock_api_client):
 
     hass.bus.async_listen_once("test_event_with_data", listener)
 
-    await mock_api_client.post(
+    yield from mock_api_client.post(
         const.URL_API_EVENTS_EVENT.format("test_event_with_data"), json={"test": 1}
     )
 
-    await hass.async_block_till_done()
+    yield from hass.async_block_till_done()
 
     assert len(test_value) == 1
 
 
 # pylint: disable=invalid-name
-async def test_api_fire_event_with_invalid_json(hass, mock_api_client):
+@asyncio.coroutine
+def test_api_fire_event_with_invalid_json(hass, mock_api_client):
     """Test if the API allows us to fire an event."""
     test_value = []
 
@@ -195,32 +211,33 @@ async def test_api_fire_event_with_invalid_json(hass, mock_api_client):
 
     hass.bus.async_listen_once("test_event_bad_data", listener)
 
-    resp = await mock_api_client.post(
+    resp = yield from mock_api_client.post(
         const.URL_API_EVENTS_EVENT.format("test_event_bad_data"),
         data=json.dumps("not an object"),
     )
 
-    await hass.async_block_till_done()
+    yield from hass.async_block_till_done()
 
     assert resp.status == 400
     assert len(test_value) == 0
 
     # Try now with valid but unusable JSON
-    resp = await mock_api_client.post(
+    resp = yield from mock_api_client.post(
         const.URL_API_EVENTS_EVENT.format("test_event_bad_data"),
         data=json.dumps([1, 2, 3]),
     )
 
-    await hass.async_block_till_done()
+    yield from hass.async_block_till_done()
 
     assert resp.status == 400
     assert len(test_value) == 0
 
 
-async def test_api_get_config(hass, mock_api_client):
+@asyncio.coroutine
+def test_api_get_config(hass, mock_api_client):
     """Test the return of the configuration."""
-    resp = await mock_api_client.get(const.URL_API_CONFIG)
-    result = await resp.json()
+    resp = yield from mock_api_client.get(const.URL_API_CONFIG)
+    result = yield from resp.json()
     if "components" in result:
         result["components"] = set(result["components"])
     if "whitelist_external_dirs" in result:
@@ -229,17 +246,19 @@ async def test_api_get_config(hass, mock_api_client):
     assert hass.config.as_dict() == result
 
 
-async def test_api_get_components(hass, mock_api_client):
+@asyncio.coroutine
+def test_api_get_components(hass, mock_api_client):
     """Test the return of the components."""
-    resp = await mock_api_client.get(const.URL_API_COMPONENTS)
-    result = await resp.json()
+    resp = yield from mock_api_client.get(const.URL_API_COMPONENTS)
+    result = yield from resp.json()
     assert set(result) == hass.config.components
 
 
-async def test_api_get_event_listeners(hass, mock_api_client):
+@asyncio.coroutine
+def test_api_get_event_listeners(hass, mock_api_client):
     """Test if we can get the list of events being listened for."""
-    resp = await mock_api_client.get(const.URL_API_EVENTS)
-    data = await resp.json()
+    resp = yield from mock_api_client.get(const.URL_API_EVENTS)
+    data = yield from resp.json()
 
     local = hass.bus.async_listeners()
 
@@ -249,10 +268,11 @@ async def test_api_get_event_listeners(hass, mock_api_client):
     assert len(local) == 0
 
 
-async def test_api_get_services(hass, mock_api_client):
+@asyncio.coroutine
+def test_api_get_services(hass, mock_api_client):
     """Test if we can get a dict describing current services."""
-    resp = await mock_api_client.get(const.URL_API_SERVICES)
-    data = await resp.json()
+    resp = yield from mock_api_client.get(const.URL_API_SERVICES)
+    data = yield from resp.json()
     local_services = hass.services.async_services()
 
     for serv_domain in data:
@@ -261,7 +281,8 @@ async def test_api_get_services(hass, mock_api_client):
         assert serv_domain["services"] == local
 
 
-async def test_api_call_service_no_data(hass, mock_api_client):
+@asyncio.coroutine
+def test_api_call_service_no_data(hass, mock_api_client):
     """Test if the API allows us to call a service."""
     test_value = []
 
@@ -272,14 +293,15 @@ async def test_api_call_service_no_data(hass, mock_api_client):
 
     hass.services.async_register("test_domain", "test_service", listener)
 
-    await mock_api_client.post(
+    yield from mock_api_client.post(
         const.URL_API_SERVICES_SERVICE.format("test_domain", "test_service")
     )
-    await hass.async_block_till_done()
+    yield from hass.async_block_till_done()
     assert len(test_value) == 1
 
 
-async def test_api_call_service_with_data(hass, mock_api_client):
+@asyncio.coroutine
+def test_api_call_service_with_data(hass, mock_api_client):
     """Test if the API allows us to call a service."""
     test_value = []
 
@@ -294,83 +316,88 @@ async def test_api_call_service_with_data(hass, mock_api_client):
 
     hass.services.async_register("test_domain", "test_service", listener)
 
-    await mock_api_client.post(
+    yield from mock_api_client.post(
         const.URL_API_SERVICES_SERVICE.format("test_domain", "test_service"),
         json={"test": 1},
     )
 
-    await hass.async_block_till_done()
+    yield from hass.async_block_till_done()
     assert len(test_value) == 1
 
 
-async def test_api_template(hass, mock_api_client):
+@asyncio.coroutine
+def test_api_template(hass, mock_api_client):
     """Test the template API."""
     hass.states.async_set("sensor.temperature", 10)
 
-    resp = await mock_api_client.post(
+    resp = yield from mock_api_client.post(
         const.URL_API_TEMPLATE,
         json={"template": "{{ states.sensor.temperature.state }}"},
     )
 
-    body = await resp.text()
+    body = yield from resp.text()
 
     assert body == "10"
 
 
-async def test_api_template_error(hass, mock_api_client):
+@asyncio.coroutine
+def test_api_template_error(hass, mock_api_client):
     """Test the template API."""
     hass.states.async_set("sensor.temperature", 10)
 
-    resp = await mock_api_client.post(
+    resp = yield from mock_api_client.post(
         const.URL_API_TEMPLATE, json={"template": "{{ states.sensor.temperature.state"}
     )
 
     assert resp.status == 400
 
 
-async def test_stream(hass, mock_api_client):
+@asyncio.coroutine
+def test_stream(hass, mock_api_client):
     """Test the stream."""
     listen_count = _listen_count(hass)
 
-    resp = await mock_api_client.get(const.URL_API_STREAM)
+    resp = yield from mock_api_client.get(const.URL_API_STREAM)
     assert resp.status == 200
     assert listen_count + 1 == _listen_count(hass)
 
     hass.bus.async_fire("test_event")
 
-    data = await _stream_next_event(resp.content)
+    data = yield from _stream_next_event(resp.content)
 
     assert data["event_type"] == "test_event"
 
 
-async def test_stream_with_restricted(hass, mock_api_client):
+@asyncio.coroutine
+def test_stream_with_restricted(hass, mock_api_client):
     """Test the stream with restrictions."""
     listen_count = _listen_count(hass)
 
-    resp = await mock_api_client.get(
+    resp = yield from mock_api_client.get(
         "{}?restrict=test_event1,test_event3".format(const.URL_API_STREAM)
     )
     assert resp.status == 200
     assert listen_count + 1 == _listen_count(hass)
 
     hass.bus.async_fire("test_event1")
-    data = await _stream_next_event(resp.content)
+    data = yield from _stream_next_event(resp.content)
     assert data["event_type"] == "test_event1"
 
     hass.bus.async_fire("test_event2")
     hass.bus.async_fire("test_event3")
-    data = await _stream_next_event(resp.content)
+    data = yield from _stream_next_event(resp.content)
     assert data["event_type"] == "test_event3"
 
 
-async def _stream_next_event(stream):
+@asyncio.coroutine
+def _stream_next_event(stream):
     """Read the stream for next event while ignoring ping."""
     while True:
         last_new_line = False
         data = b""
 
         while True:
-            dat = await stream.read(1)
+            dat = yield from stream.read(1)
             if dat == b"\n" and last_new_line:
                 break
             data += dat

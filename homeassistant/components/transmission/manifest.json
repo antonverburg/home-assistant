@@ -3,7 +3,12 @@
   "name": "Transmission",
   "config_flow": true,
   "documentation": "https://www.home-assistant.io/integrations/transmission",
-  "requirements": ["transmissionrpc==0.11"],
+  "requirements": [
+    "transmissionrpc==0.11"
+  ],
   "dependencies": [],
-  "codeowners": ["@engrbm87", "@JPHutchins"]
+  "codeowners": [
+    "@engrbm87",
+    "@JPHutchins"
+  ]
 }

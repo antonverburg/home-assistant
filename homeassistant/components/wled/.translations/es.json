@@ -7,7 +7,7 @@
         "error": {
             "connection_error": "No se ha podido conectar al dispositivo WLED."
         },
-        "flow_title": "WLED: {name}",
+        "flow_title": "WLED: {nombre}",
         "step": {
             "user": {
                 "data": {

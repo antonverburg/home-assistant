@@ -1,9 +1,8 @@
 """Support for HomeMatic devices."""
-from datetime import datetime, timedelta
+from datetime import timedelta, datetime
 from functools import partial
 import logging
 
-from pyhomematic import HMConnection
 import voluptuous as vol
 
 from homeassistant.const import (
@@ -173,7 +172,6 @@ HM_DEVICE_TYPES = {
         "IPMultiIO",
         "TiltIP",
         "IPShutterContactSabotage",
-        "IPContact",
     ],
     DISCOVER_COVER: ["Blind", "KeyBlind", "IPKeyBlind", "IPKeyBlindTilt"],
     DISCOVER_LOCKS: ["KeyMatic"],
@@ -299,7 +297,6 @@ CONFIG_SCHEMA = vol.Schema(
                 vol.Optional(CONF_HOSTS, default={}): {
                     cv.match_all: {
                         vol.Required(CONF_HOST): cv.string,
-                        vol.Optional(CONF_PORT, default=DEFAULT_PORT): cv.port,
                         vol.Optional(
                             CONF_USERNAME, default=DEFAULT_USERNAME
                         ): cv.string,
@@ -369,6 +366,7 @@ SCHEMA_SERVICE_PUT_PARAMSET = vol.Schema(
 
 def setup(hass, config):
     """Set up the Homematic component."""
+    from pyhomematic import HMConnection
 
     conf = config[DOMAIN]
     hass.data[DATA_CONF] = remotes = {}
@@ -394,7 +392,7 @@ def setup(hass, config):
     for sname, sconfig in conf[CONF_HOSTS].items():
         remotes[sname] = {
             "ip": sconfig.get(CONF_HOST),
-            "port": sconfig[CONF_PORT],
+            "port": DEFAULT_PORT,
             "username": sconfig.get(CONF_USERNAME),
             "password": sconfig.get(CONF_PASSWORD),
             "connect": False,
@@ -413,7 +411,7 @@ def setup(hass, config):
     # Start server thread, connect to hosts, initialize to receive events
     homematic.start()
 
-    # Stops server when Home Assistant is shutting down
+    # Stops server when HASS is shutting down
     hass.bus.listen_once(EVENT_HOMEASSISTANT_STOP, hass.data[DATA_HOMEMATIC].stop)
 
     # Init homematic hubs
@@ -601,7 +599,7 @@ def _system_callback_handler(hass, config, src, *args):
             if hmdevice.EVENTNODE:
                 hmdevice.setEventCallback(callback=bound_event_callback, bequeath=True)
 
-        # Create Home Assistant entities
+        # Create HASS entities
         if addresses:
             for component_name, discovery_type in (
                 ("switch", DISCOVER_SWITCHES),
@@ -617,7 +615,7 @@ def _system_callback_handler(hass, config, src, *args):
                 found_devices = _get_devices(hass, discovery_type, addresses, interface)
 
                 # When devices of this type are found
-                # they are setup in Home Assistant and a discovery event is fired
+                # they are setup in HASS and a discovery event is fired
                 if found_devices:
                     discovery.load_platform(
                         hass,
@@ -970,7 +968,7 @@ class HMDevice(Entity):
             self._available = not self._hmdevice.UNREACH
             has_changed = True
 
-        # If it has changed data point, update Home Assistant
+        # If it has changed data point, update HASS
         if has_changed:
             self.schedule_update_ha_state()
 

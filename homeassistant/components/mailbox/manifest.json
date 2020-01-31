@@ -3,6 +3,8 @@
   "name": "Mailbox",
   "documentation": "https://www.home-assistant.io/integrations/mailbox",
   "requirements": [],
-  "dependencies": ["http"],
+  "dependencies": [
+    "http"
+  ],
   "codeowners": []
 }

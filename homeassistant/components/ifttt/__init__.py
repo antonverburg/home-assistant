@@ -9,7 +9,6 @@ import voluptuous as vol
 from homeassistant.const import CONF_WEBHOOK_ID
 from homeassistant.helpers import config_entry_flow
 import homeassistant.helpers.config_validation as cv
-
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -24,7 +23,6 @@ ATTR_VALUE3 = "value3"
 
 CONF_KEY = "key"
 
-SERVICE_PUSH_ALARM_STATE = "push_alarm_state"
 SERVICE_TRIGGER = "trigger"
 
 SERVICE_TRIGGER_SCHEMA = vol.Schema(

@@ -1,23 +1,21 @@
 """Provides device automations for Fan."""
 from typing import List
-
 import voluptuous as vol
 
-from homeassistant.components.automation import AutomationActionType, state
-from homeassistant.components.device_automation import TRIGGER_BASE_SCHEMA
 from homeassistant.const import (
-    CONF_DEVICE_ID,
     CONF_DOMAIN,
-    CONF_ENTITY_ID,
-    CONF_PLATFORM,
     CONF_TYPE,
-    STATE_OFF,
+    CONF_PLATFORM,
+    CONF_DEVICE_ID,
+    CONF_ENTITY_ID,
     STATE_ON,
+    STATE_OFF,
 )
-from homeassistant.core import CALLBACK_TYPE, HomeAssistant
+from homeassistant.core import HomeAssistant, CALLBACK_TYPE
 from homeassistant.helpers import config_validation as cv, entity_registry
 from homeassistant.helpers.typing import ConfigType
-
+from homeassistant.components.automation import state, AutomationActionType
+from homeassistant.components.device_automation import TRIGGER_BASE_SCHEMA
 from . import DOMAIN
 
 TRIGGER_TYPES = {"turned_on", "turned_off"}

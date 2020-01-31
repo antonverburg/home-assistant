@@ -1,16 +1,12 @@
 """Support for Powerview scenes from a Powerview hub."""
 import logging
 
-from aiopvapi.helpers.aiorequest import AioRequest
-from aiopvapi.resources.scene import Scene as PvScene
-from aiopvapi.rooms import Rooms
-from aiopvapi.scenes import Scenes
 import voluptuous as vol
 
-from homeassistant.components.scene import DOMAIN, Scene
+import homeassistant.helpers.config_validation as cv
+from homeassistant.components.scene import Scene, DOMAIN
 from homeassistant.const import CONF_PLATFORM
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import async_generate_entity_id
 
 _LOGGER = logging.getLogger(__name__)
@@ -36,7 +32,12 @@ STATE_ATTRIBUTE_ROOM_NAME = "roomName"
 
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
-    """Set up Home Assistant scene entries."""
+    """Set up home assistant scene entries."""
+    # from aiopvapi.hub import Hub
+    from aiopvapi.helpers.aiorequest import AioRequest
+    from aiopvapi.scenes import Scenes
+    from aiopvapi.rooms import Rooms
+    from aiopvapi.resources.scene import Scene as PvScene
 
     hub_address = config.get(HUB_ADDRESS)
     websession = async_get_clientsession(hass)

@@ -1,12 +1,13 @@
 """The tests for the Template lock platform."""
 import logging
 
+from homeassistant.core import callback
 from homeassistant import setup
 from homeassistant.components import lock
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import callback
+from homeassistant.const import ATTR_ENTITY_ID
+from homeassistant.const import STATE_ON, STATE_OFF, STATE_UNAVAILABLE
 
-from tests.common import assert_setup_component, get_test_home_assistant
+from tests.common import get_test_home_assistant, assert_setup_component
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -253,9 +254,10 @@ class TestTemplateLock:
         assert state.state == lock.STATE_UNLOCKED
 
         assert (
-            "Template lock 'Template Lock' has no entity ids configured to track "
-            "nor were we able to extract the entities to track from the value "
-            "template(s). This entity will only be able to be updated manually"
+            "Template lock 'Template Lock' has no entity ids configured "
+            "to track nor were we able to extract the entities to track "
+            "from the 'value_template' template. This entity will only "
+            "be able to be updated manually."
         ) in caplog.text
 
         self.hass.states.set("lock.template_lock", lock.STATE_LOCKED)
@@ -341,7 +343,7 @@ async def test_available_template_with_entities(hass):
         {
             "lock": {
                 "platform": "template",
-                "value_template": "{{ states('switch.test_state') }}",
+                "value_template": "{{ 'on' }}",
                 "lock": {"service": "switch.turn_on", "entity_id": "switch.test_state"},
                 "unlock": {
                     "service": "switch.turn_off",

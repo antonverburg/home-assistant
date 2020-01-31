@@ -1,11 +1,11 @@
-"""Test Home Assistant pressure utility functions."""
+"""Test homeassistant pressure utility functions."""
 import pytest
 
 from homeassistant.const import (
-    PRESSURE_HPA,
-    PRESSURE_INHG,
-    PRESSURE_MBAR,
     PRESSURE_PA,
+    PRESSURE_HPA,
+    PRESSURE_MBAR,
+    PRESSURE_INHG,
     PRESSURE_PSI,
 )
 import homeassistant.util.pressure as pressure_util

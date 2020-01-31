@@ -2,8 +2,6 @@
 from datetime import timedelta
 import logging
 
-from netdata import Netdata
-from netdata.exceptions import NetdataError
 import voluptuous as vol
 
 from homeassistant.components.sensor import PLATFORM_SCHEMA
@@ -55,6 +53,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the Netdata sensor."""
+    from netdata import Netdata
 
     name = config.get(CONF_NAME)
     host = config.get(CONF_HOST)
@@ -155,6 +154,7 @@ class NetdataData:
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     async def async_update(self):
         """Get the latest data from the Netdata REST API."""
+        from netdata.exceptions import NetdataError
 
         try:
             await self.api.get_allmetrics()

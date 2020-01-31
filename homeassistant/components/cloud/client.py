@@ -1,25 +1,26 @@
 """Interface implementation for cloud client."""
 import asyncio
-import logging
 from pathlib import Path
 from typing import Any, Dict
+import logging
 
 import aiohttp
 from hass_nabucasa.client import CloudClient as Interface
 
-from homeassistant.components.alexa import (
-    errors as alexa_errors,
-    smart_home as alexa_sh,
-)
+from homeassistant.core import callback
 from homeassistant.components.google_assistant import smart_home as ga
-from homeassistant.core import Context, callback
-from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.typing import HomeAssistantType
+from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.util.aiohttp import MockRequest
+from homeassistant.components.alexa import (
+    smart_home as alexa_sh,
+    errors as alexa_errors,
+)
 
-from . import alexa_config, google_config, utils
+from . import utils, alexa_config, google_config
 from .const import DISPATCHER_REMOTE_UPDATE
 from .prefs import CloudPreferences
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,6 +44,7 @@ class CloudClient(Interface):
         self.alexa_user_config = alexa_user_config
         self._alexa_config = None
         self._google_config = None
+        self.cloud = None
 
     @property
     def base_path(self) -> Path:
@@ -90,23 +92,23 @@ class CloudClient(Interface):
 
         return self._alexa_config
 
-    async def get_google_config(self) -> google_config.CloudGoogleConfig:
+    @property
+    def google_config(self) -> google_config.CloudGoogleConfig:
         """Return Google config."""
         if not self._google_config:
             assert self.cloud is not None
-
-            cloud_user = await self._prefs.get_cloud_user()
-
             self._google_config = google_config.CloudGoogleConfig(
-                self._hass, self.google_user_config, cloud_user, self._prefs, self.cloud
+                self._hass, self.google_user_config, self._prefs, self.cloud
             )
-            await self._google_config.async_initialize()
 
         return self._google_config
 
-    async def logged_in(self) -> None:
-        """When user logs in."""
-        await self.prefs.async_set_username(self.cloud.username)
+    async def async_initialize(self, cloud) -> None:
+        """Initialize the client."""
+        self.cloud = cloud
+
+        if not self.cloud.is_logged_in:
+            return
 
         if self.alexa_config.enabled and self.alexa_config.should_report_state:
             try:
@@ -114,18 +116,14 @@ class CloudClient(Interface):
             except alexa_errors.NoTokenAvailable:
                 pass
 
-        if self._prefs.google_enabled:
-            gconf = await self.get_google_config()
+        if self.google_config.enabled:
+            self.google_config.async_enable_local_sdk()
 
-            gconf.async_enable_local_sdk()
-
-            if gconf.should_report_state:
-                gconf.async_enable_report_state()
+            if self.google_config.should_report_state:
+                self.google_config.async_enable_report_state()
 
     async def cleanups(self) -> None:
         """Cleanup some stuff after logout."""
-        await self.prefs.async_set_username(None)
-
         self._google_config = None
 
     @callback
@@ -143,13 +141,8 @@ class CloudClient(Interface):
 
     async def async_alexa_message(self, payload: Dict[Any, Any]) -> Dict[Any, Any]:
         """Process cloud alexa message to client."""
-        cloud_user = await self._prefs.get_cloud_user()
         return await alexa_sh.async_handle_message(
-            self._hass,
-            self.alexa_config,
-            payload,
-            context=Context(user_id=cloud_user),
-            enabled=self._prefs.alexa_enabled,
+            self._hass, self.alexa_config, payload, enabled=self._prefs.alexa_enabled
         )
 
     async def async_google_message(self, payload: Dict[Any, Any]) -> Dict[Any, Any]:
@@ -157,10 +150,8 @@ class CloudClient(Interface):
         if not self._prefs.google_enabled:
             return ga.turned_off_response(payload)
 
-        gconf = await self.get_google_config()
-
         return await ga.async_handle_message(
-            self._hass, gconf, gconf.cloud_user, payload
+            self._hass, self.google_config, self.prefs.cloud_user, payload
         )
 
     async def async_webhook_message(self, payload: Dict[Any, Any]) -> Dict[Any, Any]:

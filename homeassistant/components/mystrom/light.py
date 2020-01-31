@@ -1,23 +1,21 @@
 """Support for myStrom Wifi bulbs."""
 import logging
 
-from pymystrom.bulb import MyStromBulb
-from pymystrom.exceptions import MyStromConnectionError
 import voluptuous as vol
 
+import homeassistant.helpers.config_validation as cv
 from homeassistant.components.light import (
-    ATTR_BRIGHTNESS,
-    ATTR_EFFECT,
-    ATTR_HS_COLOR,
-    PLATFORM_SCHEMA,
-    SUPPORT_BRIGHTNESS,
-    SUPPORT_COLOR,
-    SUPPORT_EFFECT,
-    SUPPORT_FLASH,
     Light,
+    PLATFORM_SCHEMA,
+    ATTR_BRIGHTNESS,
+    SUPPORT_BRIGHTNESS,
+    SUPPORT_EFFECT,
+    ATTR_EFFECT,
+    SUPPORT_FLASH,
+    SUPPORT_COLOR,
+    ATTR_HS_COLOR,
 )
 from homeassistant.const import CONF_HOST, CONF_MAC, CONF_NAME
-import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -41,6 +39,8 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the myStrom Light platform."""
+    from pymystrom.bulb import MyStromBulb
+    from pymystrom.exceptions import MyStromConnectionError
 
     host = config.get(CONF_HOST)
     mac = config.get(CONF_MAC)
@@ -107,6 +107,7 @@ class MyStromLight(Light):
 
     def turn_on(self, **kwargs):
         """Turn on the light."""
+        from pymystrom.exceptions import MyStromConnectionError
 
         brightness = kwargs.get(ATTR_BRIGHTNESS, 255)
         effect = kwargs.get(ATTR_EFFECT)
@@ -135,6 +136,7 @@ class MyStromLight(Light):
 
     def turn_off(self, **kwargs):
         """Turn off the bulb."""
+        from pymystrom.exceptions import MyStromConnectionError
 
         try:
             self._bulb.set_off()
@@ -143,6 +145,7 @@ class MyStromLight(Light):
 
     def update(self):
         """Fetch new state data for this light."""
+        from pymystrom.exceptions import MyStromConnectionError
 
         try:
             self._state = self._bulb.get_status()

@@ -5,26 +5,26 @@ import logging
 import time
 from typing import Optional
 
-from aiohttp import ClientError, ClientSession
 import async_timeout
-from pyalmond import AbstractAlmondWebAuth, AlmondLocalAuth, WebAlmondAPI
+from aiohttp import ClientSession, ClientError
+from pyalmond import AlmondLocalAuth, AbstractAlmondWebAuth, WebAlmondAPI
 import voluptuous as vol
 
-from homeassistant import config_entries
-from homeassistant.auth.const import GROUP_ID_ADMIN
-from homeassistant.components import conversation
-from homeassistant.const import CONF_HOST, CONF_TYPE, EVENT_HOMEASSISTANT_START
-from homeassistant.core import Context, CoreState, HomeAssistant
+from homeassistant.core import HomeAssistant, CoreState
+from homeassistant.const import CONF_TYPE, CONF_HOST, EVENT_HOMEASSISTANT_START
 from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.auth.const import GROUP_ID_ADMIN
 from homeassistant.helpers import (
-    aiohttp_client,
-    config_entry_oauth2_flow,
     config_validation as cv,
+    config_entry_oauth2_flow,
     event,
     intent,
-    network,
+    aiohttp_client,
     storage,
+    network,
 )
+from homeassistant import config_entries
+from homeassistant.components import conversation
 
 from . import config_flow
 from .const import DOMAIN, TYPE_LOCAL, TYPE_OAUTH2
@@ -263,6 +263,8 @@ class AlmondAgent(conversation.AbstractConversationAgent):
         host = self.entry.data["host"]
         if self.entry.data.get("is_hassio"):
             host = "/core_almond"
+        elif self.entry.data["type"] != TYPE_LOCAL:
+            host = f"{host}/me"
         return {
             "text": "Would you like to opt-in to share your anonymized commands with Stanford to improve Almond's responses?",
             "url": f"{host}/conversation",
@@ -277,7 +279,7 @@ class AlmondAgent(conversation.AbstractConversationAgent):
         return True
 
     async def async_process(
-        self, text: str, context: Context, conversation_id: Optional[str] = None
+        self, text: str, conversation_id: Optional[str] = None
     ) -> intent.IntentResponse:
         """Process a sentence."""
         response = await self.api.async_converse_text(text, conversation_id)

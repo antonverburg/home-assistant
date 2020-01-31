@@ -6,37 +6,37 @@ import voluptuous as vol
 
 from homeassistant.components.climate import ClimateDevice
 from homeassistant.components.climate.const import (
-    ATTR_TARGET_TEMP_HIGH,
-    ATTR_TARGET_TEMP_LOW,
-    CURRENT_HVAC_COOL,
-    CURRENT_HVAC_DRY,
-    CURRENT_HVAC_FAN,
-    CURRENT_HVAC_HEAT,
-    CURRENT_HVAC_IDLE,
-    FAN_AUTO,
-    FAN_ON,
-    HVAC_MODE_AUTO,
     HVAC_MODE_COOL,
     HVAC_MODE_HEAT,
+    HVAC_MODE_AUTO,
     HVAC_MODE_OFF,
-    PRESET_AWAY,
-    PRESET_NONE,
-    SUPPORT_AUX_HEAT,
-    SUPPORT_FAN_MODE,
-    SUPPORT_PRESET_MODE,
+    ATTR_TARGET_TEMP_LOW,
+    ATTR_TARGET_TEMP_HIGH,
     SUPPORT_TARGET_TEMPERATURE,
+    SUPPORT_AUX_HEAT,
     SUPPORT_TARGET_TEMPERATURE_RANGE,
+    SUPPORT_FAN_MODE,
+    PRESET_AWAY,
+    FAN_AUTO,
+    FAN_ON,
+    CURRENT_HVAC_IDLE,
+    CURRENT_HVAC_HEAT,
+    CURRENT_HVAC_COOL,
+    SUPPORT_PRESET_MODE,
+    PRESET_NONE,
+    CURRENT_HVAC_FAN,
+    CURRENT_HVAC_DRY,
 )
 from homeassistant.const import (
     ATTR_ENTITY_ID,
-    ATTR_TEMPERATURE,
     STATE_ON,
+    ATTR_TEMPERATURE,
     TEMP_FAHRENHEIT,
 )
-import homeassistant.helpers.config_validation as cv
 from homeassistant.util.temperature import convert
+import homeassistant.helpers.config_validation as cv
 
-from .const import _LOGGER, DOMAIN, ECOBEE_MODEL_TO_NAME, MANUFACTURER
+from .const import DOMAIN, ECOBEE_MODEL_TO_NAME, MANUFACTURER, _LOGGER
 from .util import ecobee_date, ecobee_time
 
 ATTR_COOL_TEMP = "cool_temp"
@@ -550,7 +550,7 @@ class Thermostat(ClimateDevice):
             self.hold_preference(),
         )
         _LOGGER.debug(
-            "Setting ecobee hold_temp to: heat=%s, is=%s, cool=%s, is=%s",
+            "Setting ecobee hold_temp to: heat=%s, is=%s, " "cool=%s, is=%s",
             heat_temp,
             isinstance(heat_temp, (int, float)),
             cool_temp,

@@ -1,21 +1,22 @@
 """Support for the iZone HVAC."""
 import logging
-from typing import List, Optional
+from typing import Optional, List
 
-from pizone import Controller, Zone
+from pizone import Zone, Controller
 
+from homeassistant.core import callback
 from homeassistant.components.climate import ClimateDevice
 from homeassistant.components.climate.const import (
-    FAN_AUTO,
-    FAN_HIGH,
-    FAN_LOW,
-    FAN_MEDIUM,
+    HVAC_MODE_HEAT_COOL,
     HVAC_MODE_COOL,
     HVAC_MODE_DRY,
     HVAC_MODE_FAN_ONLY,
     HVAC_MODE_HEAT,
-    HVAC_MODE_HEAT_COOL,
     HVAC_MODE_OFF,
+    FAN_LOW,
+    FAN_MEDIUM,
+    FAN_HIGH,
+    FAN_AUTO,
     PRESET_ECO,
     PRESET_NONE,
     SUPPORT_FAN_MODE,
@@ -24,24 +25,23 @@ from homeassistant.components.climate.const import (
 )
 from homeassistant.const import (
     ATTR_TEMPERATURE,
-    CONF_EXCLUDE,
     PRECISION_HALVES,
     TEMP_CELSIUS,
+    CONF_EXCLUDE,
 )
-from homeassistant.core import callback
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.temperature import display_temp as show_temp
 from homeassistant.helpers.typing import ConfigType, HomeAssistantType
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 from .const import (
-    DATA_CONFIG,
     DATA_DISCOVERY_SERVICE,
-    DISPATCH_CONTROLLER_DISCONNECTED,
+    IZONE,
     DISPATCH_CONTROLLER_DISCOVERED,
+    DISPATCH_CONTROLLER_DISCONNECTED,
     DISPATCH_CONTROLLER_RECONNECTED,
     DISPATCH_CONTROLLER_UPDATE,
     DISPATCH_ZONE_UPDATE,
-    IZONE,
+    DATA_CONFIG,
 )
 
 _LOGGER = logging.getLogger(__name__)

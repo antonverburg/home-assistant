@@ -11,7 +11,9 @@ import logging
 
 import voluptuous as vol
 
+import homeassistant.helpers.config_validation as cv
 from homeassistant.components.light import (
+    is_on,
     ATTR_BRIGHTNESS,
     ATTR_COLOR_TEMP,
     ATTR_RGB_COLOR,
@@ -20,31 +22,29 @@ from homeassistant.components.light import (
     ATTR_XY_COLOR,
     DOMAIN as LIGHT_DOMAIN,
     VALID_TRANSITION,
-    is_on,
 )
 from homeassistant.components.switch import DOMAIN, SwitchDevice
 from homeassistant.const import (
     ATTR_ENTITY_ID,
-    CONF_LIGHTS,
-    CONF_MODE,
     CONF_NAME,
     CONF_PLATFORM,
+    CONF_LIGHTS,
+    CONF_MODE,
     SERVICE_TURN_ON,
     STATE_ON,
     SUN_EVENT_SUNRISE,
     SUN_EVENT_SUNSET,
 )
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.sun import get_astral_event_date
 from homeassistant.util import slugify
 from homeassistant.util.color import (
+    color_temperature_to_rgb,
     color_RGB_to_xy_brightness,
     color_temperature_kelvin_to_mired,
-    color_temperature_to_rgb,
 )
-from homeassistant.util.dt import as_local, utcnow as dt_utcnow
+from homeassistant.util.dt import utcnow as dt_utcnow, as_local
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -323,7 +323,7 @@ class FluxSwitch(SwitchDevice, RestoreEntity):
         elif self._mode == MODE_RGB:
             await async_set_lights_rgb(self.hass, self._lights, rgb, self._transition)
             _LOGGER.debug(
-                "Lights updated to rgb:%s, %s%% of %s cycle complete at %s",
+                "Lights updated to rgb:%s, %s%% " "of %s cycle complete at %s",
                 rgb,
                 round(percentage_complete * 100),
                 time_state,

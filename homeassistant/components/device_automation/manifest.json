@@ -1,9 +1,12 @@
 {
   "domain": "device_automation",
-  "name": "Device Automation",
+  "name": "Device automation",
   "documentation": "https://www.home-assistant.io/integrations/device_automation",
   "requirements": [],
-  "dependencies": ["webhook"],
-  "codeowners": ["@home-assistant/core"],
-  "quality_scale": "internal"
+  "dependencies": [
+    "webhook"
+  ],
+  "codeowners": [
+    "@home-assistant/core"
+  ]
 }

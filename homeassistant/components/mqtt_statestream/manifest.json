@@ -1,8 +1,10 @@
 {
   "domain": "mqtt_statestream",
-  "name": "MQTT Statestream",
+  "name": "Mqtt statestream",
   "documentation": "https://www.home-assistant.io/integrations/mqtt_statestream",
   "requirements": [],
-  "dependencies": ["mqtt"],
+  "dependencies": [
+    "mqtt"
+  ],
   "codeowners": []
 }

@@ -1,13 +1,12 @@
 """Support for Irish Rail RTPI information."""
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
-from pyirishrail.pyirishrail import IrishRailRTPI
 import voluptuous as vol
 
-from homeassistant.components.sensor import PLATFORM_SCHEMA
-from homeassistant.const import ATTR_ATTRIBUTION, CONF_NAME
 import homeassistant.helpers.config_validation as cv
+from homeassistant.components.sensor import PLATFORM_SCHEMA
+from homeassistant.const import CONF_NAME, ATTR_ATTRIBUTION
 from homeassistant.helpers.entity import Entity
 
 _LOGGER = logging.getLogger(__name__)
@@ -48,6 +47,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the Irish Rail transport sensor."""
+    from pyirishrail.pyirishrail import IrishRailRTPI
 
     station = config.get(CONF_STATION)
     direction = config.get(CONF_DIRECTION)

@@ -1,11 +1,10 @@
 """Test real IP middleware."""
-from ipaddress import ip_network
-
 from aiohttp import web
 from aiohttp.hdrs import X_FORWARDED_FOR
+from ipaddress import ip_network
 
-from homeassistant.components.http.const import KEY_REAL_IP
 from homeassistant.components.http.real_ip import setup_real_ip
+from homeassistant.components.http.const import KEY_REAL_IP
 
 
 async def mock_handler(request):

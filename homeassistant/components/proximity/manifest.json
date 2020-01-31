@@ -3,7 +3,9 @@
   "name": "Proximity",
   "documentation": "https://www.home-assistant.io/integrations/proximity",
   "requirements": [],
-  "dependencies": ["device_tracker", "zone"],
-  "codeowners": [],
-  "quality_scale": "internal"
+  "dependencies": [
+    "device_tracker",
+    "zone"
+  ],
+  "codeowners": []
 }

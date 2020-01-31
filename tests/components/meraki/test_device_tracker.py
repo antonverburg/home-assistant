@@ -1,16 +1,14 @@
 """The tests the for Meraki device tracker."""
+import asyncio
 import json
 
 import pytest
 
-import homeassistant.components.device_tracker as device_tracker
-from homeassistant.components.meraki.device_tracker import (
-    CONF_SECRET,
-    CONF_VALIDATOR,
-    URL,
-)
-from homeassistant.const import CONF_PLATFORM
+from homeassistant.components.meraki.device_tracker import CONF_VALIDATOR, CONF_SECRET
 from homeassistant.setup import async_setup_component
+import homeassistant.components.device_tracker as device_tracker
+from homeassistant.const import CONF_PLATFORM
+from homeassistant.components.meraki.device_tracker import URL
 
 
 @pytest.fixture
@@ -33,38 +31,39 @@ def meraki_client(loop, hass, hass_client):
     yield loop.run_until_complete(hass_client())
 
 
-async def test_invalid_or_missing_data(mock_device_tracker_conf, meraki_client):
+@asyncio.coroutine
+def test_invalid_or_missing_data(mock_device_tracker_conf, meraki_client):
     """Test validator with invalid or missing data."""
-    req = await meraki_client.get(URL)
-    text = await req.text()
+    req = yield from meraki_client.get(URL)
+    text = yield from req.text()
     assert req.status == 200
     assert text == "validator"
 
-    req = await meraki_client.post(URL, data=b"invalid")
-    text = await req.json()
+    req = yield from meraki_client.post(URL, data=b"invalid")
+    text = yield from req.json()
     assert req.status == 400
     assert text["message"] == "Invalid JSON"
 
-    req = await meraki_client.post(URL, data=b"{}")
-    text = await req.json()
+    req = yield from meraki_client.post(URL, data=b"{}")
+    text = yield from req.json()
     assert req.status == 422
     assert text["message"] == "No secret"
 
     data = {"version": "1.0", "secret": "secret"}
-    req = await meraki_client.post(URL, data=json.dumps(data))
-    text = await req.json()
+    req = yield from meraki_client.post(URL, data=json.dumps(data))
+    text = yield from req.json()
     assert req.status == 422
     assert text["message"] == "Invalid version"
 
     data = {"version": "2.0", "secret": "invalid"}
-    req = await meraki_client.post(URL, data=json.dumps(data))
-    text = await req.json()
+    req = yield from meraki_client.post(URL, data=json.dumps(data))
+    text = yield from req.json()
     assert req.status == 422
     assert text["message"] == "Invalid secret"
 
     data = {"version": "2.0", "secret": "secret", "type": "InvalidType"}
-    req = await meraki_client.post(URL, data=json.dumps(data))
-    text = await req.json()
+    req = yield from meraki_client.post(URL, data=json.dumps(data))
+    text = yield from req.json()
     assert req.status == 422
     assert text["message"] == "Invalid device type"
 
@@ -74,11 +73,12 @@ async def test_invalid_or_missing_data(mock_device_tracker_conf, meraki_client):
         "type": "BluetoothDevicesSeen",
         "data": {"observations": []},
     }
-    req = await meraki_client.post(URL, data=json.dumps(data))
+    req = yield from meraki_client.post(URL, data=json.dumps(data))
     assert req.status == 200
 
 
-async def test_data_will_be_saved(mock_device_tracker_conf, hass, meraki_client):
+@asyncio.coroutine
+def test_data_will_be_saved(mock_device_tracker_conf, hass, meraki_client):
     """Test with valid data."""
     data = {
         "version": "2.0",
@@ -119,9 +119,9 @@ async def test_data_will_be_saved(mock_device_tracker_conf, hass, meraki_client)
             ]
         },
     }
-    req = await meraki_client.post(URL, data=json.dumps(data))
+    req = yield from meraki_client.post(URL, data=json.dumps(data))
     assert req.status == 200
-    await hass.async_block_till_done()
+    yield from hass.async_block_till_done()
     state_name = hass.states.get(
         "{}.{}".format("device_tracker", "00_26_ab_b8_a9_a4")
     ).state

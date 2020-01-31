@@ -1,8 +1,10 @@
 {
   "domain": "streamlabswater",
-  "name": "StreamLabs",
+  "name": "Streamlabs Water",
   "documentation": "https://www.home-assistant.io/integrations/streamlabswater",
-  "requirements": ["streamlabswater==1.0.1"],
+  "requirements": [
+    "streamlabswater==1.0.1"
+  ],
   "dependencies": [],
   "codeowners": []
 }

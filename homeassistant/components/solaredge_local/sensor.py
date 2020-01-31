@@ -1,10 +1,10 @@
 """Support for SolarEdge-local Monitoring API."""
-from copy import deepcopy
-from datetime import timedelta
 import logging
+from datetime import timedelta
 import statistics
+from copy import deepcopy
 
-from requests.exceptions import ConnectTimeout, HTTPError
+from requests.exceptions import HTTPError, ConnectTimeout
 from solaredge_local import SolarEdge
 import voluptuous as vol
 
@@ -12,8 +12,8 @@ from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.const import (
     CONF_IP_ADDRESS,
     CONF_NAME,
-    ENERGY_WATT_HOUR,
     POWER_WATT,
+    ENERGY_WATT_HOUR,
     TEMP_CELSIUS,
     TEMP_FAHRENHEIT,
 )

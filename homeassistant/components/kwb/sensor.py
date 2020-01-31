@@ -1,19 +1,18 @@
 """Support for KWB Easyfire."""
 import logging
 
-from pykwb import kwb
 import voluptuous as vol
 
-from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.const import (
-    CONF_DEVICE,
     CONF_HOST,
-    CONF_NAME,
     CONF_PORT,
+    CONF_DEVICE,
+    CONF_NAME,
     EVENT_HOMEASSISTANT_STOP,
 )
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity
+from homeassistant.components.sensor import PLATFORM_SCHEMA
+import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -56,6 +55,8 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     connection_type = config.get(CONF_TYPE)
     raw = config.get(CONF_RAW)
     client_name = config.get(CONF_NAME)
+
+    from pykwb import kwb
 
     if connection_type == "serial":
         easyfire = kwb.KWBEasyfire(MODE_SERIAL, "", 0, device)

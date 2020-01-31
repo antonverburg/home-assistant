@@ -1,9 +1,7 @@
 """Support for device connected via Lightwave WiFi-link hub."""
-from lightwave.lightwave import LWLink
 import voluptuous as vol
-
-from homeassistant.const import CONF_HOST, CONF_LIGHTS, CONF_NAME, CONF_SWITCHES
 import homeassistant.helpers.config_validation as cv
+from homeassistant.const import CONF_HOST, CONF_LIGHTS, CONF_NAME, CONF_SWITCHES
 from homeassistant.helpers.discovery import async_load_platform
 
 LIGHTWAVE_LINK = "lightwave_link"
@@ -34,6 +32,7 @@ CONFIG_SCHEMA = vol.Schema(
 
 async def async_setup(hass, config):
     """Try to start embedded Lightwave broker."""
+    from lightwave.lightwave import LWLink
 
     host = config[DOMAIN][CONF_HOST]
     hass.data[LIGHTWAVE_LINK] = LWLink(host)

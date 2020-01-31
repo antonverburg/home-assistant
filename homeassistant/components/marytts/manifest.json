@@ -1,6 +1,6 @@
 {
   "domain": "marytts",
-  "name": "MaryTTS",
+  "name": "Marytts",
   "documentation": "https://www.home-assistant.io/integrations/marytts",
   "requirements": [],
   "dependencies": [],
